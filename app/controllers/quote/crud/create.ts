@@ -29,20 +29,25 @@ export default class Create {
       settings.nextQuoteNumber = null
       await settings.save()
     } else {
-      // Generate next quote number
+      // Generate next quote number from pattern
+      const pattern = settings?.quoteFilenamePattern || 'DEV-{annee}-{numero}'
+      const currentYear = new Date().getFullYear().toString()
+      const prefix = pattern.replace('{annee}', currentYear).replace('{numero}', '')
+
       const lastQuote = await Quote.query()
         .where('team_id', teamId)
+        .where('quote_number', 'like', `${prefix}%`)
         .orderBy('created_at', 'desc')
         .first()
 
-      quoteNumber = 'DEV-001'
+      let nextNum = 1
       if (lastQuote) {
-        const match = lastQuote.quoteNumber.match(/^DEV-(\d+)$/)
-        if (match) {
-          const num = parseInt(match[1], 10) + 1
-          quoteNumber = `DEV-${num.toString().padStart(3, '0')}`
-        }
+        const numStr = lastQuote.quoteNumber.slice(prefix.length)
+        const parsed = parseInt(numStr, 10)
+        if (!isNaN(parsed)) nextNum = parsed + 1
       }
+
+      quoteNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`
     }
 
     // Calculate totals from lines

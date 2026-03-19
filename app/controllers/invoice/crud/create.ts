@@ -29,20 +29,25 @@ export default class Create {
       settings.nextInvoiceNumber = null
       await settings.save()
     } else {
-      // Generate next invoice number
+      // Generate next invoice number from pattern
+      const pattern = settings?.invoiceFilenamePattern || 'FAC-{annee}-{numero}'
+      const currentYear = new Date().getFullYear().toString()
+      const prefix = pattern.replace('{annee}', currentYear).replace('{numero}', '')
+
       const lastInvoice = await Invoice.query()
         .where('team_id', teamId)
+        .where('invoice_number', 'like', `${prefix}%`)
         .orderBy('created_at', 'desc')
         .first()
 
-      invoiceNumber = 'FAC-001'
+      let nextNum = 1
       if (lastInvoice) {
-        const match = lastInvoice.invoiceNumber.match(/^FAC-(\d+)$/)
-        if (match) {
-          const num = parseInt(match[1], 10) + 1
-          invoiceNumber = `FAC-${num.toString().padStart(3, '0')}`
-        }
+        const numStr = lastInvoice.invoiceNumber.slice(prefix.length)
+        const parsed = parseInt(numStr, 10)
+        if (!isNaN(parsed)) nextNum = parsed + 1
       }
+
+      invoiceNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`
     }
 
     // Calculate totals from lines

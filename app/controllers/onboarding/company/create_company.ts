@@ -1,7 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Company from '#models/team/company'
+import BankAccount from '#models/team/bank_account'
 import { createCompanyValidator } from '#validators/auth/onboarding_validators'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 
 export default class CreateCompany {
   async handle(ctx: HttpContext) {
@@ -46,6 +48,24 @@ export default class CreateCompany {
     encryptModelFields(companyData, [...ENCRYPTED_FIELDS.company], dek)
 
     const company = await Company.create(companyData)
+
+    // Also create a BankAccount record so bank info appears in settings
+    if (payload.iban || payload.bic || payload.bankName) {
+      let encryptedIban: string | null = payload.iban ?? null
+      let encryptedBic: string | null = payload.bic ?? null
+
+      if (encryptedIban) encryptedIban = zeroAccessCryptoService.encryptField(encryptedIban, dek)
+      if (encryptedBic) encryptedBic = zeroAccessCryptoService.encryptField(encryptedBic, dek)
+
+      await BankAccount.create({
+        teamId: user.currentTeamId,
+        label: payload.bankName || 'Compte principal',
+        bankName: payload.bankName ?? null,
+        iban: encryptedIban,
+        bic: encryptedBic,
+        isDefault: true,
+      })
+    }
 
     return response.created({
       message: 'Company created successfully',
