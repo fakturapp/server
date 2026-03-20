@@ -147,4 +147,11 @@ export interface ApiDefinition {
   creditNoteDuplicate: typeof routes['credit_note_duplicate']
   creditNoteUpdate: typeof routes['credit_note_update']
   creditNoteDelete: typeof routes['credit_note_delete']
+  recurringInvoiceList: typeof routes['recurring_invoice_list']
+  recurringInvoiceShow: typeof routes['recurring_invoice_show']
+  recurringInvoiceCreate: typeof routes['recurring_invoice_create']
+  recurringInvoiceUpdate: typeof routes['recurring_invoice_update']
+  recurringInvoiceDelete: typeof routes['recurring_invoice_delete']
+  recurringInvoiceGenerate: typeof routes['recurring_invoice_generate']
+  recurringInvoiceToggleActive: typeof routes['recurring_invoice_toggle_active']
 }

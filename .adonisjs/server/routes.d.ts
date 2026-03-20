@@ -142,6 +142,13 @@ export type ScannedRoutes = {
     'credit_note_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring_invoice_list': { paramsTuple?: []; params?: {} }
+    'recurring_invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring_invoice_create': { paramsTuple?: []; params?: {} }
+    'recurring_invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring_invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring_invoice_generate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring_invoice_toggle_active': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -199,6 +206,8 @@ export type ScannedRoutes = {
     'credit_note_create': { paramsTuple?: []; params?: {} }
     'credit_note_convert_invoice': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring_invoice_create': { paramsTuple?: []; params?: {} }
+    'recurring_invoice_generate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -251,6 +260,8 @@ export type ScannedRoutes = {
     'credit_note_next_number': { paramsTuple?: []; params?: {} }
     'credit_note_list': { paramsTuple?: []; params?: {} }
     'credit_note_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring_invoice_list': { paramsTuple?: []; params?: {} }
+    'recurring_invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -303,6 +314,8 @@ export type ScannedRoutes = {
     'credit_note_next_number': { paramsTuple?: []; params?: {} }
     'credit_note_list': { paramsTuple?: []; params?: {} }
     'credit_note_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring_invoice_list': { paramsTuple?: []; params?: {} }
+    'recurring_invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -318,6 +331,7 @@ export type ScannedRoutes = {
     'invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'product_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring_invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -332,6 +346,7 @@ export type ScannedRoutes = {
     'email_accounts_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'product_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring_invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -342,6 +357,7 @@ export type ScannedRoutes = {
     'email_accounts_set_default': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_update_comment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'recurring_invoice_toggle_active': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

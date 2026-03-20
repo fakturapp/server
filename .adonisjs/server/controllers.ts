@@ -246,4 +246,17 @@ export const controllers = {
       UpdateComment: () => import('#controllers/credit_note/operations/update_comment'),
     },
   },
+  recurringInvoice: {
+    crud: {
+      Create: () => import('#controllers/recurring_invoice/crud/create'),
+      List: () => import('#controllers/recurring_invoice/crud/list'),
+      Show: () => import('#controllers/recurring_invoice/crud/show'),
+      Update: () => import('#controllers/recurring_invoice/crud/update'),
+      Delete: () => import('#controllers/recurring_invoice/crud/delete'),
+    },
+    operations: {
+      Generate: () => import('#controllers/recurring_invoice/operations/generate'),
+      ToggleActive: () => import('#controllers/recurring_invoice/operations/toggle_active'),
+    },
+  },
 }

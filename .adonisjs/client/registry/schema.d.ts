@@ -1663,4 +1663,88 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/crud/delete').default['handle']>>>
     }
   }
+  'recurring_invoice_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/recurring-invoices'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/crud/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/crud/list').default['handle']>>>
+    }
+  }
+  'recurring_invoice_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/recurring-invoices/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/crud/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/crud/show').default['handle']>>>
+    }
+  }
+  'recurring_invoice_create': {
+    methods: ["POST"]
+    pattern: '/api/v1/recurring-invoices'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/recurring_invoice_validator').createRecurringInvoiceValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/recurring_invoice_validator').createRecurringInvoiceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/crud/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/crud/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'recurring_invoice_update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/recurring-invoices/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/recurring_invoice_validator').createRecurringInvoiceValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/recurring_invoice_validator').createRecurringInvoiceValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/crud/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/crud/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'recurring_invoice_delete': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/recurring-invoices/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/crud/delete').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/crud/delete').default['handle']>>>
+    }
+  }
+  'recurring_invoice_generate': {
+    methods: ["POST"]
+    pattern: '/api/v1/recurring-invoices/:id/generate'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/operations/generate').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/operations/generate').default['handle']>>>
+    }
+  }
+  'recurring_invoice_toggle_active': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/recurring-invoices/:id/toggle-active'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/operations/toggle_active').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/operations/toggle_active').default['handle']>>>
+    }
+  }
 }

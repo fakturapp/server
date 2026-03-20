@@ -834,6 +834,48 @@ const routes = {
     tokens: [{"old":"/api/v1/credit-notes/:id","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes/:id","type":0,"val":"credit-notes","end":""},{"old":"/api/v1/credit-notes/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['credit_note_delete']['types'],
   },
+  'recurring_invoice_list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/recurring-invoices',
+    tokens: [{"old":"/api/v1/recurring-invoices","type":0,"val":"api","end":""},{"old":"/api/v1/recurring-invoices","type":0,"val":"v1","end":""},{"old":"/api/v1/recurring-invoices","type":0,"val":"recurring-invoices","end":""}],
+    types: placeholder as Registry['recurring_invoice_list']['types'],
+  },
+  'recurring_invoice_show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/recurring-invoices/:id',
+    tokens: [{"old":"/api/v1/recurring-invoices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/recurring-invoices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/recurring-invoices/:id","type":0,"val":"recurring-invoices","end":""},{"old":"/api/v1/recurring-invoices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['recurring_invoice_show']['types'],
+  },
+  'recurring_invoice_create': {
+    methods: ["POST"],
+    pattern: '/api/v1/recurring-invoices',
+    tokens: [{"old":"/api/v1/recurring-invoices","type":0,"val":"api","end":""},{"old":"/api/v1/recurring-invoices","type":0,"val":"v1","end":""},{"old":"/api/v1/recurring-invoices","type":0,"val":"recurring-invoices","end":""}],
+    types: placeholder as Registry['recurring_invoice_create']['types'],
+  },
+  'recurring_invoice_update': {
+    methods: ["PUT"],
+    pattern: '/api/v1/recurring-invoices/:id',
+    tokens: [{"old":"/api/v1/recurring-invoices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/recurring-invoices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/recurring-invoices/:id","type":0,"val":"recurring-invoices","end":""},{"old":"/api/v1/recurring-invoices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['recurring_invoice_update']['types'],
+  },
+  'recurring_invoice_delete': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/recurring-invoices/:id',
+    tokens: [{"old":"/api/v1/recurring-invoices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/recurring-invoices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/recurring-invoices/:id","type":0,"val":"recurring-invoices","end":""},{"old":"/api/v1/recurring-invoices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['recurring_invoice_delete']['types'],
+  },
+  'recurring_invoice_generate': {
+    methods: ["POST"],
+    pattern: '/api/v1/recurring-invoices/:id/generate',
+    tokens: [{"old":"/api/v1/recurring-invoices/:id/generate","type":0,"val":"api","end":""},{"old":"/api/v1/recurring-invoices/:id/generate","type":0,"val":"v1","end":""},{"old":"/api/v1/recurring-invoices/:id/generate","type":0,"val":"recurring-invoices","end":""},{"old":"/api/v1/recurring-invoices/:id/generate","type":1,"val":"id","end":""},{"old":"/api/v1/recurring-invoices/:id/generate","type":0,"val":"generate","end":""}],
+    types: placeholder as Registry['recurring_invoice_generate']['types'],
+  },
+  'recurring_invoice_toggle_active': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/recurring-invoices/:id/toggle-active',
+    tokens: [{"old":"/api/v1/recurring-invoices/:id/toggle-active","type":0,"val":"api","end":""},{"old":"/api/v1/recurring-invoices/:id/toggle-active","type":0,"val":"v1","end":""},{"old":"/api/v1/recurring-invoices/:id/toggle-active","type":0,"val":"recurring-invoices","end":""},{"old":"/api/v1/recurring-invoices/:id/toggle-active","type":1,"val":"id","end":""},{"old":"/api/v1/recurring-invoices/:id/toggle-active","type":0,"val":"toggle-active","end":""}],
+    types: placeholder as Registry['recurring_invoice_toggle_active']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }
