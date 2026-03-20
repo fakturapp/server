@@ -16,6 +16,9 @@ const InvoiceUpdateStatus = () => import('#controllers/invoice/operations/update
 const InvoiceUnlinkQuote = () => import('#controllers/invoice/operations/unlink_quote')
 const InvoiceDuplicate = () => import('#controllers/invoice/operations/duplicate')
 const InvoiceUpdateComment = () => import('#controllers/invoice/operations/update_comment')
+const InvoicePaymentIndex = () => import('#controllers/invoice/payments/index')
+const InvoicePaymentStore = () => import('#controllers/invoice/payments/store')
+const InvoicePaymentDestroy = () => import('#controllers/invoice/payments/destroy')
 
 router
   .group(() => {
@@ -33,6 +36,11 @@ router
     router.post('/:id/duplicate', [InvoiceDuplicate, 'handle'])
     router.put('/:id', [InvoiceUpdate, 'handle'])
     router.delete('/:id', [InvoiceDelete, 'handle'])
+
+    // Payments (partial payments / installments)
+    router.get('/:invoiceId/payments', [InvoicePaymentIndex, 'handle'])
+    router.post('/:invoiceId/payments', [InvoicePaymentStore, 'handle'])
+    router.delete('/:invoiceId/payments/:id', [InvoicePaymentDestroy, 'handle'])
   })
   .prefix(API_PREFIX + '/invoices')
   .use(middleware.auth())

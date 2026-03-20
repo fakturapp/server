@@ -144,4 +144,6 @@ export const ENCRYPTED_FIELDS = {
   recurringInvoiceLine: ['description', 'saleType', 'unit'] as const,
 
   expense: ['description', 'supplier', 'notes'] as const,
+
+  invoicePayment: ['paymentMethod', 'notes'] as const,
 } as const
