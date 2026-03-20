@@ -2,7 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import AiService from '#services/ai/ai_service'
 import Client from '#models/client/client'
-import Company from '#models/company/company'
+import Company from '#models/team/company'
 import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 const generateDocumentValidator = vine.compile(
@@ -37,7 +37,7 @@ export default class GenerateDocument {
     const company = await Company.findBy('teamId', teamId)
     if (company) {
       decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
-      companyContext = `Entreprise émettrice: ${company.name || ''}, ${company.city || ''}`
+      companyContext = `Entreprise émettrice: ${company.legalName || ''}, ${company.city || ''}`
     }
 
     // Load client info if provided
