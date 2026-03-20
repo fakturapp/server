@@ -14,6 +14,7 @@ import '#start/routes/invoice'
 import '#start/routes/einvoicing'
 import '#start/routes/email'
 import '#start/routes/product'
+import '#start/routes/credit_note'
 
 router.get(API_PREFIX + '/', async () => {
   return {

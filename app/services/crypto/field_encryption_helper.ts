@@ -112,4 +112,19 @@ export const ENCRYPTED_FIELDS = {
   invoiceSetting: ['pdpApiKey'] as const,
 
   product: ['name', 'description', 'reference', 'unit', 'saleType'] as const,
+
+  creditNote: [
+    'reason',
+    'subject',
+    'notes',
+    'acceptanceConditions',
+    'documentTitle',
+    'freeField',
+    'deliveryAddress',
+    'clientSiren',
+    'clientVatNumber',
+    'comment',
+  ] as const,
+
+  creditNoteLine: ['description', 'saleType', 'unit'] as const,
 } as const
