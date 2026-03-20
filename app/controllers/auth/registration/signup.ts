@@ -5,11 +5,18 @@ import { registerValidator } from '#validators/auth/auth_validators'
 import TokenService from '#services/auth/token_service'
 import EmailService from '#services/email/email_service'
 import AuditLog from '#models/shared/audit_log'
+import TurnstileService from '#services/security/turnstile_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 
 export default class Signup {
   async handle({ request, response }: HttpContext) {
     const data = await request.validateUsing(registerValidator)
+
+    // Verify Turnstile captcha
+    const turnstileValid = await TurnstileService.verifyToken(data.turnstileToken || '', request.ip())
+    if (!turnstileValid) {
+      return response.forbidden({ message: 'Captcha verification failed' })
+    }
 
     const saltKdf = zeroAccessCryptoService.generateSalt()
 

@@ -55,4 +55,7 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Google OAuth (for login/register authentication)
   GOOGLE_AUTH_REDIRECT_URI: Env.schema.string.optional(),
+
+  // Cloudflare Turnstile (captcha)
+  CLOUDFLARE_TURNSTILE_SECRET_KEY: Env.schema.string.optional(),
 })

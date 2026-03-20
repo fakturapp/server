@@ -14,6 +14,7 @@ export const registerValidator = vine.compile(
         return !user
       }),
     password: vine.string().minLength(securityConfig.password.minLength).maxLength(128).confirmed(),
+    turnstileToken: vine.string().optional(),
   })
 )
 
@@ -21,6 +22,7 @@ export const loginValidator = vine.compile(
   vine.object({
     email: vine.string().trim().email().normalizeEmail(),
     password: vine.string(),
+    turnstileToken: vine.string().optional(),
   })
 )
 

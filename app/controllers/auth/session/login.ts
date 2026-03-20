@@ -7,14 +7,21 @@ import LoginHistory from '#models/account/login_history'
 import AuditLog from '#models/shared/audit_log'
 import { loginValidator } from '#validators/auth/auth_validators'
 import TwoFactorService from '#services/auth/two_factor_service'
+import TurnstileService from '#services/security/turnstile_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 
 export default class Login {
   async handle({ request, response }: HttpContext) {
-    const { email, password, code } = request.only(['email', 'password', 'code'])
+    const { email, password, code, turnstileToken } = request.only(['email', 'password', 'code', 'turnstileToken'])
 
     await request.validateUsing(loginValidator)
+
+    // Verify Turnstile captcha
+    const turnstileValid = await TurnstileService.verifyToken(turnstileToken || '', request.ip())
+    if (!turnstileValid) {
+      return response.forbidden({ message: 'Captcha verification failed' })
+    }
 
     const user = await User.findBy('email', email)
 
