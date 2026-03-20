@@ -154,4 +154,8 @@ export interface ApiDefinition {
   recurringInvoiceDelete: typeof routes['recurring_invoice_delete']
   recurringInvoiceGenerate: typeof routes['recurring_invoice_generate']
   recurringInvoiceToggleActive: typeof routes['recurring_invoice_toggle_active']
+  reminderSettingsGet: typeof routes['reminder_settings_get']
+  reminderSettingsUpdate: typeof routes['reminder_settings_update']
+  sendReminder: typeof routes['send_reminder']
+  listReminders: typeof routes['list_reminders']
 }

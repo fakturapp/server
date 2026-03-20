@@ -1747,4 +1747,52 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/recurring_invoice/operations/toggle_active').default['handle']>>>
     }
   }
+  'reminder_settings_get': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/reminders/settings'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/reminder/settings/get').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reminder/settings/get').default['handle']>>>
+    }
+  }
+  'reminder_settings_update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/reminders/settings'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/reminder/settings/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reminder/settings/update').default['handle']>>>
+    }
+  }
+  'send_reminder': {
+    methods: ["POST"]
+    pattern: '/api/v1/reminders/invoices/:id/send'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/reminder/operations/send_reminder').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reminder/operations/send_reminder').default['handle']>>>
+    }
+  }
+  'list_reminders': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/reminders/invoices/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/reminder/operations/list_reminders').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/reminder/operations/list_reminders').default['handle']>>>
+    }
+  }
 }

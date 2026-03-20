@@ -876,6 +876,30 @@ const routes = {
     tokens: [{"old":"/api/v1/recurring-invoices/:id/toggle-active","type":0,"val":"api","end":""},{"old":"/api/v1/recurring-invoices/:id/toggle-active","type":0,"val":"v1","end":""},{"old":"/api/v1/recurring-invoices/:id/toggle-active","type":0,"val":"recurring-invoices","end":""},{"old":"/api/v1/recurring-invoices/:id/toggle-active","type":1,"val":"id","end":""},{"old":"/api/v1/recurring-invoices/:id/toggle-active","type":0,"val":"toggle-active","end":""}],
     types: placeholder as Registry['recurring_invoice_toggle_active']['types'],
   },
+  'reminder_settings_get': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/reminders/settings',
+    tokens: [{"old":"/api/v1/reminders/settings","type":0,"val":"api","end":""},{"old":"/api/v1/reminders/settings","type":0,"val":"v1","end":""},{"old":"/api/v1/reminders/settings","type":0,"val":"reminders","end":""},{"old":"/api/v1/reminders/settings","type":0,"val":"settings","end":""}],
+    types: placeholder as Registry['reminder_settings_get']['types'],
+  },
+  'reminder_settings_update': {
+    methods: ["PUT"],
+    pattern: '/api/v1/reminders/settings',
+    tokens: [{"old":"/api/v1/reminders/settings","type":0,"val":"api","end":""},{"old":"/api/v1/reminders/settings","type":0,"val":"v1","end":""},{"old":"/api/v1/reminders/settings","type":0,"val":"reminders","end":""},{"old":"/api/v1/reminders/settings","type":0,"val":"settings","end":""}],
+    types: placeholder as Registry['reminder_settings_update']['types'],
+  },
+  'send_reminder': {
+    methods: ["POST"],
+    pattern: '/api/v1/reminders/invoices/:id/send',
+    tokens: [{"old":"/api/v1/reminders/invoices/:id/send","type":0,"val":"api","end":""},{"old":"/api/v1/reminders/invoices/:id/send","type":0,"val":"v1","end":""},{"old":"/api/v1/reminders/invoices/:id/send","type":0,"val":"reminders","end":""},{"old":"/api/v1/reminders/invoices/:id/send","type":0,"val":"invoices","end":""},{"old":"/api/v1/reminders/invoices/:id/send","type":1,"val":"id","end":""},{"old":"/api/v1/reminders/invoices/:id/send","type":0,"val":"send","end":""}],
+    types: placeholder as Registry['send_reminder']['types'],
+  },
+  'list_reminders': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/reminders/invoices/:id',
+    tokens: [{"old":"/api/v1/reminders/invoices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/reminders/invoices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/reminders/invoices/:id","type":0,"val":"reminders","end":""},{"old":"/api/v1/reminders/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/api/v1/reminders/invoices/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['list_reminders']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

@@ -149,6 +149,10 @@ export type ScannedRoutes = {
     'recurring_invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_generate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_toggle_active': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'reminder_settings_get': { paramsTuple?: []; params?: {} }
+    'reminder_settings_update': { paramsTuple?: []; params?: {} }
+    'send_reminder': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'list_reminders': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -208,6 +212,7 @@ export type ScannedRoutes = {
     'credit_note_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_create': { paramsTuple?: []; params?: {} }
     'recurring_invoice_generate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'send_reminder': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -262,6 +267,8 @@ export type ScannedRoutes = {
     'credit_note_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_list': { paramsTuple?: []; params?: {} }
     'recurring_invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'reminder_settings_get': { paramsTuple?: []; params?: {} }
+    'list_reminders': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -316,6 +323,8 @@ export type ScannedRoutes = {
     'credit_note_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_list': { paramsTuple?: []; params?: {} }
     'recurring_invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'reminder_settings_get': { paramsTuple?: []; params?: {} }
+    'list_reminders': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -332,6 +341,7 @@ export type ScannedRoutes = {
     'product_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'reminder_settings_update': { paramsTuple?: []; params?: {} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

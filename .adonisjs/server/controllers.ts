@@ -259,4 +259,14 @@ export const controllers = {
       ToggleActive: () => import('#controllers/recurring_invoice/operations/toggle_active'),
     },
   },
+  reminder: {
+    settings: {
+      Get: () => import('#controllers/reminder/settings/get'),
+      Update: () => import('#controllers/reminder/settings/update'),
+    },
+    operations: {
+      SendReminder: () => import('#controllers/reminder/operations/send_reminder'),
+      ListReminders: () => import('#controllers/reminder/operations/list_reminders'),
+    },
+  },
 }
