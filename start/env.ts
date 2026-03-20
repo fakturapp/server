@@ -58,4 +58,8 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   // Cloudflare Turnstile (captcha)
   CLOUDFLARE_TURNSTILE_SECRET_KEY: Env.schema.string.optional(),
+
+  // OCR (receipt extraction)
+  OCR_PROVIDER: Env.schema.enum.optional(['mock', 'mindee'] as const),
+  MINDEE_API_KEY: Env.schema.string.optional(),
 })

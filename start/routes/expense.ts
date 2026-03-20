@@ -9,6 +9,7 @@ const ExpenseDelete = () => import('#controllers/expense/crud/delete')
 const ExpenseCategoryList = () => import('#controllers/expense/categories/list')
 const ExpenseCategoryCreate = () => import('#controllers/expense/categories/create')
 const ExpenseCategoryDelete = () => import('#controllers/expense/categories/delete')
+const ParseReceipt = () => import('#controllers/expense/ocr/parse_receipt')
 
 router
   .group(() => {
@@ -22,6 +23,9 @@ router
     router.get('/categories', [ExpenseCategoryList, 'handle'])
     router.post('/categories', [ExpenseCategoryCreate, 'handle'])
     router.delete('/categories/:id', [ExpenseCategoryDelete, 'handle'])
+
+    // OCR receipt extraction
+    router.post('/parse-receipt', [ParseReceipt, 'handle'])
   })
   .prefix(API_PREFIX + '/expenses')
   .use(middleware.auth())
