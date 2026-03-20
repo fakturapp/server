@@ -900,6 +900,48 @@ const routes = {
     tokens: [{"old":"/api/v1/reminders/invoices/:id","type":0,"val":"api","end":""},{"old":"/api/v1/reminders/invoices/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/reminders/invoices/:id","type":0,"val":"reminders","end":""},{"old":"/api/v1/reminders/invoices/:id","type":0,"val":"invoices","end":""},{"old":"/api/v1/reminders/invoices/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['list_reminders']['types'],
   },
+  'expense_list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/expenses',
+    tokens: [{"old":"/api/v1/expenses","type":0,"val":"api","end":""},{"old":"/api/v1/expenses","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses","type":0,"val":"expenses","end":""}],
+    types: placeholder as Registry['expense_list']['types'],
+  },
+  'expense_create': {
+    methods: ["POST"],
+    pattern: '/api/v1/expenses',
+    tokens: [{"old":"/api/v1/expenses","type":0,"val":"api","end":""},{"old":"/api/v1/expenses","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses","type":0,"val":"expenses","end":""}],
+    types: placeholder as Registry['expense_create']['types'],
+  },
+  'expense_update': {
+    methods: ["PUT"],
+    pattern: '/api/v1/expenses/:id',
+    tokens: [{"old":"/api/v1/expenses/:id","type":0,"val":"api","end":""},{"old":"/api/v1/expenses/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses/:id","type":0,"val":"expenses","end":""},{"old":"/api/v1/expenses/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['expense_update']['types'],
+  },
+  'expense_delete': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/expenses/:id',
+    tokens: [{"old":"/api/v1/expenses/:id","type":0,"val":"api","end":""},{"old":"/api/v1/expenses/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses/:id","type":0,"val":"expenses","end":""},{"old":"/api/v1/expenses/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['expense_delete']['types'],
+  },
+  'expense_category_list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/expenses/categories',
+    tokens: [{"old":"/api/v1/expenses/categories","type":0,"val":"api","end":""},{"old":"/api/v1/expenses/categories","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses/categories","type":0,"val":"expenses","end":""},{"old":"/api/v1/expenses/categories","type":0,"val":"categories","end":""}],
+    types: placeholder as Registry['expense_category_list']['types'],
+  },
+  'expense_category_create': {
+    methods: ["POST"],
+    pattern: '/api/v1/expenses/categories',
+    tokens: [{"old":"/api/v1/expenses/categories","type":0,"val":"api","end":""},{"old":"/api/v1/expenses/categories","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses/categories","type":0,"val":"expenses","end":""},{"old":"/api/v1/expenses/categories","type":0,"val":"categories","end":""}],
+    types: placeholder as Registry['expense_category_create']['types'],
+  },
+  'expense_category_delete': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/expenses/categories/:id',
+    tokens: [{"old":"/api/v1/expenses/categories/:id","type":0,"val":"api","end":""},{"old":"/api/v1/expenses/categories/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/expenses/categories/:id","type":0,"val":"expenses","end":""},{"old":"/api/v1/expenses/categories/:id","type":0,"val":"categories","end":""},{"old":"/api/v1/expenses/categories/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['expense_category_delete']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }

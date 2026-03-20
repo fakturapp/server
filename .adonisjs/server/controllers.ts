@@ -269,4 +269,17 @@ export const controllers = {
       ListReminders: () => import('#controllers/reminder/operations/list_reminders'),
     },
   },
+  expense: {
+    crud: {
+      List: () => import('#controllers/expense/crud/list'),
+      Create: () => import('#controllers/expense/crud/create'),
+      Update: () => import('#controllers/expense/crud/update'),
+      Delete: () => import('#controllers/expense/crud/delete'),
+    },
+    categories: {
+      List: () => import('#controllers/expense/categories/list'),
+      Create: () => import('#controllers/expense/categories/create'),
+      Delete: () => import('#controllers/expense/categories/delete'),
+    },
+  },
 }

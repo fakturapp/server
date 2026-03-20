@@ -158,4 +158,11 @@ export interface ApiDefinition {
   reminderSettingsUpdate: typeof routes['reminder_settings_update']
   sendReminder: typeof routes['send_reminder']
   listReminders: typeof routes['list_reminders']
+  expenseList: typeof routes['expense_list']
+  expenseCreate: typeof routes['expense_create']
+  expenseUpdate: typeof routes['expense_update']
+  expenseDelete: typeof routes['expense_delete']
+  expenseCategoryList: typeof routes['expense_category_list']
+  expenseCategoryCreate: typeof routes['expense_category_create']
+  expenseCategoryDelete: typeof routes['expense_category_delete']
 }

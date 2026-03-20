@@ -153,6 +153,13 @@ export type ScannedRoutes = {
     'reminder_settings_update': { paramsTuple?: []; params?: {} }
     'send_reminder': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'list_reminders': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expense_list': { paramsTuple?: []; params?: {} }
+    'expense_create': { paramsTuple?: []; params?: {} }
+    'expense_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expense_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expense_category_list': { paramsTuple?: []; params?: {} }
+    'expense_category_create': { paramsTuple?: []; params?: {} }
+    'expense_category_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -213,6 +220,8 @@ export type ScannedRoutes = {
     'recurring_invoice_create': { paramsTuple?: []; params?: {} }
     'recurring_invoice_generate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'send_reminder': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expense_create': { paramsTuple?: []; params?: {} }
+    'expense_category_create': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -269,6 +278,8 @@ export type ScannedRoutes = {
     'recurring_invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reminder_settings_get': { paramsTuple?: []; params?: {} }
     'list_reminders': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expense_list': { paramsTuple?: []; params?: {} }
+    'expense_category_list': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -325,6 +336,8 @@ export type ScannedRoutes = {
     'recurring_invoice_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reminder_settings_get': { paramsTuple?: []; params?: {} }
     'list_reminders': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expense_list': { paramsTuple?: []; params?: {} }
+    'expense_category_list': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -342,6 +355,7 @@ export type ScannedRoutes = {
     'credit_note_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'reminder_settings_update': { paramsTuple?: []; params?: {} }
+    'expense_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -357,6 +371,8 @@ export type ScannedRoutes = {
     'product_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'credit_note_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'recurring_invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expense_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'expense_category_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
