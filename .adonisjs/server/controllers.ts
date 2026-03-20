@@ -228,4 +228,22 @@ export const controllers = {
     Update: () => import('#controllers/product/update'),
     Delete: () => import('#controllers/product/delete'),
   },
+  creditNote: {
+    crud: {
+      Create: () => import('#controllers/credit_note/crud/create'),
+      List: () => import('#controllers/credit_note/crud/list'),
+      Show: () => import('#controllers/credit_note/crud/show'),
+      Update: () => import('#controllers/credit_note/crud/update'),
+      Delete: () => import('#controllers/credit_note/crud/delete'),
+    },
+    number: {
+      NextNumber: () => import('#controllers/credit_note/number/next_number'),
+    },
+    operations: {
+      ConvertInvoice: () => import('#controllers/credit_note/operations/convert_invoice'),
+      UpdateStatus: () => import('#controllers/credit_note/operations/update_status'),
+      Duplicate: () => import('#controllers/credit_note/operations/duplicate'),
+      UpdateComment: () => import('#controllers/credit_note/operations/update_comment'),
+    },
+  },
 }

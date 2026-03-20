@@ -132,6 +132,16 @@ export type ScannedRoutes = {
     'product_create': { paramsTuple?: []; params?: {} }
     'product_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'product_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_next_number': { paramsTuple?: []; params?: {} }
+    'credit_note_list': { paramsTuple?: []; params?: {} }
+    'credit_note_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_create': { paramsTuple?: []; params?: {} }
+    'credit_note_convert_invoice': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_update_comment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -186,6 +196,9 @@ export type ScannedRoutes = {
     'send_email': { paramsTuple?: []; params?: {} }
     'send_test_email': { paramsTuple?: []; params?: {} }
     'product_create': { paramsTuple?: []; params?: {} }
+    'credit_note_create': { paramsTuple?: []; params?: {} }
+    'credit_note_convert_invoice': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_duplicate': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   GET: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -235,6 +248,9 @@ export type ScannedRoutes = {
     'list_email_logs': { paramsTuple?: []; params?: {} }
     'product_list': { paramsTuple?: []; params?: {} }
     'product_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_next_number': { paramsTuple?: []; params?: {} }
+    'credit_note_list': { paramsTuple?: []; params?: {} }
+    'credit_note_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   HEAD: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -284,6 +300,9 @@ export type ScannedRoutes = {
     'list_email_logs': { paramsTuple?: []; params?: {} }
     'product_list': { paramsTuple?: []; params?: {} }
     'product_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_next_number': { paramsTuple?: []; params?: {} }
+    'credit_note_list': { paramsTuple?: []; params?: {} }
+    'credit_note_show': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }
@@ -298,6 +317,7 @@ export type ScannedRoutes = {
     'quote_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'product_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -311,6 +331,7 @@ export type ScannedRoutes = {
     'invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'email_accounts_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'product_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
   PATCH: {
     'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -319,6 +340,8 @@ export type ScannedRoutes = {
     'invoice_unlink_quote': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_update_comment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'email_accounts_set_default': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'credit_note_update_comment': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

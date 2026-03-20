@@ -1543,4 +1543,124 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/product/delete').default['handle']>>>
     }
   }
+  'credit_note_next_number': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/credit-notes/next-number'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/number/next_number').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/number/next_number').default['handle']>>>
+    }
+  }
+  'credit_note_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/credit-notes'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/crud/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/crud/list').default['handle']>>>
+    }
+  }
+  'credit_note_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/credit-notes/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/crud/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/crud/show').default['handle']>>>
+    }
+  }
+  'credit_note_create': {
+    methods: ["POST"]
+    pattern: '/api/v1/credit-notes'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/credit_note_validator').createCreditNoteValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/credit_note_validator').createCreditNoteValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/crud/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/crud/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'credit_note_convert_invoice': {
+    methods: ["POST"]
+    pattern: '/api/v1/credit-notes/convert-invoice/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/convert_invoice').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/convert_invoice').default['handle']>>>
+    }
+  }
+  'credit_note_update_status': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/credit-notes/:id/status'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/update_status').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/update_status').default['handle']>>>
+    }
+  }
+  'credit_note_update_comment': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/credit-notes/:id/comment'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/update_comment').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/update_comment').default['handle']>>>
+    }
+  }
+  'credit_note_duplicate': {
+    methods: ["POST"]
+    pattern: '/api/v1/credit-notes/:id/duplicate'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/duplicate').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/operations/duplicate').default['handle']>>>
+    }
+  }
+  'credit_note_update': {
+    methods: ["PUT"]
+    pattern: '/api/v1/credit-notes/:id'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/credit_note_validator').createCreditNoteValidator)>>
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/credit_note_validator').createCreditNoteValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/crud/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/crud/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'credit_note_delete': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/credit-notes/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/credit_note/crud/delete').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/credit_note/crud/delete').default['handle']>>>
+    }
+  }
 }

@@ -774,6 +774,66 @@ const routes = {
     tokens: [{"old":"/api/v1/products/:id","type":0,"val":"api","end":""},{"old":"/api/v1/products/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/products/:id","type":0,"val":"products","end":""},{"old":"/api/v1/products/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['product_delete']['types'],
   },
+  'credit_note_next_number': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/credit-notes/next-number',
+    tokens: [{"old":"/api/v1/credit-notes/next-number","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes/next-number","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes/next-number","type":0,"val":"credit-notes","end":""},{"old":"/api/v1/credit-notes/next-number","type":0,"val":"next-number","end":""}],
+    types: placeholder as Registry['credit_note_next_number']['types'],
+  },
+  'credit_note_list': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/credit-notes',
+    tokens: [{"old":"/api/v1/credit-notes","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes","type":0,"val":"credit-notes","end":""}],
+    types: placeholder as Registry['credit_note_list']['types'],
+  },
+  'credit_note_show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/credit-notes/:id',
+    tokens: [{"old":"/api/v1/credit-notes/:id","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes/:id","type":0,"val":"credit-notes","end":""},{"old":"/api/v1/credit-notes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['credit_note_show']['types'],
+  },
+  'credit_note_create': {
+    methods: ["POST"],
+    pattern: '/api/v1/credit-notes',
+    tokens: [{"old":"/api/v1/credit-notes","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes","type":0,"val":"credit-notes","end":""}],
+    types: placeholder as Registry['credit_note_create']['types'],
+  },
+  'credit_note_convert_invoice': {
+    methods: ["POST"],
+    pattern: '/api/v1/credit-notes/convert-invoice/:id',
+    tokens: [{"old":"/api/v1/credit-notes/convert-invoice/:id","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes/convert-invoice/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes/convert-invoice/:id","type":0,"val":"credit-notes","end":""},{"old":"/api/v1/credit-notes/convert-invoice/:id","type":0,"val":"convert-invoice","end":""},{"old":"/api/v1/credit-notes/convert-invoice/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['credit_note_convert_invoice']['types'],
+  },
+  'credit_note_update_status': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/credit-notes/:id/status',
+    tokens: [{"old":"/api/v1/credit-notes/:id/status","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes/:id/status","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes/:id/status","type":0,"val":"credit-notes","end":""},{"old":"/api/v1/credit-notes/:id/status","type":1,"val":"id","end":""},{"old":"/api/v1/credit-notes/:id/status","type":0,"val":"status","end":""}],
+    types: placeholder as Registry['credit_note_update_status']['types'],
+  },
+  'credit_note_update_comment': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/credit-notes/:id/comment',
+    tokens: [{"old":"/api/v1/credit-notes/:id/comment","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes/:id/comment","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes/:id/comment","type":0,"val":"credit-notes","end":""},{"old":"/api/v1/credit-notes/:id/comment","type":1,"val":"id","end":""},{"old":"/api/v1/credit-notes/:id/comment","type":0,"val":"comment","end":""}],
+    types: placeholder as Registry['credit_note_update_comment']['types'],
+  },
+  'credit_note_duplicate': {
+    methods: ["POST"],
+    pattern: '/api/v1/credit-notes/:id/duplicate',
+    tokens: [{"old":"/api/v1/credit-notes/:id/duplicate","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes/:id/duplicate","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes/:id/duplicate","type":0,"val":"credit-notes","end":""},{"old":"/api/v1/credit-notes/:id/duplicate","type":1,"val":"id","end":""},{"old":"/api/v1/credit-notes/:id/duplicate","type":0,"val":"duplicate","end":""}],
+    types: placeholder as Registry['credit_note_duplicate']['types'],
+  },
+  'credit_note_update': {
+    methods: ["PUT"],
+    pattern: '/api/v1/credit-notes/:id',
+    tokens: [{"old":"/api/v1/credit-notes/:id","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes/:id","type":0,"val":"credit-notes","end":""},{"old":"/api/v1/credit-notes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['credit_note_update']['types'],
+  },
+  'credit_note_delete': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/credit-notes/:id',
+    tokens: [{"old":"/api/v1/credit-notes/:id","type":0,"val":"api","end":""},{"old":"/api/v1/credit-notes/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/credit-notes/:id","type":0,"val":"credit-notes","end":""},{"old":"/api/v1/credit-notes/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['credit_note_delete']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }
