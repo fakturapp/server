@@ -179,4 +179,8 @@ export interface ApiDefinition {
   parseReceipt: typeof routes['parse_receipt']
   vatReport: typeof routes['vat_report']
   fecExport: typeof routes['fec_export']
+  generateText: typeof routes['generate_text']
+  suggestInvoiceLines: typeof routes['suggest_invoice_lines']
+  dashboardSummary: typeof routes['dashboard_summary']
+  generateReminder: typeof routes['generate_reminder']
 }

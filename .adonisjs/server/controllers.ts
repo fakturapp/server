@@ -308,4 +308,10 @@ export const controllers = {
   export: {
     FecExport: () => import('#controllers/export/fec_export'),
   },
+  ai: {
+    GenerateText: () => import('#controllers/ai/generate_text'),
+    SuggestInvoiceLines: () => import('#controllers/ai/suggest_invoice_lines'),
+    DashboardSummary: () => import('#controllers/ai/dashboard_summary'),
+    GenerateReminder: () => import('#controllers/ai/generate_reminder'),
+  },
 }

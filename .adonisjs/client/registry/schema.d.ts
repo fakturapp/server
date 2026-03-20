@@ -2047,4 +2047,52 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/export/fec_export').default['handle']>>>
     }
   }
+  'generate_text': {
+    methods: ["POST"]
+    pattern: '/api/v1/ai/generate-text'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai/generate_text').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/generate_text').default['handle']>>>
+    }
+  }
+  'suggest_invoice_lines': {
+    methods: ["POST"]
+    pattern: '/api/v1/ai/suggest-invoice-lines'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai/suggest_invoice_lines').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/suggest_invoice_lines').default['handle']>>>
+    }
+  }
+  'dashboard_summary': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/ai/dashboard-summary'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai/dashboard_summary').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/dashboard_summary').default['handle']>>>
+    }
+  }
+  'generate_reminder': {
+    methods: ["POST"]
+    pattern: '/api/v1/ai/generate-reminder'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai/generate_reminder').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/generate_reminder').default['handle']>>>
+    }
+  }
 }

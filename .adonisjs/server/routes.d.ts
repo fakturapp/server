@@ -174,6 +174,10 @@ export type ScannedRoutes = {
     'parse_receipt': { paramsTuple?: []; params?: {} }
     'vat_report': { paramsTuple?: []; params?: {} }
     'fec_export': { paramsTuple?: []; params?: {} }
+    'generate_text': { paramsTuple?: []; params?: {} }
+    'suggest_invoice_lines': { paramsTuple?: []; params?: {} }
+    'dashboard_summary': { paramsTuple?: []; params?: {} }
+    'generate_reminder': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -239,6 +243,9 @@ export type ScannedRoutes = {
     'expense_create': { paramsTuple?: []; params?: {} }
     'expense_category_create': { paramsTuple?: []; params?: {} }
     'parse_receipt': { paramsTuple?: []; params?: {} }
+    'generate_text': { paramsTuple?: []; params?: {} }
+    'suggest_invoice_lines': { paramsTuple?: []; params?: {} }
+    'generate_reminder': { paramsTuple?: []; params?: {} }
   }
   GET: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -304,6 +311,7 @@ export type ScannedRoutes = {
     'expense_category_list': { paramsTuple?: []; params?: {} }
     'vat_report': { paramsTuple?: []; params?: {} }
     'fec_export': { paramsTuple?: []; params?: {} }
+    'dashboard_summary': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -369,6 +377,7 @@ export type ScannedRoutes = {
     'expense_category_list': { paramsTuple?: []; params?: {} }
     'vat_report': { paramsTuple?: []; params?: {} }
     'fec_export': { paramsTuple?: []; params?: {} }
+    'dashboard_summary': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }

@@ -1026,6 +1026,30 @@ const routes = {
     tokens: [{"old":"/api/v1/export/fec","type":0,"val":"api","end":""},{"old":"/api/v1/export/fec","type":0,"val":"v1","end":""},{"old":"/api/v1/export/fec","type":0,"val":"export","end":""},{"old":"/api/v1/export/fec","type":0,"val":"fec","end":""}],
     types: placeholder as Registry['fec_export']['types'],
   },
+  'generate_text': {
+    methods: ["POST"],
+    pattern: '/api/v1/ai/generate-text',
+    tokens: [{"old":"/api/v1/ai/generate-text","type":0,"val":"api","end":""},{"old":"/api/v1/ai/generate-text","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/generate-text","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/generate-text","type":0,"val":"generate-text","end":""}],
+    types: placeholder as Registry['generate_text']['types'],
+  },
+  'suggest_invoice_lines': {
+    methods: ["POST"],
+    pattern: '/api/v1/ai/suggest-invoice-lines',
+    tokens: [{"old":"/api/v1/ai/suggest-invoice-lines","type":0,"val":"api","end":""},{"old":"/api/v1/ai/suggest-invoice-lines","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/suggest-invoice-lines","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/suggest-invoice-lines","type":0,"val":"suggest-invoice-lines","end":""}],
+    types: placeholder as Registry['suggest_invoice_lines']['types'],
+  },
+  'dashboard_summary': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/ai/dashboard-summary',
+    tokens: [{"old":"/api/v1/ai/dashboard-summary","type":0,"val":"api","end":""},{"old":"/api/v1/ai/dashboard-summary","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/dashboard-summary","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/dashboard-summary","type":0,"val":"dashboard-summary","end":""}],
+    types: placeholder as Registry['dashboard_summary']['types'],
+  },
+  'generate_reminder': {
+    methods: ["POST"],
+    pattern: '/api/v1/ai/generate-reminder',
+    tokens: [{"old":"/api/v1/ai/generate-reminder","type":0,"val":"api","end":""},{"old":"/api/v1/ai/generate-reminder","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/generate-reminder","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/generate-reminder","type":0,"val":"generate-reminder","end":""}],
+    types: placeholder as Registry['generate_reminder']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }
