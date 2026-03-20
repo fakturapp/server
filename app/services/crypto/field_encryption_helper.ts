@@ -127,4 +127,19 @@ export const ENCRYPTED_FIELDS = {
   ] as const,
 
   creditNoteLine: ['description', 'saleType', 'unit'] as const,
+
+  recurringInvoice: [
+    'name',
+    'subject',
+    'notes',
+    'acceptanceConditions',
+    'documentTitle',
+    'freeField',
+    'deliveryAddress',
+    'clientSiren',
+    'clientVatNumber',
+    'paymentTerms',
+  ] as const,
+
+  recurringInvoiceLine: ['description', 'saleType', 'unit'] as const,
 } as const
