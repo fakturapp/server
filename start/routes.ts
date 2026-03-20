@@ -25,7 +25,7 @@ import '#start/routes/ai'
 router.get(API_PREFIX + '/', async () => {
   return {
     name: 'Faktur API',
-    version: '1.0.0',
+    version: '1.2.7',
     status: 'healthy',
   }
 })
