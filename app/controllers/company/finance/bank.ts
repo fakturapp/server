@@ -1,7 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Company from '#models/team/company'
+import BankAccount from '#models/team/bank_account'
 import { updateBankValidator } from '#validators/auth/onboarding_validators'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class Bank {
   async handle(ctx: HttpContext) {
@@ -21,6 +23,7 @@ export default class Bank {
 
     const payload = await request.validateUsing(updateBankValidator)
 
+    // Update deprecated Company fields for backward compatibility
     if (payload.iban !== undefined)
       company.iban = payload.iban ? zeroAccessCryptoService.encryptField(payload.iban, dek) : null
     if (payload.bic !== undefined)
@@ -31,6 +34,36 @@ export default class Bank {
         : null
 
     await company.save()
+
+    // Also sync to BankAccount: create or update the default bank account
+    if (payload.iban || payload.bic || payload.bankName) {
+      let defaultAccount = await BankAccount.query()
+        .where('team_id', user.currentTeamId)
+        .where('is_default', true)
+        .first()
+
+      const bankData: Record<string, any> = {
+        teamId: user.currentTeamId,
+        label: payload.bankName || 'Compte principal',
+        bankName: payload.bankName || null,
+        iban: payload.iban || null,
+        bic: payload.bic || null,
+        isDefault: true,
+      }
+
+      encryptModelFields(bankData, [...ENCRYPTED_FIELDS.bankAccount], dek)
+      // bankName on BankAccount is not in ENCRYPTED_FIELDS.bankAccount, encrypt manually
+      if (bankData.bankName && typeof bankData.bankName === 'string' && !zeroAccessCryptoService.isEncryptedField(bankData.bankName)) {
+        bankData.bankName = zeroAccessCryptoService.encryptField(bankData.bankName, dek)
+      }
+
+      if (defaultAccount) {
+        defaultAccount.merge(bankData as Partial<typeof defaultAccount>)
+        await defaultAccount.save()
+      } else {
+        await BankAccount.create(bankData)
+      }
+    }
 
     return response.ok({
       message: 'Bank details updated successfully',
