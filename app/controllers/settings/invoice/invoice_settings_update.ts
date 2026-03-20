@@ -21,6 +21,12 @@ export default class InvoiceSettingsUpdate {
       pdpApiKeyToStore = zeroAccessCryptoService.encryptField(payload.pdpApiKey, dek)
     }
 
+    // Encrypt aiCustomApiKey if provided
+    let aiCustomApiKeyToStore: string | null = null
+    if (payload.aiCustomApiKey && payload.aiCustomApiKey !== '••••••••') {
+      aiCustomApiKeyToStore = zeroAccessCryptoService.encryptField(payload.aiCustomApiKey, dek)
+    }
+
     let settings = await InvoiceSetting.findBy('teamId', user.currentTeamId)
 
     if (!settings) {
@@ -51,6 +57,9 @@ export default class InvoiceSettingsUpdate {
         invoiceFilenamePattern: payload.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: payload.footerMode || 'vat_exempt',
         logoBorderRadius: payload.logoBorderRadius ?? 0,
+        aiEnabled: payload.aiEnabled ?? false,
+        aiModel: payload.aiModel || 'claude-sonnet-4-5-20250929',
+        aiCustomApiKey: aiCustomApiKeyToStore,
       })
     } else {
       settings.billingType = payload.billingType
@@ -80,6 +89,11 @@ export default class InvoiceSettingsUpdate {
       if (payload.invoiceFilenamePattern !== undefined) settings.invoiceFilenamePattern = payload.invoiceFilenamePattern || 'FAC-{numero}'
       if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'vat_exempt'
       if (payload.logoBorderRadius !== undefined) settings.logoBorderRadius = payload.logoBorderRadius
+      if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
+      if (payload.aiModel !== undefined) settings.aiModel = payload.aiModel || 'claude-sonnet-4-5-20250929'
+      if (payload.aiCustomApiKey !== undefined && payload.aiCustomApiKey !== '••••••••') {
+        settings.aiCustomApiKey = aiCustomApiKeyToStore
+      }
       await settings.save()
     }
 
@@ -112,6 +126,9 @@ export default class InvoiceSettingsUpdate {
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: settings.footerMode || 'vat_exempt',
         logoBorderRadius: settings.logoBorderRadius ?? 0,
+        aiEnabled: settings.aiEnabled ?? false,
+        aiModel: settings.aiModel || 'claude-sonnet-4-5-20250929',
+        aiCustomApiKey: settings.aiCustomApiKey ? '••••••••' : null,
       },
     })
   }

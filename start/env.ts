@@ -62,4 +62,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   // OCR (receipt extraction)
   OCR_PROVIDER: Env.schema.enum.optional(['mock', 'mindee'] as const),
   MINDEE_API_KEY: Env.schema.string.optional(),
+
+  // AI (Claude API)
+  ANTHROPIC_API_KEY: Env.schema.string.optional(),
 })

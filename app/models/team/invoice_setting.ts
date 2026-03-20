@@ -103,6 +103,15 @@ export default class InvoiceSetting extends BaseModel {
   @column()
   declare nextQuoteNumber: string | null
 
+  @column()
+  declare aiEnabled: boolean
+
+  @column()
+  declare aiModel: string
+
+  @column()
+  declare aiCustomApiKey: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

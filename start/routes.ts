@@ -20,6 +20,7 @@ import '#start/routes/reminder'
 import '#start/routes/expense'
 import '#start/routes/tax'
 import '#start/routes/export'
+import '#start/routes/ai'
 
 router.get(API_PREFIX + '/', async () => {
   return {

@@ -46,6 +46,9 @@ export default class InvoiceSettingsShow {
           invoiceFilenamePattern: 'FAC-{numero}',
           footerMode: 'vat_exempt',
           logoBorderRadius: 0,
+          aiEnabled: false,
+          aiModel: 'claude-sonnet-4-5-20250929',
+          aiCustomApiKey: null,
         },
       })
     }
@@ -79,6 +82,9 @@ export default class InvoiceSettingsShow {
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: settings.footerMode || 'vat_exempt',
         logoBorderRadius: settings.logoBorderRadius ?? 0,
+        aiEnabled: settings.aiEnabled ?? false,
+        aiModel: settings.aiModel || 'claude-sonnet-4-5-20250929',
+        aiCustomApiKey: settings.aiCustomApiKey ? '••••••••' : null,
       },
     })
   }
