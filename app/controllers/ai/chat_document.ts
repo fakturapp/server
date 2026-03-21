@@ -18,7 +18,18 @@ const chatDocumentValidator = vine.compile(
       notes: vine.string().trim().optional(),
       acceptanceConditions: vine.string().trim().optional(),
     }),
+    clientContext: vine
+      .object({
+        name: vine.string().trim().optional(),
+        siren: vine.string().trim().optional(),
+        siret: vine.string().trim().optional(),
+        vatNumber: vine.string().trim().optional(),
+        address: vine.string().trim().optional(),
+        email: vine.string().trim().optional(),
+      })
+      .optional(),
     type: vine.enum(['invoice', 'quote']),
+    detailLevel: vine.enum(['rapide', 'complet']).optional(),
     provider: vine.enum(['claude', 'gemini', 'groq']).optional(),
     model: vine.string().trim().maxLength(100).optional(),
     mode: vine.enum(['edition', 'question', 'libre']).optional(),
@@ -26,12 +37,48 @@ const chatDocumentValidator = vine.compile(
   })
 )
 
+// ─── Client context builder ──────────────────────────────────────────
+
+interface ClientCtx {
+  name?: string
+  siren?: string
+  siret?: string
+  vatNumber?: string
+  address?: string
+  email?: string
+}
+
+function buildClientBlock(client?: ClientCtx): string {
+  if (!client || !Object.values(client).some(Boolean)) return ''
+  const parts: string[] = []
+  if (client.name) parts.push(`- Nom du client : ${client.name}`)
+  if (client.siren) parts.push(`- SIREN : ${client.siren}`)
+  if (client.siret) parts.push(`- SIRET : ${client.siret}`)
+  if (client.vatNumber) parts.push(`- N° TVA : ${client.vatNumber}`)
+  if (client.address) parts.push(`- Adresse : ${client.address}`)
+  if (client.email) parts.push(`- Email : ${client.email}`)
+  return `\n\nContexte client :\n${parts.join('\n')}`
+}
+
+function buildDetailBlock(level?: string): string {
+  if (!level) return ''
+  if (level === 'rapide') {
+    return `\n\nNiveau de détail : RAPIDE — Génère un document concis avec les lignes principales uniquement, sans trop de sous-détails.`
+  }
+  return `\n\nNiveau de détail : COMPLET — Génère un document détaillé avec des lignes précises, sous-éléments, descriptions complètes et mentions spécifiques.`
+}
+
 // ─── System Prompts per Mode ──────────────────────────────────────────
 
-function buildEditionPrompt(docType: string, currentDoc: string): string {
+function buildEditionPrompt(
+  docType: string,
+  currentDoc: string,
+  clientCtx?: ClientCtx,
+  detailLevel?: string
+): string {
   return `Tu es un assistant qui modifie un document de facturation français (${docType}). Voici le document actuel en JSON:
 
-${currentDoc}
+${currentDoc}${buildClientBlock(clientCtx)}${buildDetailBlock(detailLevel)}
 
 L'utilisateur demande une modification. Applique la modification et retourne ta réponse dans le format JSON suivant:
 {
@@ -59,11 +106,16 @@ Règles:
 - Réponds UNIQUEMENT avec le JSON, rien d'autre`
 }
 
-function buildQuestionPrompt(docType: string, currentDoc: string): string {
+function buildQuestionPrompt(
+  docType: string,
+  currentDoc: string,
+  clientCtx?: ClientCtx,
+  detailLevel?: string
+): string {
   return `Tu es un expert en facturation française et en conformité légale. Tu analyses des documents de type "${docType}".
 
 Voici le document actuel:
-${currentDoc}
+${currentDoc}${buildClientBlock(clientCtx)}${buildDetailBlock(detailLevel)}
 
 Tu dois répondre aux questions de l'utilisateur en respectant ces règles:
 
@@ -87,10 +139,15 @@ Tu dois répondre aux questions de l'utilisateur en respectant ces règles:
 - Réponds UNIQUEMENT avec le JSON, rien d'autre`
 }
 
-function buildLibrePrompt(docType: string, currentDoc: string): string {
+function buildLibrePrompt(
+  docType: string,
+  currentDoc: string,
+  clientCtx?: ClientCtx,
+  detailLevel?: string
+): string {
   return `Tu es un assistant créatif pour les documents de facturation français (${docType}). Voici le document actuel:
 
-${currentDoc}
+${currentDoc}${buildClientBlock(clientCtx)}${buildDetailBlock(detailLevel)}
 
 L'utilisateur te donne une instruction libre. Tu dois:
 1. Exécuter la tâche demandée
@@ -133,12 +190,16 @@ Règles:
 export default class ChatDocument {
   async handle(ctx: HttpContext) {
     const { auth, request, response } = ctx
-    const dek: Buffer = (ctx as any).dek
+    const dek: Buffer | undefined = (ctx as any).dek
     const user = auth.user!
     const teamId = user.currentTeamId
 
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
+    }
+
+    if (!dek) {
+      return response.status(423).send({ message: 'Vault is locked. Please re-authenticate.' })
     }
 
     const ai = new AiService()
@@ -152,18 +213,21 @@ export default class ChatDocument {
     const docType = payload.type === 'invoice' ? 'facture' : 'devis'
     const currentDoc = JSON.stringify(payload.currentDocument, null, 2)
 
-    // Build mode-specific system prompt
+    // Build mode-specific system prompt with client context
+    const clientCtx = payload.clientContext as ClientCtx | undefined
+    const detailLevel = payload.detailLevel
+
     let systemPrompt: string
     switch (mode) {
       case 'question':
-        systemPrompt = buildQuestionPrompt(docType, currentDoc)
+        systemPrompt = buildQuestionPrompt(docType, currentDoc, clientCtx, detailLevel)
         break
       case 'libre':
-        systemPrompt = buildLibrePrompt(docType, currentDoc)
+        systemPrompt = buildLibrePrompt(docType, currentDoc, clientCtx, detailLevel)
         break
       case 'edition':
       default:
-        systemPrompt = buildEditionPrompt(docType, currentDoc)
+        systemPrompt = buildEditionPrompt(docType, currentDoc, clientCtx, detailLevel)
         break
     }
 
@@ -188,14 +252,12 @@ export default class ChatDocument {
       const parsed = JSON.parse(jsonMatch[0])
 
       if (mode === 'question') {
-        // Question mode: return message only, no document modification
         return response.ok({
           message: parsed.message || result,
         })
       }
 
       if (mode === 'libre') {
-        // Libre mode: return message + document + modifications list
         if (!parsed.document?.subject || !Array.isArray(parsed.document?.lines)) {
           return response.badRequest({ message: 'Invalid document structure from AI' })
         }
@@ -206,9 +268,8 @@ export default class ChatDocument {
         })
       }
 
-      // Edition mode: return message + document
+      // Edition mode
       if (!parsed.document?.subject || !Array.isArray(parsed.document?.lines)) {
-        // Fallback: try legacy format (just the document at root level)
         if (parsed.subject && Array.isArray(parsed.lines)) {
           return response.ok({
             message: parsed.message || 'Document mis à jour.',
@@ -228,7 +289,19 @@ export default class ChatDocument {
         document: parsed.document,
       })
     } catch (error: any) {
-      return response.internalServerError({ message: 'AI chat failed', error: error.message })
+      const msg = error.message || 'Unknown error'
+
+      // API key missing → 400
+      if (msg.includes('clé API') || msg.includes('API key') || msg.includes('No API key')) {
+        return response.badRequest({ message: msg })
+      }
+
+      // Provider API errors → 502
+      if (msg.includes('API error')) {
+        return response.status(502).send({ message: 'Le service IA est temporairement indisponible.', error: msg })
+      }
+
+      return response.internalServerError({ message: 'AI chat failed', error: msg })
     }
   }
 }
