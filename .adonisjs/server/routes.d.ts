@@ -180,6 +180,7 @@ export type ScannedRoutes = {
     'generate_reminder': { paramsTuple?: []; params?: {} }
     'generate_document': { paramsTuple?: []; params?: {} }
     'chat_document': { paramsTuple?: []; params?: {} }
+    'check_providers': { paramsTuple?: []; params?: {} }
   }
   POST: {
     'signup': { paramsTuple?: []; params?: {} }
@@ -316,6 +317,7 @@ export type ScannedRoutes = {
     'vat_report': { paramsTuple?: []; params?: {} }
     'fec_export': { paramsTuple?: []; params?: {} }
     'dashboard_summary': { paramsTuple?: []; params?: {} }
+    'check_providers': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -382,6 +384,7 @@ export type ScannedRoutes = {
     'vat_report': { paramsTuple?: []; params?: {} }
     'fec_export': { paramsTuple?: []; params?: {} }
     'dashboard_summary': { paramsTuple?: []; params?: {} }
+    'check_providers': { paramsTuple?: []; params?: {} }
   }
   PUT: {
     'profile_update': { paramsTuple?: []; params?: {} }

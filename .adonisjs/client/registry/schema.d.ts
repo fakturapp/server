@@ -2119,4 +2119,16 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/chat_document').default['handle']>>>
     }
   }
+  'check_providers': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/ai/providers'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai/check_providers').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/check_providers').default['handle']>>>
+    }
+  }
 }

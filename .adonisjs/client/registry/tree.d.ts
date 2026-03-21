@@ -185,4 +185,5 @@ export interface ApiDefinition {
   generateReminder: typeof routes['generate_reminder']
   generateDocument: typeof routes['generate_document']
   chatDocument: typeof routes['chat_document']
+  checkProviders: typeof routes['check_providers']
 }

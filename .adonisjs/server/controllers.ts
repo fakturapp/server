@@ -33,6 +33,15 @@ export const controllers = {
       Setup: () => import('#controllers/account/two_factor/setup'),
     },
   },
+  ai: {
+    ChatDocument: () => import('#controllers/ai/chat_document'),
+    CheckProviders: () => import('#controllers/ai/check_providers'),
+    DashboardSummary: () => import('#controllers/ai/dashboard_summary'),
+    GenerateDocument: () => import('#controllers/ai/generate_document'),
+    GenerateReminder: () => import('#controllers/ai/generate_reminder'),
+    GenerateText: () => import('#controllers/ai/generate_text'),
+    SuggestInvoiceLines: () => import('#controllers/ai/suggest_invoice_lines'),
+  },
   auth: {
     oauth: {
       GoogleAuthUrl: () => import('#controllers/auth/oauth/google_auth_url'),
@@ -68,6 +77,12 @@ export const controllers = {
     },
   },
   client: {
+    contacts: {
+      Destroy: () => import('#controllers/client/contacts/destroy'),
+      Index: () => import('#controllers/client/contacts/index'),
+      Store: () => import('#controllers/client/contacts/store'),
+      Update: () => import('#controllers/client/contacts/update'),
+    },
     crud: {
       Create: () => import('#controllers/client/crud/create'),
       Delete: () => import('#controllers/client/crud/delete'),
@@ -77,12 +92,6 @@ export const controllers = {
     },
     lookup: {
       SearchSiren: () => import('#controllers/client/lookup/search_siren'),
-    },
-    contacts: {
-      Index: () => import('#controllers/client/contacts/index'),
-      Store: () => import('#controllers/client/contacts/store'),
-      Update: () => import('#controllers/client/contacts/update'),
-      Destroy: () => import('#controllers/client/contacts/destroy'),
     },
   },
   company: {
@@ -99,11 +108,30 @@ export const controllers = {
       UploadLogo: () => import('#controllers/company/media/upload_logo'),
     },
   },
+  creditNote: {
+    crud: {
+      Create: () => import('#controllers/credit_note/crud/create'),
+      Delete: () => import('#controllers/credit_note/crud/delete'),
+      List: () => import('#controllers/credit_note/crud/list'),
+      Show: () => import('#controllers/credit_note/crud/show'),
+      Update: () => import('#controllers/credit_note/crud/update'),
+    },
+    number: {
+      NextNumber: () => import('#controllers/credit_note/number/next_number'),
+    },
+    operations: {
+      ConvertInvoice: () => import('#controllers/credit_note/operations/convert_invoice'),
+      DownloadPdf: () => import('#controllers/credit_note/operations/download_pdf'),
+      Duplicate: () => import('#controllers/credit_note/operations/duplicate'),
+      UpdateComment: () => import('#controllers/credit_note/operations/update_comment'),
+      UpdateStatus: () => import('#controllers/credit_note/operations/update_status'),
+    },
+  },
   dashboard: {
+    CashFlow: () => import('#controllers/dashboard/cash_flow'),
     Charts: () => import('#controllers/dashboard/charts'),
     SidebarCounts: () => import('#controllers/dashboard/sidebar_counts'),
     Stats: () => import('#controllers/dashboard/stats'),
-    CashFlow: () => import('#controllers/dashboard/cash_flow'),
   },
   einvoicing: {
     Submit: () => import('#controllers/einvoicing/submit'),
@@ -137,6 +165,25 @@ export const controllers = {
       Update: () => import('#controllers/email/templates/update'),
     },
   },
+  expense: {
+    categories: {
+      Create: () => import('#controllers/expense/categories/create'),
+      Delete: () => import('#controllers/expense/categories/delete'),
+      List: () => import('#controllers/expense/categories/list'),
+    },
+    crud: {
+      Create: () => import('#controllers/expense/crud/create'),
+      Delete: () => import('#controllers/expense/crud/delete'),
+      List: () => import('#controllers/expense/crud/list'),
+      Update: () => import('#controllers/expense/crud/update'),
+    },
+    ocr: {
+      ParseReceipt: () => import('#controllers/expense/ocr/parse_receipt'),
+    },
+  },
+  export: {
+    FecExport: () => import('#controllers/export/fec_export'),
+  },
   invoice: {
     crud: {
       Create: () => import('#controllers/invoice/crud/create'),
@@ -161,9 +208,9 @@ export const controllers = {
       UpdateStatus: () => import('#controllers/invoice/operations/update_status'),
     },
     payments: {
+      Destroy: () => import('#controllers/invoice/payments/destroy'),
       Index: () => import('#controllers/invoice/payments/index'),
       Store: () => import('#controllers/invoice/payments/store'),
-      Destroy: () => import('#controllers/invoice/payments/destroy'),
     },
   },
   onboarding: {
@@ -178,6 +225,13 @@ export const controllers = {
     team: {
       CreateTeam: () => import('#controllers/onboarding/team/create_team'),
     },
+  },
+  product: {
+    Create: () => import('#controllers/product/create'),
+    Delete: () => import('#controllers/product/delete'),
+    List: () => import('#controllers/product/list'),
+    Show: () => import('#controllers/product/show'),
+    Update: () => import('#controllers/product/update'),
   },
   quote: {
     crud: {
@@ -201,6 +255,29 @@ export const controllers = {
       UpdateStatus: () => import('#controllers/quote/operations/update_status'),
     },
   },
+  recurringInvoice: {
+    crud: {
+      Create: () => import('#controllers/recurring_invoice/crud/create'),
+      Delete: () => import('#controllers/recurring_invoice/crud/delete'),
+      List: () => import('#controllers/recurring_invoice/crud/list'),
+      Show: () => import('#controllers/recurring_invoice/crud/show'),
+      Update: () => import('#controllers/recurring_invoice/crud/update'),
+    },
+    operations: {
+      Generate: () => import('#controllers/recurring_invoice/operations/generate'),
+      ToggleActive: () => import('#controllers/recurring_invoice/operations/toggle_active'),
+    },
+  },
+  reminder: {
+    operations: {
+      ListReminders: () => import('#controllers/reminder/operations/list_reminders'),
+      SendReminder: () => import('#controllers/reminder/operations/send_reminder'),
+    },
+    settings: {
+      Get: () => import('#controllers/reminder/settings/get'),
+      Update: () => import('#controllers/reminder/settings/update'),
+    },
+  },
   settings: {
     invoice: {
       InvoiceLogoUpload: () => import('#controllers/settings/invoice/invoice_logo_upload'),
@@ -208,6 +285,9 @@ export const controllers = {
       InvoiceSettingsUpdate: () => import('#controllers/settings/invoice/invoice_settings_update'),
       ServeInvoiceLogo: () => import('#controllers/settings/invoice/serve_invoice_logo'),
     },
+  },
+  tax: {
+    VatReport: () => import('#controllers/tax/vat_report'),
   },
   team: {
     core: {
@@ -236,84 +316,5 @@ export const controllers = {
       TransferOwnership: () => import('#controllers/team/members/transfer_ownership'),
       UpdateRole: () => import('#controllers/team/members/update_role'),
     },
-  },
-  product: {
-    List: () => import('#controllers/product/list'),
-    Show: () => import('#controllers/product/show'),
-    Create: () => import('#controllers/product/create'),
-    Update: () => import('#controllers/product/update'),
-    Delete: () => import('#controllers/product/delete'),
-  },
-  creditNote: {
-    crud: {
-      Create: () => import('#controllers/credit_note/crud/create'),
-      List: () => import('#controllers/credit_note/crud/list'),
-      Show: () => import('#controllers/credit_note/crud/show'),
-      Update: () => import('#controllers/credit_note/crud/update'),
-      Delete: () => import('#controllers/credit_note/crud/delete'),
-    },
-    number: {
-      NextNumber: () => import('#controllers/credit_note/number/next_number'),
-    },
-    operations: {
-      ConvertInvoice: () => import('#controllers/credit_note/operations/convert_invoice'),
-      UpdateStatus: () => import('#controllers/credit_note/operations/update_status'),
-      Duplicate: () => import('#controllers/credit_note/operations/duplicate'),
-      UpdateComment: () => import('#controllers/credit_note/operations/update_comment'),
-      DownloadPdf: () => import('#controllers/credit_note/operations/download_pdf'),
-    },
-  },
-  recurringInvoice: {
-    crud: {
-      Create: () => import('#controllers/recurring_invoice/crud/create'),
-      List: () => import('#controllers/recurring_invoice/crud/list'),
-      Show: () => import('#controllers/recurring_invoice/crud/show'),
-      Update: () => import('#controllers/recurring_invoice/crud/update'),
-      Delete: () => import('#controllers/recurring_invoice/crud/delete'),
-    },
-    operations: {
-      Generate: () => import('#controllers/recurring_invoice/operations/generate'),
-      ToggleActive: () => import('#controllers/recurring_invoice/operations/toggle_active'),
-    },
-  },
-  reminder: {
-    settings: {
-      Get: () => import('#controllers/reminder/settings/get'),
-      Update: () => import('#controllers/reminder/settings/update'),
-    },
-    operations: {
-      SendReminder: () => import('#controllers/reminder/operations/send_reminder'),
-      ListReminders: () => import('#controllers/reminder/operations/list_reminders'),
-    },
-  },
-  expense: {
-    crud: {
-      List: () => import('#controllers/expense/crud/list'),
-      Create: () => import('#controllers/expense/crud/create'),
-      Update: () => import('#controllers/expense/crud/update'),
-      Delete: () => import('#controllers/expense/crud/delete'),
-    },
-    categories: {
-      List: () => import('#controllers/expense/categories/list'),
-      Create: () => import('#controllers/expense/categories/create'),
-      Delete: () => import('#controllers/expense/categories/delete'),
-    },
-    ocr: {
-      ParseReceipt: () => import('#controllers/expense/ocr/parse_receipt'),
-    },
-  },
-  tax: {
-    VatReport: () => import('#controllers/tax/vat_report'),
-  },
-  export: {
-    FecExport: () => import('#controllers/export/fec_export'),
-  },
-  ai: {
-    GenerateText: () => import('#controllers/ai/generate_text'),
-    SuggestInvoiceLines: () => import('#controllers/ai/suggest_invoice_lines'),
-    DashboardSummary: () => import('#controllers/ai/dashboard_summary'),
-    GenerateReminder: () => import('#controllers/ai/generate_reminder'),
-    GenerateDocument: () => import('#controllers/ai/generate_document'),
-    ChatDocument: () => import('#controllers/ai/chat_document'),
   },
 }

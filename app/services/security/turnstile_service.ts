@@ -2,8 +2,12 @@ import env from '#start/env'
 
 export default class TurnstileService {
   static async verifyToken(token: string, ip: string): Promise<boolean> {
-    const secret = env.get('CLOUDFLARE_TURNSTILE_SECRET_KEY', '')
+    const enabled = env.get('CAPTCHA_ENABLED', false)
+    if (!enabled) {
+      return true
+    }
 
+    const secret = env.get('CLOUDFLARE_TURNSTILE_SECRET_KEY', '')
     if (!secret) {
       return true
     }

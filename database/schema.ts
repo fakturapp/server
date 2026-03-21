@@ -33,12 +33,14 @@ export class AuditLogSchema extends BaseModel {
 }
 
 export class AuthAccessTokenSchema extends BaseModel {
-  static $columns = ['abilities', 'createdAt', 'expiresAt', 'hash', 'id', 'ipAddress', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt', 'userAgent'] as const
+  static $columns = ['abilities', 'createdAt', 'encryptedKek', 'expiresAt', 'hash', 'id', 'ipAddress', 'lastUsedAt', 'name', 'tokenableId', 'type', 'updatedAt', 'userAgent'] as const
   $columns = AuthAccessTokenSchema.$columns
   @column()
   declare abilities: string
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime | null
+  @column()
+  declare encryptedKek: string | null
   @column.dateTime()
   declare expiresAt: DateTime | null
   @column()
@@ -61,6 +63,29 @@ export class AuthAccessTokenSchema extends BaseModel {
   declare userAgent: string | null
 }
 
+export class AuthProviderSchema extends BaseModel {
+  static $columns = ['avatarUrl', 'createdAt', 'displayName', 'email', 'id', 'provider', 'providerUserId', 'updatedAt', 'userId'] as const
+  $columns = AuthProviderSchema.$columns
+  @column()
+  declare avatarUrl: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare displayName: string | null
+  @column()
+  declare email: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare provider: string
+  @column()
+  declare providerUserId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare userId: string
+}
+
 export class BankAccountSchema extends BaseModel {
   static $columns = ['bankName', 'bic', 'createdAt', 'iban', 'id', 'isDefault', 'label', 'teamId', 'updatedAt'] as const
   $columns = BankAccountSchema.$columns
@@ -78,6 +103,37 @@ export class BankAccountSchema extends BaseModel {
   declare isDefault: boolean
   @column()
   declare label: string
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class ClientContactSchema extends BaseModel {
+  static $columns = ['clientId', 'createdAt', 'email', 'firstName', 'id', 'includeInEmails', 'isPrimary', 'lastName', 'notes', 'phone', 'role', 'teamId', 'updatedAt'] as const
+  $columns = ClientContactSchema.$columns
+  @column()
+  declare clientId: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare email: string | null
+  @column()
+  declare firstName: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare includeInEmails: boolean
+  @column()
+  declare isPrimary: boolean
+  @column()
+  declare lastName: string | null
+  @column()
+  declare notes: string | null
+  @column()
+  declare phone: string | null
+  @column()
+  declare role: string | null
   @column()
   declare teamId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
@@ -182,6 +238,102 @@ export class CompanySchema extends BaseModel {
   declare website: string | null
 }
 
+export class CreditNoteLineSchema extends BaseModel {
+  static $columns = ['createdAt', 'creditNoteId', 'description', 'id', 'position', 'quantity', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
+  $columns = CreditNoteLineSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare creditNoteId: string
+  @column()
+  declare description: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare position: number
+  @column()
+  declare quantity: string
+  @column()
+  declare saleType: string | null
+  @column()
+  declare total: string
+  @column()
+  declare unit: string | null
+  @column()
+  declare unitPrice: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare vatRate: string
+}
+
+export class CreditNoteSchema extends BaseModel {
+  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'creditNoteNumber', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'reason', 'signatureField', 'sourceInvoiceId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
+  $columns = CreditNoteSchema.$columns
+  @column()
+  declare accentColor: string
+  @column()
+  declare acceptanceConditions: string | null
+  @column()
+  declare billingType: string
+  @column()
+  declare clientId: string | null
+  @column()
+  declare clientSiren: string | null
+  @column()
+  declare clientVatNumber: string | null
+  @column()
+  declare comment: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare creditNoteNumber: string
+  @column()
+  declare deliveryAddress: string | null
+  @column()
+  declare documentTitle: string | null
+  @column()
+  declare freeField: string | null
+  @column()
+  declare globalDiscountType: string
+  @column()
+  declare globalDiscountValue: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare issueDate: string
+  @column()
+  declare language: string
+  @column()
+  declare logoUrl: string | null
+  @column()
+  declare notes: string | null
+  @column()
+  declare operationCategory: string | null
+  @column()
+  declare reason: string | null
+  @column()
+  declare signatureField: boolean
+  @column()
+  declare sourceInvoiceId: string | null
+  @column()
+  declare status: string
+  @column()
+  declare subject: string | null
+  @column()
+  declare subtotal: string
+  @column()
+  declare taxAmount: string
+  @column()
+  declare teamId: string
+  @column()
+  declare total: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare vatExemptReason: string
+}
+
 export class EmailAccountSchema extends BaseModel {
   static $columns = ['accessToken', 'createdAt', 'displayName', 'email', 'id', 'isActive', 'isDefault', 'provider', 'refreshToken', 'smtpHost', 'smtpPassword', 'smtpPort', 'smtpUsername', 'teamId', 'tokenExpiresAt', 'updatedAt'] as const
   $columns = EmailAccountSchema.$columns
@@ -252,6 +404,79 @@ export class EmailLogSchema extends BaseModel {
   declare updatedAt: DateTime | null
 }
 
+export class EmailTemplateSchema extends BaseModel {
+  static $columns = ['body', 'createdAt', 'id', 'subject', 'teamId', 'templateType', 'updatedAt'] as const
+  $columns = EmailTemplateSchema.$columns
+  @column()
+  declare body: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare subject: string
+  @column()
+  declare teamId: string
+  @column()
+  declare templateType: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
+export class ExpenseCategorySchema extends BaseModel {
+  static $columns = ['color', 'createdAt', 'id', 'name', 'teamId', 'updatedAt'] as const
+  $columns = ExpenseCategorySchema.$columns
+  @column()
+  declare color: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare name: string
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class ExpenseSchema extends BaseModel {
+  static $columns = ['amount', 'categoryId', 'createdAt', 'currency', 'description', 'expenseDate', 'id', 'isDeductible', 'notes', 'paymentMethod', 'receiptUrl', 'supplier', 'teamId', 'updatedAt', 'vatAmount', 'vatRate'] as const
+  $columns = ExpenseSchema.$columns
+  @column()
+  declare amount: string
+  @column()
+  declare categoryId: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare currency: string
+  @column()
+  declare description: string
+  @column()
+  declare expenseDate: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isDeductible: boolean
+  @column()
+  declare notes: string | null
+  @column()
+  declare paymentMethod: string | null
+  @column()
+  declare receiptUrl: string | null
+  @column()
+  declare supplier: string | null
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare vatAmount: string
+  @column()
+  declare vatRate: string
+}
+
 export class InvoiceLineSchema extends BaseModel {
   static $columns = ['createdAt', 'description', 'id', 'invoiceId', 'position', 'quantity', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
   $columns = InvoiceLineSchema.$columns
@@ -281,19 +506,50 @@ export class InvoiceLineSchema extends BaseModel {
   declare vatRate: string
 }
 
+export class InvoicePaymentSchema extends BaseModel {
+  static $columns = ['amount', 'createdAt', 'id', 'invoiceId', 'notes', 'paymentDate', 'paymentMethod', 'teamId', 'updatedAt'] as const
+  $columns = InvoicePaymentSchema.$columns
+  @column()
+  declare amount: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare invoiceId: string
+  @column()
+  declare notes: string | null
+  @column()
+  declare paymentDate: string
+  @column()
+  declare paymentMethod: string | null
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
 export class InvoiceSettingSchema extends BaseModel {
-  static $columns = ['accentColor', 'aiCustomApiKey', 'aiEnabled', 'aiModel', 'aiProvider', 'billingType', 'createdAt', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'teamId', 'template', 'updatedAt'] as const
+  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'billingType', 'createdAt', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'teamId', 'template', 'updatedAt'] as const
   $columns = InvoiceSettingSchema.$columns
   @column()
   declare accentColor: string
+  @column()
+  declare aiApiKeyClaude: string | null
+  @column()
+  declare aiApiKeyGemini: string | null
+  @column()
+  declare aiApiKeyGroq: string | null
   @column()
   declare aiCustomApiKey: string | null
   @column()
   declare aiEnabled: boolean
   @column()
+  declare aiKeyMode: string
+  @column()
   declare aiModel: string
   @column()
-  declare aiProvider: string
+  declare aiProvider: string | null
   @column()
   declare billingType: string
   @column.dateTime({ autoCreate: true })
@@ -407,8 +663,8 @@ export class InvoiceSchema extends BaseModel {
   declare notes: string | null
   @column()
   declare operationCategory: string | null
-  @column()
-  declare paidDate: string | null
+  @column.date()
+  declare paidDate: DateTime | null
   @column()
   declare paymentMethod: string | null
   @column()
@@ -460,6 +716,89 @@ export class LoginHistorySchema extends BaseModel {
   declare userAgent: string | null
   @column()
   declare userId: string | null
+}
+
+export class PaymentReminderSettingSchema extends BaseModel {
+  static $columns = ['autoSend', 'createdAt', 'daysAfterDue', 'daysBeforeDue', 'emailAccountId', 'emailBodyTemplate', 'emailSubjectTemplate', 'enabled', 'id', 'repeatIntervalDays', 'teamId', 'updatedAt'] as const
+  $columns = PaymentReminderSettingSchema.$columns
+  @column()
+  declare autoSend: boolean
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare daysAfterDue: number | null
+  @column()
+  declare daysBeforeDue: number | null
+  @column()
+  declare emailAccountId: string | null
+  @column()
+  declare emailBodyTemplate: string | null
+  @column()
+  declare emailSubjectTemplate: string | null
+  @column()
+  declare enabled: boolean
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare repeatIntervalDays: number | null
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class PaymentReminderSchema extends BaseModel {
+  static $columns = ['createdAt', 'errorMessage', 'id', 'invoiceId', 'sentAt', 'status', 'teamId', 'toEmail', 'type', 'updatedAt'] as const
+  $columns = PaymentReminderSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare errorMessage: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare invoiceId: string
+  @column.dateTime()
+  declare sentAt: DateTime
+  @column()
+  declare status: string
+  @column()
+  declare teamId: string
+  @column()
+  declare toEmail: string | null
+  @column()
+  declare type: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+}
+
+export class ProductSchema extends BaseModel {
+  static $columns = ['createdAt', 'description', 'id', 'isArchived', 'name', 'reference', 'saleType', 'teamId', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
+  $columns = ProductSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare description: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isArchived: boolean
+  @column()
+  declare name: string
+  @column()
+  declare reference: string | null
+  @column()
+  declare saleType: string | null
+  @column()
+  declare teamId: string
+  @column()
+  declare unit: string | null
+  @column()
+  declare unitPrice: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
+  @column()
+  declare vatRate: string
 }
 
 export class QuoteLineSchema extends BaseModel {
@@ -565,167 +904,21 @@ export class RateLimitSchema extends BaseModel {
   declare points: number
 }
 
-export class TeamMemberSchema extends BaseModel {
-  static $columns = ['createdAt', 'dekVersion', 'encryptedInviteDek', 'encryptedTeamDek', 'id', 'invitationToken', 'invitedAt', 'invitedEmail', 'joinedAt', 'role', 'status', 'teamId', 'updatedAt', 'userId'] as const
-  $columns = TeamMemberSchema.$columns
+export class RecurringInvoiceLineSchema extends BaseModel {
+  static $columns = ['createdAt', 'description', 'id', 'position', 'quantity', 'recurringInvoiceId', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
+  $columns = RecurringInvoiceLineSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
-  declare dekVersion: number | null
-  @column()
-  declare encryptedInviteDek: string | null
-  @column()
-  declare encryptedTeamDek: string | null
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare invitationToken: string | null
-  @column.dateTime()
-  declare invitedAt: DateTime | null
-  @column()
-  declare invitedEmail: string | null
-  @column.dateTime()
-  declare joinedAt: DateTime | null
-  @column()
-  declare role: string
-  @column()
-  declare status: string
-  @column()
-  declare teamId: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-  @column()
-  declare userId: string | null
-}
-
-export class TeamSchema extends BaseModel {
-  static $columns = ['createdAt', 'iconUrl', 'id', 'name', 'ownerId', 'updatedAt'] as const
-  $columns = TeamSchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column()
-  declare iconUrl: string | null
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare name: string
-  @column()
-  declare ownerId: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
-export class ProductSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'isArchived', 'name', 'reference', 'saleType', 'teamId', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
-  $columns = ProductSchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column()
-  declare description: string | null
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare isArchived: boolean
-  @column()
-  declare name: string
-  @column()
-  declare reference: string | null
-  @column()
-  declare saleType: string | null
-  @column()
-  declare teamId: string
-  @column()
-  declare unit: string | null
-  @column()
-  declare unitPrice: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-  @column()
-  declare vatRate: string
-}
-
-export class CreditNoteSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'creditNoteNumber', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'reason', 'signatureField', 'sourceInvoiceId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
-  $columns = CreditNoteSchema.$columns
-  @column()
-  declare accentColor: string
-  @column()
-  declare acceptanceConditions: string | null
-  @column()
-  declare billingType: string
-  @column()
-  declare clientId: string | null
-  @column()
-  declare clientSiren: string | null
-  @column()
-  declare clientVatNumber: string | null
-  @column()
-  declare comment: string | null
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column()
-  declare creditNoteNumber: string
-  @column()
-  declare deliveryAddress: string | null
-  @column()
-  declare documentTitle: string | null
-  @column()
-  declare freeField: string | null
-  @column()
-  declare globalDiscountType: string
-  @column()
-  declare globalDiscountValue: string
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare issueDate: string
-  @column()
-  declare language: string
-  @column()
-  declare logoUrl: string | null
-  @column()
-  declare notes: string | null
-  @column()
-  declare operationCategory: string | null
-  @column()
-  declare reason: string | null
-  @column()
-  declare signatureField: boolean
-  @column()
-  declare sourceInvoiceId: string | null
-  @column()
-  declare status: string
-  @column()
-  declare subject: string | null
-  @column()
-  declare subtotal: string
-  @column()
-  declare taxAmount: string
-  @column()
-  declare teamId: string
-  @column()
-  declare total: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-  @column()
-  declare vatExemptReason: string
-}
-
-export class CreditNoteLineSchema extends BaseModel {
-  static $columns = ['createdAt', 'creditNoteId', 'description', 'id', 'position', 'quantity', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
-  $columns = CreditNoteLineSchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column()
-  declare creditNoteId: string
-  @column()
-  declare description: string | null
+  declare description: string
   @column({ isPrimary: true })
   declare id: string
   @column()
   declare position: number
   @column()
   declare quantity: string
+  @column()
+  declare recurringInvoiceId: string
   @column()
   declare saleType: string | null
   @column()
@@ -815,212 +1008,52 @@ export class RecurringInvoiceSchema extends BaseModel {
   declare vatExemptReason: string
 }
 
-export class RecurringInvoiceLineSchema extends BaseModel {
-  static $columns = ['createdAt', 'description', 'id', 'position', 'quantity', 'recurringInvoiceId', 'saleType', 'total', 'unit', 'unitPrice', 'updatedAt', 'vatRate'] as const
-  $columns = RecurringInvoiceLineSchema.$columns
+export class TeamMemberSchema extends BaseModel {
+  static $columns = ['createdAt', 'dekVersion', 'encryptedInviteDek', 'encryptedTeamDek', 'id', 'invitationToken', 'invitedAt', 'invitedEmail', 'joinedAt', 'role', 'status', 'teamId', 'updatedAt', 'userId'] as const
+  $columns = TeamMemberSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
-  declare description: string | null
+  declare dekVersion: number | null
+  @column()
+  declare encryptedInviteDek: string | null
+  @column()
+  declare encryptedTeamDek: string | null
   @column({ isPrimary: true })
   declare id: string
   @column()
-  declare position: number
-  @column()
-  declare quantity: string
-  @column()
-  declare recurringInvoiceId: string
-  @column()
-  declare saleType: string | null
-  @column()
-  declare total: string
-  @column()
-  declare unit: string | null
-  @column()
-  declare unitPrice: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-  @column()
-  declare vatRate: string
-}
-
-export class PaymentReminderSettingSchema extends BaseModel {
-  static $columns = ['autoSend', 'createdAt', 'daysAfterDue', 'daysBeforeDue', 'emailAccountId', 'emailBodyTemplate', 'emailSubjectTemplate', 'enabled', 'id', 'repeatIntervalDays', 'teamId', 'updatedAt'] as const
-  $columns = PaymentReminderSettingSchema.$columns
-  @column()
-  declare autoSend: boolean
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column()
-  declare daysAfterDue: number | null
-  @column()
-  declare daysBeforeDue: number | null
-  @column()
-  declare emailAccountId: string | null
-  @column()
-  declare emailBodyTemplate: string | null
-  @column()
-  declare emailSubjectTemplate: string | null
-  @column()
-  declare enabled: boolean
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare repeatIntervalDays: number | null
-  @column()
-  declare teamId: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
-export class PaymentReminderSchema extends BaseModel {
-  static $columns = ['createdAt', 'errorMessage', 'id', 'invoiceId', 'sentAt', 'status', 'teamId', 'toEmail', 'type', 'updatedAt'] as const
-  $columns = PaymentReminderSchema.$columns
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column()
-  declare errorMessage: string | null
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare invoiceId: string
+  declare invitationToken: string | null
   @column.dateTime()
-  declare sentAt: DateTime
+  declare invitedAt: DateTime | null
+  @column()
+  declare invitedEmail: string | null
+  @column.dateTime()
+  declare joinedAt: DateTime | null
+  @column()
+  declare role: string
   @column()
   declare status: string
   @column()
   declare teamId: string
-  @column()
-  declare toEmail: string | null
-  @column()
-  declare type: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
+  @column()
+  declare userId: string | null
 }
 
-export class ExpenseCategorySchema extends BaseModel {
-  static $columns = ['color', 'createdAt', 'id', 'name', 'teamId', 'updatedAt'] as const
-  $columns = ExpenseCategorySchema.$columns
-  @column()
-  declare color: string | null
+export class TeamSchema extends BaseModel {
+  static $columns = ['createdAt', 'iconUrl', 'id', 'name', 'ownerId', 'updatedAt'] as const
+  $columns = TeamSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
+  @column()
+  declare iconUrl: string | null
   @column({ isPrimary: true })
   declare id: string
   @column()
   declare name: string
   @column()
-  declare teamId: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
-export class ExpenseSchema extends BaseModel {
-  static $columns = ['amount', 'categoryId', 'createdAt', 'currency', 'description', 'expenseDate', 'id', 'isDeductible', 'notes', 'paymentMethod', 'receiptUrl', 'supplier', 'teamId', 'updatedAt', 'vatAmount', 'vatRate'] as const
-  $columns = ExpenseSchema.$columns
-  @column()
-  declare amount: string
-  @column()
-  declare categoryId: string | null
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column()
-  declare currency: string
-  @column()
-  declare description: string
-  @column()
-  declare expenseDate: string
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare isDeductible: boolean
-  @column()
-  declare notes: string | null
-  @column()
-  declare paymentMethod: string | null
-  @column()
-  declare receiptUrl: string | null
-  @column()
-  declare supplier: string | null
-  @column()
-  declare teamId: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-  @column()
-  declare vatAmount: string
-  @column()
-  declare vatRate: string
-}
-
-export class ClientContactSchema extends BaseModel {
-  static $columns = ['clientId', 'createdAt', 'email', 'firstName', 'id', 'includeInEmails', 'isPrimary', 'lastName', 'notes', 'phone', 'role', 'teamId', 'updatedAt'] as const
-  $columns = ClientContactSchema.$columns
-  @column()
-  declare clientId: string
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column()
-  declare email: string | null
-  @column()
-  declare firstName: string | null
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare includeInEmails: boolean
-  @column()
-  declare isPrimary: boolean
-  @column()
-  declare lastName: string | null
-  @column()
-  declare notes: string | null
-  @column()
-  declare phone: string | null
-  @column()
-  declare role: string | null
-  @column()
-  declare teamId: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
-export class InvoicePaymentSchema extends BaseModel {
-  static $columns = ['amount', 'createdAt', 'id', 'invoiceId', 'notes', 'paymentDate', 'paymentMethod', 'teamId', 'updatedAt'] as const
-  $columns = InvoicePaymentSchema.$columns
-  @column()
-  declare amount: string
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare invoiceId: string
-  @column()
-  declare notes: string | null
-  @column()
-  declare paymentDate: string
-  @column()
-  declare paymentMethod: string | null
-  @column()
-  declare teamId: string
-  @column.dateTime({ autoCreate: true, autoUpdate: true })
-  declare updatedAt: DateTime | null
-}
-
-export class EmailTemplateSchema extends BaseModel {
-  static $columns = ['body', 'createdAt', 'id', 'subject', 'teamId', 'templateType', 'updatedAt'] as const
-  $columns = EmailTemplateSchema.$columns
-  @column()
-  declare body: string
-  @column.dateTime({ autoCreate: true })
-  declare createdAt: DateTime
-  @column({ isPrimary: true })
-  declare id: string
-  @column()
-  declare subject: string
-  @column()
-  declare teamId: string
-  @column()
-  declare templateType: string
+  declare ownerId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
   declare updatedAt: DateTime | null
 }

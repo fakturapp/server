@@ -1062,6 +1062,12 @@ const routes = {
     tokens: [{"old":"/api/v1/ai/chat-document","type":0,"val":"api","end":""},{"old":"/api/v1/ai/chat-document","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/chat-document","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/chat-document","type":0,"val":"chat-document","end":""}],
     types: placeholder as Registry['chat_document']['types'],
   },
+  'check_providers': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/ai/providers',
+    tokens: [{"old":"/api/v1/ai/providers","type":0,"val":"api","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"providers","end":""}],
+    types: placeholder as Registry['check_providers']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }
