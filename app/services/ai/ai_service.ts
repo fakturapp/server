@@ -51,13 +51,25 @@ export default class AiService {
   }
 
   /**
-   * Resolve the API key: per-provider key → legacy custom key → env var.
-   * In custom mode, skip env var fallback.
+   * Resolve the API key based on source mode.
+   * - 'faktur' (server): ONLY use env var, never custom keys
+   * - 'apikey' (custom): ONLY use user's custom key, never env var
+   * - undefined: use team's aiKeyMode setting (legacy behavior)
    */
-  private async getApiKey(teamId: string, dek: Buffer, provider: AiProvider): Promise<{ key: string | null; source: 'custom' | 'server' }> {
+  private async getApiKey(teamId: string, dek: Buffer, provider: AiProvider, sourceOverride?: 'faktur' | 'apikey'): Promise<{ key: string | null; source: 'custom' | 'server' }> {
     const settings = await InvoiceSetting.findBy('teamId', teamId)
-    const keyMode = (settings?.aiKeyMode as 'server' | 'custom') || 'server'
 
+    // Determine effective mode: per-request override > team setting
+    const effectiveMode = sourceOverride === 'faktur' ? 'server'
+      : sourceOverride === 'apikey' ? 'custom'
+      : (settings?.aiKeyMode as 'server' | 'custom') || 'server'
+
+    // Server mode: ONLY env var, skip custom keys entirely
+    if (effectiveMode === 'server') {
+      return { key: env.get(ENV_KEYS[provider] as any, '') || null, source: 'server' }
+    }
+
+    // Custom mode: ONLY user keys, never fall back to env
     // 1. Try per-provider key
     const providerKeyField = PROVIDER_KEY_FIELDS[provider]
     const providerKey = settings?.[providerKeyField]
@@ -78,13 +90,8 @@ export default class AiService {
       }
     }
 
-    // 3. In custom mode, do NOT fall back to server env vars
-    if (keyMode === 'custom') {
-      return { key: null, source: 'custom' }
-    }
-
-    // 4. Fallback: environment variable (server mode only)
-    return { key: env.get(ENV_KEYS[provider] as any, '') || null, source: 'server' }
+    // No custom key found — do NOT fall back to server env
+    return { key: null, source: 'custom' }
   }
 
   /**
@@ -115,6 +122,7 @@ export default class AiService {
 
   /**
    * Simple single-prompt generation (delegates to the right provider).
+   * sourceOverride: 'faktur' = server key only, 'apikey' = custom key only
    */
   async generate(
     teamId: string,
@@ -124,9 +132,10 @@ export default class AiService {
     maxTokens: number = 1024,
     overrideProvider?: string,
     overrideModel?: string,
+    sourceOverride?: 'faktur' | 'apikey',
   ): Promise<string> {
     const provider = await this.getProvider(teamId, overrideProvider)
-    const { key: apiKey, source } = await this.getApiKey(teamId, dek, provider)
+    const { key: apiKey, source } = await this.getApiKey(teamId, dek, provider, sourceOverride)
     const model = await this.getModel(teamId, provider, overrideModel)
 
     if (!apiKey) {
@@ -159,9 +168,10 @@ export default class AiService {
     maxTokens: number = 1024,
     overrideProvider?: string,
     overrideModel?: string,
+    sourceOverride?: 'faktur' | 'apikey',
   ): Promise<string> {
     const provider = await this.getProvider(teamId, overrideProvider)
-    const { key: apiKey, source } = await this.getApiKey(teamId, dek, provider)
+    const { key: apiKey, source } = await this.getApiKey(teamId, dek, provider, sourceOverride)
     const model = await this.getModel(teamId, provider, overrideModel)
 
     if (!apiKey) {

@@ -22,6 +22,7 @@ const chatDocumentValidator = vine.compile(
     provider: vine.enum(['claude', 'gemini', 'groq']).optional(),
     model: vine.string().trim().maxLength(100).optional(),
     mode: vine.enum(['edition', 'question', 'libre']).optional(),
+    source: vine.enum(['faktur', 'apikey']).optional(),
   })
 )
 
@@ -175,6 +176,7 @@ export default class ChatDocument {
         mode === 'question' ? 4096 : 2048,
         payload.provider,
         payload.model,
+        payload.source as 'faktur' | 'apikey' | undefined,
       )
 
       // Parse JSON from response
