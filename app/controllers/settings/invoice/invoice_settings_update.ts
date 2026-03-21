@@ -91,7 +91,7 @@ export default class InvoiceSettingsUpdate {
       if (payload.documentFont) settings.documentFont = payload.documentFont
       if (payload.eInvoicingEnabled !== undefined) settings.eInvoicingEnabled = payload.eInvoicingEnabled
       if (payload.pdpProvider !== undefined) settings.pdpProvider = (payload.pdpProvider || null) as 'b2brouter' | 'sandbox' | null
-      if (payload.pdpApiKey !== undefined && payload.pdpApiKey !== '••••••••') {
+      if (payload.pdpApiKey && !payload.pdpApiKey.startsWith('••••••••')) {
         settings.pdpApiKey = pdpApiKeyToStore
       }
       if (payload.pdpSandbox !== undefined) settings.pdpSandbox = payload.pdpSandbox
@@ -112,16 +112,16 @@ export default class InvoiceSettingsUpdate {
       if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
       if (payload.aiProvider !== undefined) settings.aiProvider = payload.aiProvider || 'gemini'
       if (payload.aiModel !== undefined) settings.aiModel = payload.aiModel || 'gemini-2.5-flash-lite'
-      if (payload.aiCustomApiKey !== undefined && payload.aiCustomApiKey !== '••••••••') {
+      if (payload.aiCustomApiKey && !payload.aiCustomApiKey.startsWith('••••••••')) {
         settings.aiCustomApiKey = aiCustomApiKeyToStore
       }
-      if (payload.aiApiKeyClaude !== undefined && !payload.aiApiKeyClaude?.startsWith('••••••••')) {
+      if (payload.aiApiKeyClaude && !payload.aiApiKeyClaude.startsWith('••••••••')) {
         settings.aiApiKeyClaude = aiApiKeyClaudeToStore
       }
-      if (payload.aiApiKeyGemini !== undefined && !payload.aiApiKeyGemini?.startsWith('••••••••')) {
+      if (payload.aiApiKeyGemini && !payload.aiApiKeyGemini.startsWith('••••••••')) {
         settings.aiApiKeyGemini = aiApiKeyGeminiToStore
       }
-      if (payload.aiApiKeyGroq !== undefined && !payload.aiApiKeyGroq?.startsWith('••••••••')) {
+      if (payload.aiApiKeyGroq && !payload.aiApiKeyGroq.startsWith('••••••••')) {
         settings.aiApiKeyGroq = aiApiKeyGroqToStore
       }
       await settings.save()
