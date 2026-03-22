@@ -1,12 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import vine from '@vinejs/vine'
-
-const updateProfileValidator = vine.compile(
-  vine.object({
-    fullName: vine.string().trim().minLength(2).maxLength(255).optional(),
-    avatarUrl: vine.string().trim().maxLength(500).optional(),
-  })
-)
+import { updateProfileValidator } from '#validators/account_validator'
 
 export default class Update {
   async handle({ auth, request, response }: HttpContext) {

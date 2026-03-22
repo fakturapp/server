@@ -1,19 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import vine from '@vinejs/vine'
 import EmailAccount from '#models/email/email_account'
 import EncryptionService from '#services/encryption/encryption_service'
 import SmtpService from '#services/email/smtp_service'
-
-const configureSmtpValidator = vine.compile(
-  vine.object({
-    host: vine.string().trim().minLength(1),
-    port: vine.number().min(1).max(65535),
-    username: vine.string().trim().minLength(1),
-    password: vine.string().trim().minLength(1),
-    fromEmail: vine.string().trim().email(),
-    displayName: vine.string().trim().optional(),
-  })
-)
+import { configureSmtpValidator } from '#validators/email_validator'
 
 export default class ConfigureSmtp {
   async handle({ auth, request, response }: HttpContext) {

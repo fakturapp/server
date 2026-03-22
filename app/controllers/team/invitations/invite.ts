@@ -1,7 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
-import vine from '@vinejs/vine'
 import mail from '@adonisjs/mail/services/main'
 import TeamMember from '#models/team/team_member'
 import User from '#models/account/user'
@@ -9,13 +8,7 @@ import TeamInviteNotification from '#mails/team_invite_notification'
 import env from '#start/env'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
-
-const inviteValidator = vine.compile(
-  vine.object({
-    email: vine.string().trim().email(),
-    role: vine.enum(['viewer', 'member', 'admin']),
-  })
-)
+import { inviteValidator } from '#validators/team_validator'
 
 export default class Invite {
   async handle(ctx: HttpContext) {

@@ -1,16 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import vine from '@vinejs/vine'
 import EmailAccount from '#models/email/email_account'
 import EncryptionService from '#services/encryption/encryption_service'
 import ResendUserService from '#services/email/resend_user_service'
-
-const configureResendValidator = vine.compile(
-  vine.object({
-    apiKey: vine.string().trim().minLength(10),
-    fromEmail: vine.string().trim().email(),
-    displayName: vine.string().trim().optional(),
-  })
-)
+import { configureResendValidator } from '#validators/email_validator'
 
 export default class ConfigureResend {
   async handle({ auth, request, response }: HttpContext) {

@@ -1,17 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
-import vine from '@vinejs/vine'
 import mail from '@adonisjs/mail/services/main'
 import SecurityCodeNotification from '#mails/security_code_notification'
 import TwoFactorService from '#services/auth/two_factor_service'
-
-const verifyCodeValidator = vine.compile(
-  vine.object({
-    code: vine.string().trim(),
-    method: vine.enum(['email', 'totp', 'recovery']).optional(),
-  })
-)
+import { securityVerifyValidator } from '#validators/account_validator'
 
 export default class SecurityVerify {
   /**
@@ -47,7 +40,7 @@ export default class SecurityVerify {
    */
   async verify({ auth, request, response }: HttpContext) {
     const user = auth.user!
-    const payload = await request.validateUsing(verifyCodeValidator)
+    const payload = await request.validateUsing(securityVerifyValidator)
     const method = payload.method || 'email'
 
     if (method === 'totp') {

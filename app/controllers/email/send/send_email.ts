@@ -1,6 +1,5 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { readFile } from 'node:fs/promises'
-import vine from '@vinejs/vine'
 import EmailAccount from '#models/email/email_account'
 import EmailLog from '#models/email/email_log'
 import Invoice from '#models/invoice/invoice'
@@ -11,18 +10,7 @@ import ResendUserService from '#services/email/resend_user_service'
 import SmtpService from '#services/email/smtp_service'
 import { generateInvoicePdf, generateQuotePdf, generateCreditNotePdf } from '#services/pdf/document_pdf_service'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
-
-const sendEmailValidator = vine.compile(
-  vine.object({
-    documentType: vine.enum(['invoice', 'quote', 'credit_note']),
-    documentId: vine.string().trim(),
-    emailAccountId: vine.string().trim(),
-    to: vine.string().trim().email(),
-    subject: vine.string().trim().minLength(1).maxLength(500),
-    body: vine.string().trim().minLength(1),
-    emailType: vine.enum(['send', 'reminder']).optional(),
-  })
-)
+import { sendEmailValidator } from '#validators/email_validator'
 
 export default class SendEmail {
   async handle(ctx: HttpContext) {

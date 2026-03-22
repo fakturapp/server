@@ -1,14 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import vine from '@vinejs/vine'
 import EmailTemplate from '#models/email/email_template'
-
-const updateTemplateValidator = vine.compile(
-  vine.object({
-    templateType: vine.enum(['invoice_send', 'quote_send', 'credit_note_send']),
-    subject: vine.string().trim().maxLength(500),
-    body: vine.string().trim().maxLength(5000),
-  })
-)
+import { updateTemplateValidator } from '#validators/email_validator'
 
 export default class Update {
   async handle({ auth, request, response }: HttpContext) {

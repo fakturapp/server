@@ -1,12 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import hash from '@adonisjs/core/services/hash'
-import vine from '@vinejs/vine'
-
-const deleteAccountValidator = vine.compile(
-  vine.object({
-    password: vine.string(),
-  })
-)
+import { deleteAccountValidator } from '#validators/account_validator'
 
 export default class Delete {
   async handle({ auth, request, response }: HttpContext) {

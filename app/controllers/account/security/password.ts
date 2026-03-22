@@ -1,17 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import hash from '@adonisjs/core/services/hash'
-import vine from '@vinejs/vine'
-import securityConfig from '#config/security'
 import TeamMember from '#models/team/team_member'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
-
-const changePasswordValidator = vine.compile(
-  vine.object({
-    currentPassword: vine.string(),
-    password: vine.string().minLength(securityConfig.password.minLength).maxLength(128).confirmed(),
-  })
-)
+import { changePasswordValidator } from '#validators/account_validator'
 
 export default class Password {
   async handle({ auth, request, response }: HttpContext) {

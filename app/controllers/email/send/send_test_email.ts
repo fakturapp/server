@@ -1,15 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import vine from '@vinejs/vine'
 import EmailAccount from '#models/email/email_account'
 import GmailOAuthService from '#services/email/gmail_oauth_service'
 import ResendUserService from '#services/email/resend_user_service'
 import SmtpService from '#services/email/smtp_service'
-
-const testEmailValidator = vine.compile(
-  vine.object({
-    emailAccountId: vine.string().trim(),
-  })
-)
+import { testEmailValidator } from '#validators/email_validator'
 
 export default class SendTestEmail {
   async handle({ auth, request, response }: HttpContext) {

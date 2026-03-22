@@ -1,21 +1,15 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import vine from '@vinejs/vine'
 import crypto from 'node:crypto'
 import { DateTime } from 'luxon'
 import mail from '@adonisjs/mail/services/main'
 import User from '#models/account/user'
 import SecurityCodeNotification from '#mails/security_code_notification'
-
-const validator = vine.compile(
-  vine.object({
-    newEmail: vine.string().email().trim().maxLength(254),
-  })
-)
+import { emailChangeValidator } from '#validators/account_validator'
 
 export default class EmailRequestChange {
   async handle({ auth, request, response }: HttpContext) {
     const user = auth.user!
-    const { newEmail } = await request.validateUsing(validator)
+    const { newEmail } = await request.validateUsing(emailChangeValidator)
 
     if (newEmail.toLowerCase() === user.email.toLowerCase()) {
       return response.badRequest({ message: 'Le nouvel email est identique à l\'actuel' })
