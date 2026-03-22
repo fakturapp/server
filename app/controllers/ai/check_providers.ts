@@ -12,13 +12,11 @@ export default class CheckProviders {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const ai = new AiService()
-
-    if (!(await ai.isEnabled(teamId))) {
+    if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled.' })
     }
 
-    const providers = await ai.getAvailableProviders(teamId, dek)
+    const providers = await AiService.getAvailableProviders(teamId, dek)
 
     return response.ok({ providers })
   }

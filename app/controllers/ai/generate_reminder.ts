@@ -24,9 +24,7 @@ export default class GenerateReminder {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const ai = new AiService()
-
-    if (!(await ai.isEnabled(teamId))) {
+    if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled.' })
     }
 
@@ -101,7 +99,7 @@ Jours de retard: ${daysOverdue}
 Ton souhaité: ${tone}`
 
     try {
-      const result = await ai.generate(teamId, dek, systemPrompt, contextText, 512)
+      const result = await AiService.generate(teamId, dek, systemPrompt, contextText, 512)
 
       // Parse JSON
       const jsonMatch = result.match(/\{[\s\S]*\}/)

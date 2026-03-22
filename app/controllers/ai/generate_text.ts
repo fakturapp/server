@@ -39,9 +39,7 @@ export default class GenerateText {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const ai = new AiService()
-
-    if (!(await ai.isEnabled(teamId))) {
+    if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
     }
 
@@ -53,7 +51,7 @@ export default class GenerateText {
       : `Génère un texte approprié. Langue: ${lang}`
 
     try {
-      const result = await ai.generate(teamId, dek, systemPrompt, userPrompt, 512)
+      const result = await AiService.generate(teamId, dek, systemPrompt, userPrompt, 512)
       return response.ok({ text: result.trim() })
     } catch (error: any) {
       return response.internalServerError({ message: 'AI generation failed', error: error.message })

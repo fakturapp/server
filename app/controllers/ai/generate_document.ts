@@ -26,9 +26,7 @@ export default class GenerateDocument {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const ai = new AiService()
-
-    if (!(await ai.isEnabled(teamId))) {
+    if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
     }
 
@@ -132,7 +130,7 @@ EXEMPLE DE RÉPONSE VALIDE :
 }`
 
     try {
-      const result = await ai.generate(
+      const result = await AiService.generate(
         teamId,
         dek,
         systemPrompt,

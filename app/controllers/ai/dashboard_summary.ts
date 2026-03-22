@@ -15,9 +15,7 @@ export default class DashboardSummary {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const ai = new AiService()
-
-    if (!(await ai.isEnabled(teamId))) {
+    if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled.' })
     }
 
@@ -93,7 +91,7 @@ Factures en retard: ${overdueCount} pour ${overdueTotal.toFixed(2)}€
 Dépenses ce mois: ${expensesThisMonth.toFixed(2)}€`
 
     try {
-      const summary = await ai.generate(teamId, dek, systemPrompt, metricsText, 256)
+      const summary = await AiService.generate(teamId, dek, systemPrompt, metricsText, 256)
       return response.ok({ summary: summary.trim() })
     } catch (error: any) {
       return response.internalServerError({ message: 'AI summary failed', error: error.message })

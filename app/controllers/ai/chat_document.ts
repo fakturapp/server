@@ -202,9 +202,7 @@ export default class ChatDocument {
       return response.status(423).send({ message: 'Vault is locked. Please re-authenticate.' })
     }
 
-    const ai = new AiService()
-
-    if (!(await ai.isEnabled(teamId))) {
+    if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
     }
 
@@ -232,7 +230,7 @@ export default class ChatDocument {
     }
 
     try {
-      const result = await ai.generate(
+      const result = await AiService.generate(
         teamId,
         dek,
         systemPrompt,

@@ -37,7 +37,7 @@ export default class AiService {
   /**
    * Check if AI is enabled for the team.
    */
-  async isEnabled(teamId: string): Promise<boolean> {
+  static async isEnabled(teamId: string): Promise<boolean> {
     const settings = await InvoiceSetting.findBy('teamId', teamId)
     return settings?.aiEnabled ?? false
   }
@@ -45,7 +45,7 @@ export default class AiService {
   /**
    * Resolve the provider for the team (or use override).
    */
-  private async getProvider(teamId: string, overrideProvider?: string): Promise<AiProvider> {
+  private static async getProvider(teamId: string, overrideProvider?: string): Promise<AiProvider> {
     if (overrideProvider && ['claude', 'gemini', 'groq'].includes(overrideProvider)) {
       return overrideProvider as AiProvider
     }
@@ -59,7 +59,7 @@ export default class AiService {
    * - 'apikey' (custom): ONLY use user's custom key, never env var
    * - undefined: use team's aiKeyMode setting (legacy behavior)
    */
-  private async getApiKey(
+  private static async getApiKey(
     teamId: string,
     dek: Buffer,
     provider: AiProvider,
@@ -111,14 +111,14 @@ export default class AiService {
   /**
    * Check which providers are available for the team.
    */
-  async getAvailableProviders(
+  static async getAvailableProviders(
     teamId: string,
     dek: Buffer
   ): Promise<Array<{ provider: AiProvider; available: boolean; source: 'custom' | 'server' }>> {
     const providers: AiProvider[] = ['gemini', 'groq', 'claude']
     const results = []
     for (const provider of providers) {
-      const { key, source } = await this.getApiKey(teamId, dek, provider)
+      const { key, source } = await AiService.getApiKey(teamId, dek, provider)
       results.push({ provider, available: !!key, source })
     }
     return results
@@ -127,7 +127,7 @@ export default class AiService {
   /**
    * Resolve the model from team settings (or use override).
    */
-  private async getModel(
+  private static async getModel(
     teamId: string,
     provider: AiProvider,
     overrideModel?: string
@@ -145,7 +145,7 @@ export default class AiService {
    * Simple single-prompt generation (delegates to the right provider).
    * sourceOverride: 'faktur' = server key only, 'apikey' = custom key only
    */
-  async generate(
+  static async generate(
     teamId: string,
     dek: Buffer,
     systemPrompt: string,
@@ -155,9 +155,9 @@ export default class AiService {
     overrideModel?: string,
     sourceOverride?: 'faktur' | 'apikey'
   ): Promise<string> {
-    const provider = await this.getProvider(teamId, overrideProvider)
-    const { key: apiKey, source } = await this.getApiKey(teamId, dek, provider, sourceOverride)
-    const model = await this.getModel(teamId, provider, overrideModel)
+    const provider = await AiService.getProvider(teamId, overrideProvider)
+    const { key: apiKey, source } = await AiService.getApiKey(teamId, dek, provider, sourceOverride)
+    const model = await AiService.getModel(teamId, provider, overrideModel)
 
     if (!apiKey) {
       if (source === 'custom') {
@@ -172,11 +172,11 @@ export default class AiService {
 
     switch (provider) {
       case 'claude':
-        return this.callClaude(apiKey, model, systemPrompt, userPrompt, maxTokens)
+        return AiService.callClaude(apiKey, model, systemPrompt, userPrompt, maxTokens)
       case 'gemini':
-        return this.callGemini(apiKey, model, systemPrompt, userPrompt, maxTokens)
+        return AiService.callGemini(apiKey, model, systemPrompt, userPrompt, maxTokens)
       case 'groq':
-        return this.callGroq(apiKey, model, systemPrompt, userPrompt, maxTokens)
+        return AiService.callGroq(apiKey, model, systemPrompt, userPrompt, maxTokens)
       default:
         throw new Error(`Unknown AI provider: ${provider}`)
     }
@@ -185,7 +185,7 @@ export default class AiService {
   /**
    * Chat with messages array (delegates to the right provider).
    */
-  async chat(
+  static async chat(
     teamId: string,
     dek: Buffer,
     systemPrompt: string,
@@ -195,9 +195,9 @@ export default class AiService {
     overrideModel?: string,
     sourceOverride?: 'faktur' | 'apikey'
   ): Promise<string> {
-    const provider = await this.getProvider(teamId, overrideProvider)
-    const { key: apiKey, source } = await this.getApiKey(teamId, dek, provider, sourceOverride)
-    const model = await this.getModel(teamId, provider, overrideModel)
+    const provider = await AiService.getProvider(teamId, overrideProvider)
+    const { key: apiKey, source } = await AiService.getApiKey(teamId, dek, provider, sourceOverride)
+    const model = await AiService.getModel(teamId, provider, overrideModel)
 
     if (!apiKey) {
       if (source === 'custom') {
@@ -210,11 +210,11 @@ export default class AiService {
 
     switch (provider) {
       case 'claude':
-        return this.chatClaude(apiKey, model, systemPrompt, messages, maxTokens)
+        return AiService.chatClaude(apiKey, model, systemPrompt, messages, maxTokens)
       case 'gemini':
-        return this.chatGemini(apiKey, model, systemPrompt, messages, maxTokens)
+        return AiService.chatGemini(apiKey, model, systemPrompt, messages, maxTokens)
       case 'groq':
-        return this.chatGroq(apiKey, model, systemPrompt, messages, maxTokens)
+        return AiService.chatGroq(apiKey, model, systemPrompt, messages, maxTokens)
       default:
         throw new Error(`Unknown AI provider: ${provider}`)
     }
@@ -222,14 +222,14 @@ export default class AiService {
 
   // ─── Claude (Anthropic) ────────────────────────────────────
 
-  private async callClaude(
+  private static async callClaude(
     apiKey: string,
     model: string,
     system: string,
     userPrompt: string,
     maxTokens: number
   ): Promise<string> {
-    return this.chatClaude(
+    return AiService.chatClaude(
       apiKey,
       model,
       system,
@@ -238,7 +238,7 @@ export default class AiService {
     )
   }
 
-  private async chatClaude(
+  private static async chatClaude(
     apiKey: string,
     model: string,
     system: string,
@@ -266,14 +266,14 @@ export default class AiService {
 
   // ─── Gemini (Google) ───────────────────────────────────────
 
-  private async callGemini(
+  private static async callGemini(
     apiKey: string,
     model: string,
     system: string,
     userPrompt: string,
     maxTokens: number
   ): Promise<string> {
-    return this.chatGemini(
+    return AiService.chatGemini(
       apiKey,
       model,
       system,
@@ -282,7 +282,7 @@ export default class AiService {
     )
   }
 
-  private async chatGemini(
+  private static async chatGemini(
     apiKey: string,
     model: string,
     system: string,
@@ -320,17 +320,23 @@ export default class AiService {
 
   // ─── Groq (OpenAI-compatible) ──────────────────────────────
 
-  private async callGroq(
+  private static async callGroq(
     apiKey: string,
     model: string,
     system: string,
     userPrompt: string,
     maxTokens: number
   ): Promise<string> {
-    return this.chatGroq(apiKey, model, system, [{ role: 'user', content: userPrompt }], maxTokens)
+    return AiService.chatGroq(
+      apiKey,
+      model,
+      system,
+      [{ role: 'user', content: userPrompt }],
+      maxTokens
+    )
   }
 
-  private async chatGroq(
+  private static async chatGroq(
     apiKey: string,
     model: string,
     system: string,

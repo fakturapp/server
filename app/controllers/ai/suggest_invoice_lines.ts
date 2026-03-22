@@ -26,9 +26,7 @@ export default class SuggestInvoiceLines {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const ai = new AiService()
-
-    if (!(await ai.isEnabled(teamId))) {
+    if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
     }
 
@@ -86,7 +84,7 @@ Règles:
 - Réponds UNIQUEMENT avec le JSON, rien d'autre`
 
     try {
-      const result = await ai.generate(
+      const result = await AiService.generate(
         teamId,
         dek,
         systemPrompt,
