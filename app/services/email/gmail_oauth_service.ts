@@ -16,8 +16,8 @@ function getOAuth2Client() {
   )
 }
 
-class GmailOAuthService {
-  getAuthUrl(state: string): string {
+export default class GmailOAuthService {
+  static getAuthUrl(state: string): string {
     const client = getOAuth2Client()
     return client.generateAuthUrl({
       access_type: 'offline',
@@ -27,7 +27,7 @@ class GmailOAuthService {
     })
   }
 
-  async exchangeCode(code: string): Promise<{
+  static async exchangeCode(code: string): Promise<{
     accessToken: string
     refreshToken: string
     expiresAt: Date
@@ -59,7 +59,7 @@ class GmailOAuthService {
     }
   }
 
-  async refreshAccessToken(encryptedRefreshToken: string): Promise<{
+  static async refreshAccessToken(encryptedRefreshToken: string): Promise<{
     accessToken: string
     expiresAt: Date
   }> {
@@ -83,7 +83,7 @@ class GmailOAuthService {
     }
   }
 
-  async getValidAccessToken(account: {
+  static async getValidAccessToken(account: {
     accessToken: string | null
     refreshToken: string | null
     tokenExpiresAt: { toJSDate(): Date } | null
@@ -105,7 +105,7 @@ class GmailOAuthService {
     return EncryptionService.decrypt(account.accessToken)
   }
 
-  async sendEmail(params: {
+  static async sendEmail(params: {
     accessToken: string
     from: string
     fromName?: string | null
@@ -167,5 +167,3 @@ class GmailOAuthService {
     })
   }
 }
-
-export default new GmailOAuthService()

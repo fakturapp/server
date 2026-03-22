@@ -16,8 +16,8 @@ interface VerifyResult {
   delta?: number
 }
 
-class TwoFactorService {
-  generateSecret(email: string): TwoFactorSecret {
+export default class TwoFactorService {
+  static generateSecret(email: string): TwoFactorSecret {
     const secret = speakeasy.generateSecret({
       name: `${securityConfig.twoFactor.issuer}:${email}`,
       issuer: securityConfig.twoFactor.issuer,
@@ -32,19 +32,19 @@ class TwoFactorService {
     }
   }
 
-  async generateQRCode(otpauthUrl: string): Promise<string> {
+  static async generateQRCode(otpauthUrl: string): Promise<string> {
     return QRCode.toDataURL(otpauthUrl)
   }
 
-  encryptSecret(secret: string): string {
+  static encryptSecret(secret: string): string {
     return EncryptionService.encrypt(secret)
   }
 
-  decryptSecret(encryptedSecret: string): string {
+  static decryptSecret(encryptedSecret: string): string {
     return EncryptionService.decrypt(encryptedSecret)
   }
 
-  verifyToken(secret: string, token: string): VerifyResult {
+  static verifyToken(secret: string, token: string): VerifyResult {
     const verified = speakeasy.totp.verify({
       secret: secret,
       encoding: 'base32',
@@ -55,7 +55,7 @@ class TwoFactorService {
     return { valid: verified }
   }
 
-  generateRecoveryCodes(): string[] {
+  static generateRecoveryCodes(): string[] {
     const codes: string[] = []
     const { recoveryCodesCount, recoveryCodeLength } = securityConfig.twoFactor
 
@@ -73,20 +73,20 @@ class TwoFactorService {
     return codes
   }
 
-  encryptRecoveryCodes(codes: string[]): string {
+  static encryptRecoveryCodes(codes: string[]): string {
     return EncryptionService.encrypt(JSON.stringify(codes))
   }
 
-  decryptRecoveryCodes(encryptedCodes: string): string[] {
+  static decryptRecoveryCodes(encryptedCodes: string): string[] {
     const decrypted = EncryptionService.decrypt(encryptedCodes)
     return JSON.parse(decrypted)
   }
 
-  verifyRecoveryCode(
+  static verifyRecoveryCode(
     code: string,
     encryptedCodes: string
   ): { valid: boolean; remainingCodes: string[] } {
-    const codes = this.decryptRecoveryCodes(encryptedCodes)
+    const codes = TwoFactorService.decryptRecoveryCodes(encryptedCodes)
     const normalizedInput = code.replace('-', '').toLowerCase()
 
     const index = codes.findIndex((c) => {
@@ -102,5 +102,3 @@ class TwoFactorService {
     return { valid: true, remainingCodes: codes }
   }
 }
-
-export default new TwoFactorService()

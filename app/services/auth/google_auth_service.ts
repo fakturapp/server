@@ -25,8 +25,8 @@ export interface GoogleProfile {
   picture: string | null
 }
 
-class GoogleAuthService {
-  getAuthUrl(state: string): string {
+export default class GoogleAuthService {
+  static getAuthUrl(state: string): string {
     const client = getOAuth2Client()
     return client.generateAuthUrl({
       access_type: 'online',
@@ -36,7 +36,7 @@ class GoogleAuthService {
     })
   }
 
-  async exchangeCodeForProfile(code: string): Promise<GoogleProfile> {
+  static async exchangeCodeForProfile(code: string): Promise<GoogleProfile> {
     const client = getOAuth2Client()
     const { tokens } = await client.getToken(code)
 
@@ -61,7 +61,7 @@ class GoogleAuthService {
     }
   }
 
-  encryptProfileData(profile: GoogleProfile): string {
+  static encryptProfileData(profile: GoogleProfile): string {
     const payload = JSON.stringify({
       ...profile,
       ts: Date.now(),
@@ -69,7 +69,7 @@ class GoogleAuthService {
     return EncryptionService.encrypt(payload)
   }
 
-  decryptProfileData(encrypted: string): GoogleProfile {
+  static decryptProfileData(encrypted: string): GoogleProfile {
     const raw = EncryptionService.decrypt(encrypted)
     const data = JSON.parse(raw)
 
@@ -86,5 +86,3 @@ class GoogleAuthService {
     }
   }
 }
-
-export default new GoogleAuthService()

@@ -1,11 +1,11 @@
 import nodemailer from 'nodemailer'
 import EncryptionService from '#services/encryption/encryption_service'
 
-class SmtpService {
+export default class SmtpService {
   /**
    * Validate SMTP credentials by attempting a connection.
    */
-  async validateConnection(params: {
+  static async validateConnection(params: {
     host: string
     port: number
     username: string
@@ -30,7 +30,7 @@ class SmtpService {
   /**
    * Send an email via SMTP using stored (encrypted) credentials.
    */
-  async sendEmail(params: {
+  static async sendEmail(params: {
     host: string
     port: number
     encryptedUsername: string
@@ -72,5 +72,3 @@ class SmtpService {
     })
   }
 }
-
-export default new SmtpService()

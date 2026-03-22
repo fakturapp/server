@@ -8,8 +8,8 @@ interface TokenPayload {
   expiresAt: DateTime
 }
 
-class TokenService {
-  generatePasswordResetToken(): TokenPayload {
+export default class TokenService {
+  static generatePasswordResetToken(): TokenPayload {
     const token = EncryptionService.generateSecureToken(32)
     const hash = EncryptionService.hash(token)
     const expiresAt = DateTime.now().plus({ seconds: securityConfig.tokens.passwordResetExpiry })
@@ -17,7 +17,7 @@ class TokenService {
     return { token, hash, expiresAt }
   }
 
-  generateEmailVerificationToken(): TokenPayload {
+  static generateEmailVerificationToken(): TokenPayload {
     const token = EncryptionService.generateSecureToken(32)
     const hash = EncryptionService.hash(token)
     const expiresAt = DateTime.now().plus({
@@ -27,14 +27,12 @@ class TokenService {
     return { token, hash, expiresAt }
   }
 
-  verifyToken(providedToken: string, storedHash: string): boolean {
+  static verifyToken(providedToken: string, storedHash: string): boolean {
     const providedHash = EncryptionService.hash(providedToken)
     return EncryptionService.timingSafeEqual(providedHash, storedHash)
   }
 
-  hashToken(token: string): string {
+  static hashToken(token: string): string {
     return EncryptionService.hash(token)
   }
 }
-
-export default new TokenService()
