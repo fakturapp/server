@@ -1,8 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import mail from '@adonisjs/mail/services/main'
 import User from '#models/account/user'
 import TokenService from '#services/auth/token_service'
-import PasswordResetNotification from '#mails/password_reset_notification'
+import PasswordResetRequested from '#events/password_reset_requested'
 import { passwordResetRequestValidator } from '#validators/auth/auth_validators'
 
 export default class Request {
@@ -23,7 +22,7 @@ export default class Request {
     user.passwordResetExpiresAt = expiresAt
     await user.save()
 
-    mail.sendLater(new PasswordResetNotification(user.email, token, user.fullName ?? undefined))
+    PasswordResetRequested.dispatch(user.email, token, user.fullName ?? undefined)
 
     return response.ok({
       message: 'If an account exists with this email, a reset link has been sent.',

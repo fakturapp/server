@@ -1,10 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
-import mail from '@adonisjs/mail/services/main'
 import TeamMember from '#models/team/team_member'
 import User from '#models/account/user'
-import TeamInviteNotification from '#mails/team_invite_notification'
+import TeamMemberInvited from '#events/team_member_invited'
 import env from '#start/env'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
@@ -79,7 +78,7 @@ export default class Invite {
     const inviteUrl = `${frontendUrl}/invite/${token}`
 
     // Send invitation email
-    mail.sendLater(new TeamInviteNotification(payload.email, user.fullName || user.email, inviteUrl))
+    TeamMemberInvited.dispatch(payload.email, user.fullName || user.email, inviteUrl)
 
     return response.created({
       message: 'Invitation sent',

@@ -1,9 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import crypto from 'node:crypto'
 import { DateTime } from 'luxon'
-import mail from '@adonisjs/mail/services/main'
 import User from '#models/account/user'
-import SecurityCodeNotification from '#mails/security_code_notification'
+import EmailChangeRequested from '#events/email_change_requested'
 import { emailChangeValidator } from '#validators/account_validator'
 
 export default class EmailRequestChange {
@@ -33,7 +32,7 @@ export default class EmailRequestChange {
     await user.save()
 
     // Send code to the NEW email
-    await mail.send(new SecurityCodeNotification(newEmail, code, user.fullName || undefined))
+    await EmailChangeRequested.dispatch(newEmail, code, user.fullName || undefined)
 
     return response.ok({ message: 'Code de vérification envoyé à la nouvelle adresse' })
   }

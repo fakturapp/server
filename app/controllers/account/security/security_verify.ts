@@ -1,8 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
-import mail from '@adonisjs/mail/services/main'
-import SecurityCodeNotification from '#mails/security_code_notification'
+import SecurityCodeRequested from '#events/security_code_requested'
 import TwoFactorService from '#services/auth/two_factor_service'
 import { securityVerifyValidator } from '#validators/account_validator'
 
@@ -27,7 +26,7 @@ export default class SecurityVerify {
     user.securityCodeExpiresAt = DateTime.now().plus({ minutes: 5 })
     await user.save()
 
-    mail.sendLater(new SecurityCodeNotification(user.email, code, user.fullName ?? undefined))
+    SecurityCodeRequested.dispatch(user.email, code, user.fullName ?? undefined)
 
     return response.ok({
       message: 'Security code sent',

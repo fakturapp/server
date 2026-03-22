@@ -1,8 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import mail from '@adonisjs/mail/services/main'
 import { twoFactorSetupValidator } from '#validators/auth/auth_validators'
 import TwoFactorService from '#services/auth/two_factor_service'
-import TwoFactorEnabledNotification from '#mails/two_factor_enabled_notification'
+import TwoFactorEnabled from '#events/two_factor_enabled'
 import AuditLog from '#models/shared/audit_log'
 
 export default class Enable {
@@ -40,7 +39,7 @@ export default class Enable {
       severity: 'warning',
     })
 
-    mail.sendLater(new TwoFactorEnabledNotification(user.email, user.fullName ?? undefined))
+    TwoFactorEnabled.dispatch(user.email, user.fullName ?? undefined)
 
     return response.ok({
       message: 'Two-factor authentication enabled successfully',

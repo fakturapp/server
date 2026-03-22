@@ -1,9 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
-import mail from '@adonisjs/mail/services/main'
 import User from '#models/account/user'
 import TokenService from '#services/auth/token_service'
-import VerifyEmailNotification from '#mails/verify_email_notification'
+import UserRegistered from '#events/user_registered'
 
 export default class Resend {
   async handle({ request, response }: HttpContext) {
@@ -27,7 +26,7 @@ export default class Resend {
     user.emailVerificationSentAt = DateTime.now()
     await user.save()
 
-    mail.sendLater(new VerifyEmailNotification(user.email, token, user.fullName ?? undefined))
+    UserRegistered.dispatch(user.email, token, user.fullName ?? undefined)
 
     return response.ok({
       message: 'If the email exists and is unverified, a new verification link has been sent.',
