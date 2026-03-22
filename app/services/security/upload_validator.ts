@@ -6,31 +6,91 @@ import path from 'node:path'
  */
 export default class UploadValidator {
   private static readonly DANGEROUS_PATTERNS = [
-    /\.\./,           // Path traversal
-    /[<>:"|?*]/,      // Windows reserved chars
-    /[\x00-\x1f]/,    // Control characters
-    /^\.+$/,          // Dot-only filenames
-    /\s{2,}/,         // Multiple spaces
+    /\.\./, // Path traversal
+    /[<>:"|?*]/, // Windows reserved chars
+    // eslint-disable-next-line no-control-regex
+    /[\x00-\x1f]/, // Control characters
+    /^\.+$/, // Dot-only filenames
+    /\s{2,}/, // Multiple spaces
   ]
 
   private static readonly BLOCKED_EXTENSIONS = new Set([
-    '.exe', '.bat', '.cmd', '.com', '.msi', '.scr', '.pif',
-    '.vbs', '.vbe', '.js', '.jse', '.ws', '.wsf', '.wsc', '.wsh',
-    '.ps1', '.ps1xml', '.ps2', '.ps2xml', '.psc1', '.psc2',
-    '.msh', '.msh1', '.msh2', '.mshxml', '.msh1xml', '.msh2xml',
-    '.cpl', '.inf', '.reg', '.rgs', '.sct', '.shb', '.shs',
-    '.lnk', '.url', '.dll', '.sys', '.drv', '.ocx',
-    '.php', '.phtml', '.php3', '.php4', '.php5', '.php7', '.phps',
-    '.cgi', '.pl', '.asp', '.aspx', '.cer', '.asa',
-    '.htaccess', '.htpasswd',
+    '.exe',
+    '.bat',
+    '.cmd',
+    '.com',
+    '.msi',
+    '.scr',
+    '.pif',
+    '.vbs',
+    '.vbe',
+    '.js',
+    '.jse',
+    '.ws',
+    '.wsf',
+    '.wsc',
+    '.wsh',
+    '.ps1',
+    '.ps1xml',
+    '.ps2',
+    '.ps2xml',
+    '.psc1',
+    '.psc2',
+    '.msh',
+    '.msh1',
+    '.msh2',
+    '.mshxml',
+    '.msh1xml',
+    '.msh2xml',
+    '.cpl',
+    '.inf',
+    '.reg',
+    '.rgs',
+    '.sct',
+    '.shb',
+    '.shs',
+    '.lnk',
+    '.url',
+    '.dll',
+    '.sys',
+    '.drv',
+    '.ocx',
+    '.php',
+    '.phtml',
+    '.php3',
+    '.php4',
+    '.php5',
+    '.php7',
+    '.phps',
+    '.cgi',
+    '.pl',
+    '.asp',
+    '.aspx',
+    '.cer',
+    '.asa',
+    '.htaccess',
+    '.htpasswd',
   ])
 
   private static readonly ALLOWED_IMAGE_EXTENSIONS = new Set([
-    '.jpg', '.jpeg', '.png', '.gif', '.webp', '.svg', '.ico', '.bmp',
+    '.jpg',
+    '.jpeg',
+    '.png',
+    '.gif',
+    '.webp',
+    '.svg',
+    '.ico',
+    '.bmp',
   ])
 
   private static readonly ALLOWED_DOCUMENT_EXTENSIONS = new Set([
-    '.pdf', '.doc', '.docx', '.xls', '.xlsx', '.csv', '.txt',
+    '.pdf',
+    '.doc',
+    '.docx',
+    '.xls',
+    '.xlsx',
+    '.csv',
+    '.txt',
   ])
 
   /**

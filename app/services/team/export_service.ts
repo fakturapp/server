@@ -35,7 +35,11 @@ interface ExportData {
   bankAccounts?: Record<string, unknown>[]
 }
 
-export async function collectTeamData(teamId: string, dek: Buffer, options?: { includeBankAccounts?: boolean }): Promise<ExportData> {
+export async function collectTeamData(
+  teamId: string,
+  dek: Buffer,
+  options?: { includeBankAccounts?: boolean }
+): Promise<ExportData> {
   const team = await Team.find(teamId)
   if (!team) throw new Error('Team not found')
 
@@ -73,10 +77,18 @@ export async function collectTeamData(teamId: string, dek: Buffer, options?: { i
       let iban = ba.iban
       let bic = ba.bic
       if (iban && zeroAccessCryptoService.isEncryptedField(iban)) {
-        try { iban = zeroAccessCryptoService.decryptField(iban, dek) } catch { iban = null }
+        try {
+          iban = zeroAccessCryptoService.decryptField(iban, dek)
+        } catch {
+          iban = null
+        }
       }
       if (bic && zeroAccessCryptoService.isEncryptedField(bic)) {
-        try { bic = zeroAccessCryptoService.decryptField(bic, dek) } catch { bic = null }
+        try {
+          bic = zeroAccessCryptoService.decryptField(bic, dek)
+        } catch {
+          bic = null
+        }
       }
       return {
         label: ba.label,
@@ -296,7 +308,9 @@ export async function createZipBuffer(data: ExportData, logoFiles?: LogoFile[]):
     archive.append(JSON.stringify(data.settings, null, 2), { name: 'export/settings.json' })
 
     if (data.bankAccounts) {
-      archive.append(JSON.stringify(data.bankAccounts, null, 2), { name: 'export/bank_accounts.json' })
+      archive.append(JSON.stringify(data.bankAccounts, null, 2), {
+        name: 'export/bank_accounts.json',
+      })
     }
 
     if (logoFiles) {

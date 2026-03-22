@@ -6,7 +6,7 @@ export default class SecurityCodeNotification extends BaseMail {
   subject = 'Code de vérification - Faktur'
 
   constructor(
-    private email: string,
+    email: string,
     private code: string,
     private name?: string
   ) {

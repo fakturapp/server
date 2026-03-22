@@ -10,10 +10,7 @@ export default class UnlinkQuote {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const invoice = await Invoice.query()
-      .where('id', params.id)
-      .where('team_id', teamId)
-      .first()
+    const invoice = await Invoice.query().where('id', params.id).where('team_id', teamId).first()
 
     if (!invoice) {
       return response.notFound({ message: 'Invoice not found' })

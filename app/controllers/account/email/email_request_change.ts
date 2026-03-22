@@ -11,7 +11,7 @@ export default class EmailRequestChange {
     const { newEmail } = await request.validateUsing(emailChangeValidator)
 
     if (newEmail.toLowerCase() === user.email.toLowerCase()) {
-      return response.badRequest({ message: 'Le nouvel email est identique à l\'actuel' })
+      return response.badRequest({ message: "Le nouvel email est identique à l'actuel" })
     }
 
     const existing = await User.findBy('email', newEmail)
@@ -20,7 +20,10 @@ export default class EmailRequestChange {
     }
 
     // Rate limit: reuse securityCodeExpiresAt check
-    if (user.securityCodeExpiresAt && user.securityCodeExpiresAt > DateTime.now().minus({ minutes: 4 })) {
+    if (
+      user.securityCodeExpiresAt &&
+      user.securityCodeExpiresAt > DateTime.now().minus({ minutes: 4 })
+    ) {
       return response.tooManyRequests({ message: 'Veuillez attendre avant de renvoyer un code' })
     }
 

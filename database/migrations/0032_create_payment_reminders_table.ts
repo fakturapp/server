@@ -4,10 +4,7 @@ export default class extends BaseSchema {
   async up() {
     // Team-level reminder configuration
     this.schema.createTable('payment_reminder_settings', (table) => {
-      table
-        .uuid('id')
-        .primary()
-        .defaultTo(this.raw('gen_random_uuid()'))
+      table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
 
       table
         .uuid('team_id')
@@ -21,7 +18,7 @@ export default class extends BaseSchema {
 
       // Reminder schedule: days before/after due date
       table.integer('days_before_due').nullable() // e.g. 3 = reminder 3 days before
-      table.integer('days_after_due').nullable()   // e.g. 7 = reminder 7 days after
+      table.integer('days_after_due').nullable() // e.g. 7 = reminder 7 days after
       table.integer('repeat_interval_days').nullable() // e.g. 7 = repeat every 7 days after first overdue reminder
 
       // Email template
@@ -32,7 +29,12 @@ export default class extends BaseSchema {
       table.boolean('auto_send').notNullable().defaultTo(false)
 
       // Default email account to use
-      table.uuid('email_account_id').nullable().references('id').inTable('email_accounts').onDelete('SET NULL')
+      table
+        .uuid('email_account_id')
+        .nullable()
+        .references('id')
+        .inTable('email_accounts')
+        .onDelete('SET NULL')
 
       table.timestamp('created_at').notNullable()
       table.timestamp('updated_at').nullable()
@@ -40,17 +42,9 @@ export default class extends BaseSchema {
 
     // Track individual reminders sent
     this.schema.createTable('payment_reminders', (table) => {
-      table
-        .uuid('id')
-        .primary()
-        .defaultTo(this.raw('gen_random_uuid()'))
+      table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
 
-      table
-        .uuid('team_id')
-        .notNullable()
-        .references('id')
-        .inTable('teams')
-        .onDelete('CASCADE')
+      table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
 
       table
         .uuid('invoice_id')

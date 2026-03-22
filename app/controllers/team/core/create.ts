@@ -13,7 +13,10 @@ export default class Create {
 
     const kek = keyStore.getKEK(user.id)
     if (!kek) {
-      return response.unauthorized({ code: 'SESSION_EXPIRED', message: 'Session expired. Please log in again.' })
+      return response.unauthorized({
+        code: 'SESSION_EXPIRED',
+        message: 'Session expired. Please log in again.',
+      })
     }
 
     const team = await Team.create({

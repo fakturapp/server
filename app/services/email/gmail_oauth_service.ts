@@ -120,9 +120,7 @@ export default class GmailOAuthService {
     const gmail = google.gmail({ version: 'v1', auth: client })
 
     const boundary = 'boundary_' + Date.now().toString(36)
-    const fromHeader = params.fromName
-      ? `${params.fromName} <${params.from}>`
-      : params.from
+    const fromHeader = params.fromName ? `${params.fromName} <${params.from}>` : params.from
 
     let rawMessage = [
       `From: ${fromHeader}`,

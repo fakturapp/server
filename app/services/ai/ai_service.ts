@@ -24,7 +24,10 @@ const ENV_KEYS: Record<AiProvider, string> = {
 }
 
 // Provider-specific key column names
-const PROVIDER_KEY_FIELDS: Record<AiProvider, 'aiApiKeyClaude' | 'aiApiKeyGemini' | 'aiApiKeyGroq'> = {
+const PROVIDER_KEY_FIELDS: Record<
+  AiProvider,
+  'aiApiKeyClaude' | 'aiApiKeyGemini' | 'aiApiKeyGroq'
+> = {
   claude: 'aiApiKeyClaude',
   gemini: 'aiApiKeyGemini',
   groq: 'aiApiKeyGroq',
@@ -56,13 +59,21 @@ export default class AiService {
    * - 'apikey' (custom): ONLY use user's custom key, never env var
    * - undefined: use team's aiKeyMode setting (legacy behavior)
    */
-  private async getApiKey(teamId: string, dek: Buffer, provider: AiProvider, sourceOverride?: 'faktur' | 'apikey'): Promise<{ key: string | null; source: 'custom' | 'server' }> {
+  private async getApiKey(
+    teamId: string,
+    dek: Buffer,
+    provider: AiProvider,
+    sourceOverride?: 'faktur' | 'apikey'
+  ): Promise<{ key: string | null; source: 'custom' | 'server' }> {
     const settings = await InvoiceSetting.findBy('teamId', teamId)
 
     // Determine effective mode: per-request override > team setting
-    const effectiveMode = sourceOverride === 'faktur' ? 'server'
-      : sourceOverride === 'apikey' ? 'custom'
-      : (settings?.aiKeyMode as 'server' | 'custom') || 'server'
+    const effectiveMode =
+      sourceOverride === 'faktur'
+        ? 'server'
+        : sourceOverride === 'apikey'
+          ? 'custom'
+          : (settings?.aiKeyMode as 'server' | 'custom') || 'server'
 
     // Server mode: ONLY env var, skip custom keys entirely
     if (effectiveMode === 'server') {
@@ -84,7 +95,10 @@ export default class AiService {
     // 2. Fallback: legacy aiCustomApiKey (only if provider matches settings.aiProvider)
     if (settings?.aiCustomApiKey && (settings?.aiProvider as AiProvider) === provider) {
       try {
-        return { key: zeroAccessCryptoService.decryptField(settings.aiCustomApiKey, dek), source: 'custom' }
+        return {
+          key: zeroAccessCryptoService.decryptField(settings.aiCustomApiKey, dek),
+          source: 'custom',
+        }
       } catch {
         // Decryption failed, fall through
       }
@@ -97,7 +111,10 @@ export default class AiService {
   /**
    * Check which providers are available for the team.
    */
-  async getAvailableProviders(teamId: string, dek: Buffer): Promise<Array<{ provider: AiProvider; available: boolean; source: 'custom' | 'server' }>> {
+  async getAvailableProviders(
+    teamId: string,
+    dek: Buffer
+  ): Promise<Array<{ provider: AiProvider; available: boolean; source: 'custom' | 'server' }>> {
     const providers: AiProvider[] = ['gemini', 'groq', 'claude']
     const results = []
     for (const provider of providers) {
@@ -110,7 +127,11 @@ export default class AiService {
   /**
    * Resolve the model from team settings (or use override).
    */
-  private async getModel(teamId: string, provider: AiProvider, overrideModel?: string): Promise<string> {
+  private async getModel(
+    teamId: string,
+    provider: AiProvider,
+    overrideModel?: string
+  ): Promise<string> {
     if (overrideModel) return overrideModel
     const settings = await InvoiceSetting.findBy('teamId', teamId)
     // Only use saved model if provider matches
@@ -132,7 +153,7 @@ export default class AiService {
     maxTokens: number = 1024,
     overrideProvider?: string,
     overrideModel?: string,
-    sourceOverride?: 'faktur' | 'apikey',
+    sourceOverride?: 'faktur' | 'apikey'
   ): Promise<string> {
     const provider = await this.getProvider(teamId, overrideProvider)
     const { key: apiKey, source } = await this.getApiKey(teamId, dek, provider, sourceOverride)
@@ -140,9 +161,13 @@ export default class AiService {
 
     if (!apiKey) {
       if (source === 'custom') {
-        throw new Error(`Aucune clé API configurée pour ${provider}. Ajoutez votre clé dans Paramètres > IA > Plus de paramètres.`)
+        throw new Error(
+          `Aucune clé API configurée pour ${provider}. Ajoutez votre clé dans Paramètres > IA > Plus de paramètres.`
+        )
       }
-      throw new Error(`No API key configured for ${provider}. Set ${ENV_KEYS[provider]} or add a custom key in settings.`)
+      throw new Error(
+        `No API key configured for ${provider}. Set ${ENV_KEYS[provider]} or add a custom key in settings.`
+      )
     }
 
     switch (provider) {
@@ -168,7 +193,7 @@ export default class AiService {
     maxTokens: number = 1024,
     overrideProvider?: string,
     overrideModel?: string,
-    sourceOverride?: 'faktur' | 'apikey',
+    sourceOverride?: 'faktur' | 'apikey'
   ): Promise<string> {
     const provider = await this.getProvider(teamId, overrideProvider)
     const { key: apiKey, source } = await this.getApiKey(teamId, dek, provider, sourceOverride)
@@ -176,7 +201,9 @@ export default class AiService {
 
     if (!apiKey) {
       if (source === 'custom') {
-        throw new Error(`Aucune clé API configurée pour ${provider}. Ajoutez votre clé dans Paramètres > IA > Plus de paramètres.`)
+        throw new Error(
+          `Aucune clé API configurée pour ${provider}. Ajoutez votre clé dans Paramètres > IA > Plus de paramètres.`
+        )
       }
       throw new Error(`No API key configured for ${provider}.`)
     }
@@ -195,11 +222,29 @@ export default class AiService {
 
   // ─── Claude (Anthropic) ────────────────────────────────────
 
-  private async callClaude(apiKey: string, model: string, system: string, userPrompt: string, maxTokens: number): Promise<string> {
-    return this.chatClaude(apiKey, model, system, [{ role: 'user', content: userPrompt }], maxTokens)
+  private async callClaude(
+    apiKey: string,
+    model: string,
+    system: string,
+    userPrompt: string,
+    maxTokens: number
+  ): Promise<string> {
+    return this.chatClaude(
+      apiKey,
+      model,
+      system,
+      [{ role: 'user', content: userPrompt }],
+      maxTokens
+    )
   }
 
-  private async chatClaude(apiKey: string, model: string, system: string, messages: ChatMessage[], maxTokens: number): Promise<string> {
+  private async chatClaude(
+    apiKey: string,
+    model: string,
+    system: string,
+    messages: ChatMessage[],
+    maxTokens: number
+  ): Promise<string> {
     const res = await fetch('https://api.anthropic.com/v1/messages', {
       method: 'POST',
       headers: {
@@ -215,17 +260,35 @@ export default class AiService {
       throw new Error(`Claude API error ${res.status}: ${errorText}`)
     }
 
-    const data = await res.json() as { content: Array<{ type: string; text: string }> }
+    const data = (await res.json()) as { content: Array<{ type: string; text: string }> }
     return data.content?.[0]?.text || ''
   }
 
   // ─── Gemini (Google) ───────────────────────────────────────
 
-  private async callGemini(apiKey: string, model: string, system: string, userPrompt: string, maxTokens: number): Promise<string> {
-    return this.chatGemini(apiKey, model, system, [{ role: 'user', content: userPrompt }], maxTokens)
+  private async callGemini(
+    apiKey: string,
+    model: string,
+    system: string,
+    userPrompt: string,
+    maxTokens: number
+  ): Promise<string> {
+    return this.chatGemini(
+      apiKey,
+      model,
+      system,
+      [{ role: 'user', content: userPrompt }],
+      maxTokens
+    )
   }
 
-  private async chatGemini(apiKey: string, model: string, system: string, messages: ChatMessage[], maxTokens: number): Promise<string> {
+  private async chatGemini(
+    apiKey: string,
+    model: string,
+    system: string,
+    messages: ChatMessage[],
+    maxTokens: number
+  ): Promise<string> {
     const contents = messages.map((m) => ({
       role: m.role === 'assistant' ? 'model' : 'user',
       parts: [{ text: m.content }],
@@ -249,7 +312,7 @@ export default class AiService {
       throw new Error(`Gemini API error ${res.status}: ${errorText}`)
     }
 
-    const data = await res.json() as {
+    const data = (await res.json()) as {
       candidates?: Array<{ content?: { parts?: Array<{ text?: string }> } }>
     }
     return data.candidates?.[0]?.content?.parts?.[0]?.text || ''
@@ -257,11 +320,23 @@ export default class AiService {
 
   // ─── Groq (OpenAI-compatible) ──────────────────────────────
 
-  private async callGroq(apiKey: string, model: string, system: string, userPrompt: string, maxTokens: number): Promise<string> {
+  private async callGroq(
+    apiKey: string,
+    model: string,
+    system: string,
+    userPrompt: string,
+    maxTokens: number
+  ): Promise<string> {
     return this.chatGroq(apiKey, model, system, [{ role: 'user', content: userPrompt }], maxTokens)
   }
 
-  private async chatGroq(apiKey: string, model: string, system: string, messages: ChatMessage[], maxTokens: number): Promise<string> {
+  private async chatGroq(
+    apiKey: string,
+    model: string,
+    system: string,
+    messages: ChatMessage[],
+    maxTokens: number
+  ): Promise<string> {
     const openaiMessages = [
       { role: 'system' as const, content: system },
       ...messages.map((m) => ({ role: m.role as 'user' | 'assistant', content: m.content })),
@@ -271,7 +346,7 @@ export default class AiService {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json',
-        Authorization: `Bearer ${apiKey}`,
+        'Authorization': `Bearer ${apiKey}`,
       },
       body: JSON.stringify({ model, max_tokens: maxTokens, messages: openaiMessages }),
     })
@@ -281,7 +356,7 @@ export default class AiService {
       throw new Error(`Groq API error ${res.status}: ${errorText}`)
     }
 
-    const data = await res.json() as { choices?: Array<{ message?: { content?: string } }> }
+    const data = (await res.json()) as { choices?: Array<{ message?: { content?: string } }> }
     return data.choices?.[0]?.message?.content || ''
   }
 }

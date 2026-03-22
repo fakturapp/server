@@ -16,7 +16,7 @@ export default class ValidateConnection {
 
     const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
     if (!invoiceSettings?.eInvoicingEnabled) {
-      return response.forbidden({ message: 'La facturation electronique n\'est pas activee' })
+      return response.forbidden({ message: "La facturation electronique n'est pas activee" })
     }
 
     // Decrypt pdpApiKey before building config

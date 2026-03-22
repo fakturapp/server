@@ -62,9 +62,7 @@ export default class ConfigureSmtp {
     }
 
     // Check if first account
-    const existingCount = await EmailAccount.query()
-      .where('team_id', teamId)
-      .count('* as total')
+    const existingCount = await EmailAccount.query().where('team_id', teamId).count('* as total')
 
     const isFirst = Number(existingCount[0].$extras.total) === 0
 

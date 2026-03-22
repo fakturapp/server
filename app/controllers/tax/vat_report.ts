@@ -102,7 +102,11 @@ export default class VatReport {
         totalBase: round2(totalBaseCollected),
         totalVat: round2(totalVatCollected),
         byRate: Object.entries(vatCollectedByRate)
-          .map(([rate, v]) => ({ rate: parseFloat(rate), base: round2(v.base), vat: round2(v.vat) }))
+          .map(([rate, v]) => ({
+            rate: Number.parseFloat(rate),
+            base: round2(v.base),
+            vat: round2(v.vat),
+          }))
           .sort((a, b) => a.rate - b.rate),
         invoiceCount: invoices.length,
       },
@@ -115,7 +119,11 @@ export default class VatReport {
         totalBase: round2(totalBaseDeductible),
         totalVat: round2(totalVatDeductible),
         byRate: Object.entries(vatDeductibleByRate)
-          .map(([rate, v]) => ({ rate: parseFloat(rate), base: round2(v.base), vat: round2(v.vat) }))
+          .map(([rate, v]) => ({
+            rate: Number.parseFloat(rate),
+            base: round2(v.base),
+            vat: round2(v.vat),
+          }))
           .sort((a, b) => a.rate - b.rate),
         expenseCount: expenses.length,
       },

@@ -22,7 +22,7 @@ export default class Get {
           repeatIntervalDays: null,
           emailSubjectTemplate: 'Rappel : Facture {numero} en attente de paiement',
           emailBodyTemplate:
-            'Bonjour,\n\nNous vous rappelons que la facture {numero} d\'un montant de {montant} est arrivee a echeance le {date_echeance}.\n\nMerci de bien vouloir proceder au reglement.\n\nCordialement',
+            "Bonjour,\n\nNous vous rappelons que la facture {numero} d'un montant de {montant} est arrivee a echeance le {date_echeance}.\n\nMerci de bien vouloir proceder au reglement.\n\nCordialement",
           autoSend: false,
           emailAccountId: null,
         },

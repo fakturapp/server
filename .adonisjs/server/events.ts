@@ -3,4 +3,18 @@
  * DO NOT EDIT manually
  */
 
-export const events = {}
+import EmailChangeRequested from '#events/email_change_requested'
+import PasswordResetRequested from '#events/password_reset_requested'
+import SecurityCodeRequested from '#events/security_code_requested'
+import TeamMemberInvited from '#events/team_member_invited'
+import TwoFactorEnabled from '#events/two_factor_enabled'
+import UserRegistered from '#events/user_registered'
+
+export const events = {
+  EmailChangeRequested: EmailChangeRequested,
+  PasswordResetRequested: PasswordResetRequested,
+  SecurityCodeRequested: SecurityCodeRequested,
+  TeamMemberInvited: TeamMemberInvited,
+  TwoFactorEnabled: TwoFactorEnabled,
+  UserRegistered: UserRegistered,
+}

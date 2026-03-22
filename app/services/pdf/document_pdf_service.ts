@@ -18,7 +18,11 @@ import { generatePdf } from '#services/pdf/pdf_generator'
 
 function resolveLogoToBase64(logoUrl: string | null): string | null {
   if (!logoUrl) return null
-  if (logoUrl.startsWith('data:') || logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+  if (
+    logoUrl.startsWith('data:') ||
+    logoUrl.startsWith('http://') ||
+    logoUrl.startsWith('https://')
+  ) {
     return logoUrl
   }
   const match = logoUrl.match(/^\/(invoice-logos|company-logos)\/(.+)$/)
@@ -27,7 +31,11 @@ function resolveLogoToBase64(logoUrl: string | null): string | null {
   if (!existsSync(filePath)) return null
   const ext = extname(filePath).toLowerCase().replace('.', '')
   const mimeMap: Record<string, string> = {
-    png: 'image/png', jpg: 'image/jpeg', jpeg: 'image/jpeg', svg: 'image/svg+xml', webp: 'image/webp',
+    png: 'image/png',
+    jpg: 'image/jpeg',
+    jpeg: 'image/jpeg',
+    svg: 'image/svg+xml',
+    webp: 'image/webp',
   }
   const mime = mimeMap[ext] || 'image/png'
   const base64 = readFileSync(filePath).toString('base64')
@@ -90,7 +98,11 @@ function buildCompanyData(company: Company | null) {
   }
 }
 
-export async function generateInvoicePdf(invoiceId: string, teamId: string, dek: Buffer): Promise<{ pdfBuffer: Buffer; filename: string }> {
+export async function generateInvoicePdf(
+  invoiceId: string,
+  teamId: string,
+  dek: Buffer
+): Promise<{ pdfBuffer: Buffer; filename: string }> {
   const invoice = await Invoice.query()
     .where('id', invoiceId)
     .where('team_id', teamId)
@@ -122,11 +134,13 @@ export async function generateInvoicePdf(invoiceId: string, teamId: string, dek:
     customPaymentMethod: invoiceSettings?.customPaymentMethod || null,
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'invoice' as const,
-    footerMode: (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
+    footerMode:
+      (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'
-  const rawLogoUrl = logoSource === 'company' ? (company?.logoUrl || null) : (invoiceSettings?.logoUrl || null)
+  const rawLogoUrl =
+    logoSource === 'company' ? company?.logoUrl || null : invoiceSettings?.logoUrl || null
   const resolvedLogoUrl = resolveLogoToBase64(rawLogoUrl)
 
   const quoteData = {
@@ -177,10 +191,18 @@ export async function generateInvoicePdf(invoiceId: string, teamId: string, dek:
       let iban = bankAccount.iban
       let bic = bankAccount.bic
       if (iban && zeroAccessCryptoService.isEncryptedField(iban)) {
-        try { iban = zeroAccessCryptoService.decryptField(iban, dek) } catch { iban = null }
+        try {
+          iban = zeroAccessCryptoService.decryptField(iban, dek)
+        } catch {
+          iban = null
+        }
       }
       if (bic && zeroAccessCryptoService.isEncryptedField(bic)) {
-        try { bic = zeroAccessCryptoService.decryptField(bic, dek) } catch { bic = null }
+        try {
+          bic = zeroAccessCryptoService.decryptField(bic, dek)
+        } catch {
+          bic = null
+        }
       }
       companyData.iban = iban
       companyData.bic = bic
@@ -194,7 +216,9 @@ export async function generateInvoicePdf(invoiceId: string, teamId: string, dek:
   const filenamePattern = invoiceSettings?.invoiceFilenamePattern || 'FAC-{numero}'
   const resolvedName = resolveFilenamePattern(filenamePattern, {
     numero: invoice.invoiceNumber,
-    date: invoice.issueDate ? new Date(invoice.issueDate.toString()).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+    date: invoice.issueDate
+      ? new Date(invoice.issueDate.toString()).toISOString().slice(0, 10)
+      : new Date().toISOString().slice(0, 10),
     client: invoice.client?.displayName || invoice.client?.companyName || 'client',
     entreprise: company?.legalName || company?.tradeName || 'entreprise',
   })
@@ -202,7 +226,11 @@ export async function generateInvoicePdf(invoiceId: string, teamId: string, dek:
   return { pdfBuffer, filename: `${resolvedName}.pdf` }
 }
 
-export async function generateQuotePdf(quoteId: string, teamId: string, dek: Buffer): Promise<{ pdfBuffer: Buffer; filename: string }> {
+export async function generateQuotePdf(
+  quoteId: string,
+  teamId: string,
+  dek: Buffer
+): Promise<{ pdfBuffer: Buffer; filename: string }> {
   const quote = await Quote.query()
     .where('id', quoteId)
     .where('team_id', teamId)
@@ -231,11 +259,13 @@ export async function generateQuotePdf(quoteId: string, teamId: string, dek: Buf
     customPaymentMethod: invoiceSettings?.customPaymentMethod || null,
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'quote' as const,
-    footerMode: (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
+    footerMode:
+      (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'
-  const rawLogoUrl = logoSource === 'company' ? (company?.logoUrl || null) : (invoiceSettings?.logoUrl || null)
+  const rawLogoUrl =
+    logoSource === 'company' ? company?.logoUrl || null : invoiceSettings?.logoUrl || null
   const resolvedLogoUrl = resolveLogoToBase64(rawLogoUrl)
 
   const quoteData = {
@@ -285,7 +315,9 @@ export async function generateQuotePdf(quoteId: string, teamId: string, dek: Buf
   const filenamePattern = invoiceSettings?.quoteFilenamePattern || 'DEV-{numero}'
   const resolvedName = resolveFilenamePattern(filenamePattern, {
     numero: quote.quoteNumber,
-    date: quote.issueDate ? new Date(quote.issueDate.toString()).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+    date: quote.issueDate
+      ? new Date(quote.issueDate.toString()).toISOString().slice(0, 10)
+      : new Date().toISOString().slice(0, 10),
     client: quote.client?.displayName || quote.client?.companyName || 'client',
     entreprise: company?.legalName || company?.tradeName || 'entreprise',
   })
@@ -293,7 +325,11 @@ export async function generateQuotePdf(quoteId: string, teamId: string, dek: Buf
   return { pdfBuffer, filename: `${resolvedName}.pdf` }
 }
 
-export async function generateCreditNotePdf(creditNoteId: string, teamId: string, dek: Buffer): Promise<{ pdfBuffer: Buffer; filename: string }> {
+export async function generateCreditNotePdf(
+  creditNoteId: string,
+  teamId: string,
+  dek: Buffer
+): Promise<{ pdfBuffer: Buffer; filename: string }> {
   const creditNote = await CreditNote.query()
     .where('id', creditNoteId)
     .where('team_id', teamId)
@@ -321,11 +357,13 @@ export async function generateCreditNotePdf(creditNoteId: string, teamId: string
     customPaymentMethod: null as string | null,
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'credit_note' as const,
-    footerMode: (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
+    footerMode:
+      (invoiceSettings?.footerMode as 'company_info' | 'vat_exempt' | 'custom') || 'vat_exempt',
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'
-  const rawLogoUrl = logoSource === 'company' ? (company?.logoUrl || null) : (invoiceSettings?.logoUrl || null)
+  const rawLogoUrl =
+    logoSource === 'company' ? company?.logoUrl || null : invoiceSettings?.logoUrl || null
   const resolvedLogoUrl = resolveLogoToBase64(rawLogoUrl)
 
   const quoteData = {
@@ -374,7 +412,9 @@ export async function generateCreditNotePdf(creditNoteId: string, teamId: string
 
   const resolvedName = resolveFilenamePattern('AV-{numero}', {
     numero: creditNote.creditNoteNumber,
-    date: creditNote.issueDate ? new Date(creditNote.issueDate.toString()).toISOString().slice(0, 10) : new Date().toISOString().slice(0, 10),
+    date: creditNote.issueDate
+      ? new Date(creditNote.issueDate.toString()).toISOString().slice(0, 10)
+      : new Date().toISOString().slice(0, 10),
     client: creditNote.client?.displayName || creditNote.client?.companyName || 'client',
     entreprise: company?.legalName || company?.tradeName || 'entreprise',
   })

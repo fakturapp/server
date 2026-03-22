@@ -33,92 +33,98 @@ export default class Stats {
 
     // --- Stats ---
     const [
-      totalInvoicedCurrent, totalInvoicedPrev, outstandingResult, totalCollectedCurrent, totalCollectedPrev,
-      totalQuotedCurrent, totalQuotedPrev, totalAcceptedCurrent,
+      totalInvoicedCurrent,
+      totalInvoicedPrev,
+      outstandingResult,
+      totalCollectedCurrent,
+      totalCollectedPrev,
+      totalQuotedCurrent,
+      totalQuotedPrev,
+      totalAcceptedCurrent,
     ] = await Promise.all([
-        // Total invoiced this month
-        Invoice.query()
-          .where('team_id', teamId)
-          .whereNotIn('status', ['draft', 'cancelled'])
-          .where('issue_date', '>=', startOfMonth)
-          .sum('total as total')
-          .then((r) => Number(r[0].$extras.total) || 0),
+      // Total invoiced this month
+      Invoice.query()
+        .where('team_id', teamId)
+        .whereNotIn('status', ['draft', 'cancelled'])
+        .where('issue_date', '>=', startOfMonth)
+        .sum('total as total')
+        .then((r) => Number(r[0].$extras.total) || 0),
 
-        // Total invoiced previous month
-        Invoice.query()
-          .where('team_id', teamId)
-          .whereNotIn('status', ['draft', 'cancelled'])
-          .where('issue_date', '>=', startOfPrevMonth)
-          .where('issue_date', '<=', endOfPrevMonth)
-          .sum('total as total')
-          .then((r) => Number(r[0].$extras.total) || 0),
+      // Total invoiced previous month
+      Invoice.query()
+        .where('team_id', teamId)
+        .whereNotIn('status', ['draft', 'cancelled'])
+        .where('issue_date', '>=', startOfPrevMonth)
+        .where('issue_date', '<=', endOfPrevMonth)
+        .sum('total as total')
+        .then((r) => Number(r[0].$extras.total) || 0),
 
-        // Outstanding (sent + overdue)
-        Invoice.query()
-          .where('team_id', teamId)
-          .whereIn('status', ['sent', 'overdue'])
-          .sum('total as total')
-          .then((r) => Number(r[0].$extras.total) || 0),
+      // Outstanding (sent + overdue)
+      Invoice.query()
+        .where('team_id', teamId)
+        .whereIn('status', ['sent', 'overdue'])
+        .sum('total as total')
+        .then((r) => Number(r[0].$extras.total) || 0),
 
-        // Total collected this month
-        Invoice.query()
-          .where('team_id', teamId)
-          .where('status', 'paid')
-          .where((q) => {
-            q.where((sub) => {
-              sub.whereNotNull('paid_date').where('paid_date', '>=', startOfMonth)
-            }).orWhere((sub) => {
-              sub.whereNull('paid_date').where('issue_date', '>=', startOfMonth)
-            })
+      // Total collected this month
+      Invoice.query()
+        .where('team_id', teamId)
+        .where('status', 'paid')
+        .where((q) => {
+          q.where((sub) => {
+            sub.whereNotNull('paid_date').where('paid_date', '>=', startOfMonth)
+          }).orWhere((sub) => {
+            sub.whereNull('paid_date').where('issue_date', '>=', startOfMonth)
           })
-          .sum('total as total')
-          .then((r) => Number(r[0].$extras.total) || 0),
+        })
+        .sum('total as total')
+        .then((r) => Number(r[0].$extras.total) || 0),
 
-        // Total collected previous month
-        Invoice.query()
-          .where('team_id', teamId)
-          .where('status', 'paid')
-          .where((q) => {
-            q.where((sub) => {
-              sub
-                .whereNotNull('paid_date')
-                .where('paid_date', '>=', startOfPrevMonth)
-                .where('paid_date', '<=', endOfPrevMonth)
-            }).orWhere((sub) => {
-              sub
-                .whereNull('paid_date')
-                .where('issue_date', '>=', startOfPrevMonth)
-                .where('issue_date', '<=', endOfPrevMonth)
-            })
+      // Total collected previous month
+      Invoice.query()
+        .where('team_id', teamId)
+        .where('status', 'paid')
+        .where((q) => {
+          q.where((sub) => {
+            sub
+              .whereNotNull('paid_date')
+              .where('paid_date', '>=', startOfPrevMonth)
+              .where('paid_date', '<=', endOfPrevMonth)
+          }).orWhere((sub) => {
+            sub
+              .whereNull('paid_date')
+              .where('issue_date', '>=', startOfPrevMonth)
+              .where('issue_date', '<=', endOfPrevMonth)
           })
-          .sum('total as total')
-          .then((r) => Number(r[0].$extras.total) || 0),
+        })
+        .sum('total as total')
+        .then((r) => Number(r[0].$extras.total) || 0),
 
-        // Total quoted this month (non-draft)
-        Quote.query()
-          .where('team_id', teamId)
-          .whereNot('status', 'draft')
-          .where('issue_date', '>=', startOfMonth)
-          .sum('total as total')
-          .then((r) => Number(r[0].$extras.total) || 0),
+      // Total quoted this month (non-draft)
+      Quote.query()
+        .where('team_id', teamId)
+        .whereNot('status', 'draft')
+        .where('issue_date', '>=', startOfMonth)
+        .sum('total as total')
+        .then((r) => Number(r[0].$extras.total) || 0),
 
-        // Total quoted previous month
-        Quote.query()
-          .where('team_id', teamId)
-          .whereNot('status', 'draft')
-          .where('issue_date', '>=', startOfPrevMonth)
-          .where('issue_date', '<=', endOfPrevMonth)
-          .sum('total as total')
-          .then((r) => Number(r[0].$extras.total) || 0),
+      // Total quoted previous month
+      Quote.query()
+        .where('team_id', teamId)
+        .whereNot('status', 'draft')
+        .where('issue_date', '>=', startOfPrevMonth)
+        .where('issue_date', '<=', endOfPrevMonth)
+        .sum('total as total')
+        .then((r) => Number(r[0].$extras.total) || 0),
 
-        // Total accepted this month
-        Quote.query()
-          .where('team_id', teamId)
-          .where('status', 'accepted')
-          .where('issue_date', '>=', startOfMonth)
-          .sum('total as total')
-          .then((r) => Number(r[0].$extras.total) || 0),
-      ])
+      // Total accepted this month
+      Quote.query()
+        .where('team_id', teamId)
+        .where('status', 'accepted')
+        .where('issue_date', '>=', startOfMonth)
+        .sum('total as total')
+        .then((r) => Number(r[0].$extras.total) || 0),
+    ])
 
     function calcTrend(current: number, previous: number) {
       if (previous === 0) return current > 0 ? 100 : 0

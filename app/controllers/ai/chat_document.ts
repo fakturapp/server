@@ -240,7 +240,7 @@ export default class ChatDocument {
         mode === 'question' ? 4096 : 2048,
         payload.provider,
         payload.model,
-        payload.source as 'faktur' | 'apikey' | undefined,
+        payload.source as 'faktur' | 'apikey' | undefined
       )
 
       // Parse JSON from response — strip markdown code fences if present
@@ -251,7 +251,10 @@ export default class ChatDocument {
 
       const jsonMatch = cleaned.match(/\{[\s\S]*\}/)
       if (!jsonMatch) {
-        return response.badRequest({ message: 'Failed to parse AI response', detail: result.slice(0, 500) })
+        return response.badRequest({
+          message: 'Failed to parse AI response',
+          detail: result.slice(0, 500),
+        })
       }
 
       const parsed = JSON.parse(jsonMatch[0])
@@ -290,7 +293,8 @@ export default class ChatDocument {
       // Sanitize document fields
       doc.subject = typeof doc.subject === 'string' ? doc.subject : ''
       doc.notes = typeof doc.notes === 'string' ? doc.notes : ''
-      doc.acceptanceConditions = typeof doc.acceptanceConditions === 'string' ? doc.acceptanceConditions : ''
+      doc.acceptanceConditions =
+        typeof doc.acceptanceConditions === 'string' ? doc.acceptanceConditions : ''
       doc.lines = doc.lines
         .filter((l: any) => l && typeof l === 'object')
         .map((l: any) => ({
@@ -332,7 +336,9 @@ export default class ChatDocument {
 
       // Provider API errors → 502
       if (msg.includes('API error')) {
-        return response.status(502).send({ message: 'Le service IA est temporairement indisponible.', error: msg })
+        return response
+          .status(502)
+          .send({ message: 'Le service IA est temporairement indisponible.', error: msg })
       }
 
       return response.internalServerError({ message: 'AI chat failed', error: msg })

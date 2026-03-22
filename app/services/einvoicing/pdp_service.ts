@@ -59,7 +59,9 @@ export function buildPdpConfig(settings: {
  * Validate PDP connection credentials.
  * In sandbox mode, always returns success.
  */
-export async function validatePdpConnection(config: PdpConfig): Promise<{ connected: boolean; message: string }> {
+export async function validatePdpConnection(
+  config: PdpConfig
+): Promise<{ connected: boolean; message: string }> {
   if (config.sandbox) {
     return { connected: true, message: 'Connexion sandbox reussie' }
   }
@@ -151,7 +153,9 @@ export async function validateXml(_config: PdpConfig, xml: string): Promise<PdpV
 // B2Brouter implementation
 // ═══════════════════════════════════════════════════════════
 
-async function validateB2BRouter(config: PdpConfig): Promise<{ connected: boolean; message: string }> {
+async function validateB2BRouter(
+  config: PdpConfig
+): Promise<{ connected: boolean; message: string }> {
   try {
     const resp = await fetch('https://app.b2brouter.net/api/v1/accounts/me', {
       headers: { Authorization: `Bearer ${config.apiKey}` },
@@ -173,7 +177,7 @@ async function submitToB2BRouter(
     const resp = await fetch('https://app.b2brouter.net/api/v1/invoices', {
       method: 'POST',
       headers: {
-        Authorization: `Bearer ${config.apiKey}`,
+        'Authorization': `Bearer ${config.apiKey}`,
         'Content-Type': 'application/xml',
         'X-Document-Number': metadata.documentNumber,
       },
@@ -210,17 +214,35 @@ async function submitToB2BRouter(
   }
 }
 
-async function checkB2BRouterStatus(config: PdpConfig, trackingId: string): Promise<PdpStatusResult> {
+async function checkB2BRouterStatus(
+  config: PdpConfig,
+  trackingId: string
+): Promise<PdpStatusResult> {
   try {
     const resp = await fetch(`https://app.b2brouter.net/api/v1/invoices/${trackingId}`, {
       headers: { Authorization: `Bearer ${config.apiKey}` },
     })
     if (resp.ok) {
       const data = (await resp.json()) as any
-      return { trackingId, status: data.status || 'pending', message: data.message || '', updatedAt: new Date().toISOString() }
+      return {
+        trackingId,
+        status: data.status || 'pending',
+        message: data.message || '',
+        updatedAt: new Date().toISOString(),
+      }
     }
-    return { trackingId, status: 'error', message: `Erreur: ${resp.status}`, updatedAt: new Date().toISOString() }
+    return {
+      trackingId,
+      status: 'error',
+      message: `Erreur: ${resp.status}`,
+      updatedAt: new Date().toISOString(),
+    }
   } catch {
-    return { trackingId, status: 'error', message: 'Erreur reseau', updatedAt: new Date().toISOString() }
+    return {
+      trackingId,
+      status: 'error',
+      message: 'Erreur reseau',
+      updatedAt: new Date().toISOString(),
+    }
   }
 }

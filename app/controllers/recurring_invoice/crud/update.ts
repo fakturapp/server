@@ -45,7 +45,7 @@ export default class Update {
       clientId: payload.clientId || null,
       name: payload.name,
       frequency: payload.frequency,
-      customIntervalDays: payload.frequency === 'custom' ? (payload.customIntervalDays || 30) : null,
+      customIntervalDays: payload.frequency === 'custom' ? payload.customIntervalDays || 30 : null,
       startDate: payload.startDate,
       nextExecutionDate: payload.startDate,
       endDate: payload.endDate || null,

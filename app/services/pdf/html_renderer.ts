@@ -91,7 +91,11 @@ interface SettingsData {
 
 function esc(str: string | null | undefined): string {
   if (!str) return ''
-  return str.replace(/&/g, '&amp;').replace(/</g, '&lt;').replace(/>/g, '&gt;').replace(/"/g, '&quot;')
+  return str
+    .replace(/&/g, '&amp;')
+    .replace(/</g, '&lt;')
+    .replace(/>/g, '&gt;')
+    .replace(/"/g, '&quot;')
 }
 
 function formatIban(iban: string): string {
@@ -102,14 +106,17 @@ function formatIban(iban: string): string {
 
 function fmtC(n: number, lang: string): string {
   const locale = lang === 'en' ? 'en-GB' : 'fr-FR'
-  return n.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20ac'
+  return (
+    n.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20ac'
+  )
 }
 
 function fmtD(dateStr: string | Date, lang: string): string {
   if (!dateStr) return ''
-  const str = typeof dateStr === 'object' && dateStr instanceof Date
-    ? dateStr.toISOString().split('T')[0]
-    : String(dateStr)
+  const str =
+    typeof dateStr === 'object' && dateStr instanceof Date
+      ? dateStr.toISOString().split('T')[0]
+      : String(dateStr)
   const parts = str.split('-')
   if (parts.length !== 3) return str
   const [y, m, d] = parts
@@ -117,9 +124,9 @@ function fmtD(dateStr: string | Date, lang: string): string {
 }
 
 function contrastText(hex: string): string {
-  const r = parseInt(hex.slice(1, 3), 16)
-  const g = parseInt(hex.slice(3, 5), 16)
-  const b = parseInt(hex.slice(5, 7), 16)
+  const r = Number.parseInt(hex.slice(1, 3), 16)
+  const g = Number.parseInt(hex.slice(3, 5), 16)
+  const b = Number.parseInt(hex.slice(5, 7), 16)
   return (r * 299 + g * 587 + b * 114) / 1000 > 128 ? '#000' : '#fff'
 }
 
@@ -128,49 +135,126 @@ function contrastText(hex: string): string {
    ═══════════════════════════════════════════════════════════ */
 
 interface I18n {
-  quote: string; date: string; validity: string; issuer: string; recipient: string
-  deliveryAddress: string; subject: string; description: string; qty: string
-  unitPrice: string; vat: string; amount: string; subtotalHT: string; totalHT: string
-  totalTVA: string; totalTTC: string; discount: string; notes: string; acceptanceConditions: string
-  signatureIssuer: string; signatureClient: string
-  paymentMethods: string; bankTransfer: string; cash: string; vatNo: string
-  company: string; vatBreakRate: string; vatBreakBase: string; vatBreakAmount: string
-  bankLabel: string; conditionsAndNotes: string; freeField: string
-  unit: string; quoteNumber: string; vatExemptNotSubject: string; vatExemptFranceNoVat: string; vatExemptOutsideFrance: string
+  quote: string
+  date: string
+  validity: string
+  issuer: string
+  recipient: string
+  deliveryAddress: string
+  subject: string
+  description: string
+  qty: string
+  unitPrice: string
+  vat: string
+  amount: string
+  subtotalHT: string
+  totalHT: string
+  totalTVA: string
+  totalTTC: string
+  discount: string
+  notes: string
+  acceptanceConditions: string
+  signatureIssuer: string
+  signatureClient: string
+  paymentMethods: string
+  bankTransfer: string
+  cash: string
+  vatNo: string
+  company: string
+  vatBreakRate: string
+  vatBreakBase: string
+  vatBreakAmount: string
+  bankLabel: string
+  conditionsAndNotes: string
+  freeField: string
+  unit: string
+  quoteNumber: string
+  vatExemptNotSubject: string
+  vatExemptFranceNoVat: string
+  vatExemptOutsideFrance: string
 }
 
 function getI18n(lang: string): I18n {
-  if (lang === 'en') return {
-    quote: 'QUOTE', date: 'Date', validity: 'Valid until', issuer: 'From', recipient: 'To',
-    deliveryAddress: 'Delivery address', subject: 'Subject', description: 'Description', qty: 'Qty',
-    unitPrice: 'Unit price', vat: 'VAT', amount: 'Amount', subtotalHT: 'Subtotal excl. tax',
-    totalHT: 'Total excl. tax', totalTVA: 'Total VAT', totalTTC: 'Total incl. tax',
-    discount: 'Discount', notes: 'Notes', acceptanceConditions: 'Acceptance conditions',
-    signatureIssuer: 'Issuer signature', signatureClient: 'Client signature (preceded by "Approved")',
-    paymentMethods: 'Accepted payment methods', bankTransfer: 'Bank transfer', cash: 'Cash',
-    vatNo: 'VAT No.', company: 'Company',
-    vatBreakRate: 'VAT rate', vatBreakBase: 'Base', vatBreakAmount: 'VAT amount',
-    bankLabel: 'Bank', conditionsAndNotes: 'Conditions & notes', freeField: 'Additional information',
-    unit: 'Unit', quoteNumber: 'Quote #',
-    vatExemptNotSubject: 'VAT not applicable, article 293 B of the CGI',
-    vatExemptFranceNoVat: 'VAT exemption, article 261 of the CGI',
-    vatExemptOutsideFrance: 'VAT not applicable — service performed outside France, article 259-1 of the CGI',
-  }
+  if (lang === 'en')
+    return {
+      quote: 'QUOTE',
+      date: 'Date',
+      validity: 'Valid until',
+      issuer: 'From',
+      recipient: 'To',
+      deliveryAddress: 'Delivery address',
+      subject: 'Subject',
+      description: 'Description',
+      qty: 'Qty',
+      unitPrice: 'Unit price',
+      vat: 'VAT',
+      amount: 'Amount',
+      subtotalHT: 'Subtotal excl. tax',
+      totalHT: 'Total excl. tax',
+      totalTVA: 'Total VAT',
+      totalTTC: 'Total incl. tax',
+      discount: 'Discount',
+      notes: 'Notes',
+      acceptanceConditions: 'Acceptance conditions',
+      signatureIssuer: 'Issuer signature',
+      signatureClient: 'Client signature (preceded by "Approved")',
+      paymentMethods: 'Accepted payment methods',
+      bankTransfer: 'Bank transfer',
+      cash: 'Cash',
+      vatNo: 'VAT No.',
+      company: 'Company',
+      vatBreakRate: 'VAT rate',
+      vatBreakBase: 'Base',
+      vatBreakAmount: 'VAT amount',
+      bankLabel: 'Bank',
+      conditionsAndNotes: 'Conditions & notes',
+      freeField: 'Additional information',
+      unit: 'Unit',
+      quoteNumber: 'Quote #',
+      vatExemptNotSubject: 'VAT not applicable, article 293 B of the CGI',
+      vatExemptFranceNoVat: 'VAT exemption, article 261 of the CGI',
+      vatExemptOutsideFrance:
+        'VAT not applicable — service performed outside France, article 259-1 of the CGI',
+    }
   return {
-    quote: 'DEVIS', date: 'Date', validity: 'Validite', issuer: 'Emetteur', recipient: 'Destinataire',
-    deliveryAddress: 'Adresse de livraison', subject: 'Objet', description: 'Designation', qty: 'Qte',
-    unitPrice: 'P.U. HT', vat: 'TVA', amount: 'Montant HT', subtotalHT: 'Sous-total HT',
-    totalHT: 'Total HT', totalTVA: 'Total TVA', totalTTC: 'Total TTC',
-    discount: 'Remise', notes: 'Notes', acceptanceConditions: "Conditions d'acceptation",
-    signatureIssuer: 'Signature emetteur', signatureClient: 'Signature du client (precedee de la mention "Bon pour accord")',
-    paymentMethods: 'Moyens de paiement acceptes', bankTransfer: 'Virement bancaire', cash: 'Especes',
-    vatNo: 'N\u00b0 TVA', company: 'Societe',
-    vatBreakRate: 'Taux TVA', vatBreakBase: 'Base HT', vatBreakAmount: 'Montant TVA',
-    bankLabel: 'Banque', conditionsAndNotes: 'Conditions et notes', freeField: 'Champ libre',
-    unit: 'Unite', quoteNumber: 'Devis n\u00b0',
+    quote: 'DEVIS',
+    date: 'Date',
+    validity: 'Validite',
+    issuer: 'Emetteur',
+    recipient: 'Destinataire',
+    deliveryAddress: 'Adresse de livraison',
+    subject: 'Objet',
+    description: 'Designation',
+    qty: 'Qte',
+    unitPrice: 'P.U. HT',
+    vat: 'TVA',
+    amount: 'Montant HT',
+    subtotalHT: 'Sous-total HT',
+    totalHT: 'Total HT',
+    totalTVA: 'Total TVA',
+    totalTTC: 'Total TTC',
+    discount: 'Remise',
+    notes: 'Notes',
+    acceptanceConditions: "Conditions d'acceptation",
+    signatureIssuer: 'Signature emetteur',
+    signatureClient: 'Signature du client (precedee de la mention "Bon pour accord")',
+    paymentMethods: 'Moyens de paiement acceptes',
+    bankTransfer: 'Virement bancaire',
+    cash: 'Especes',
+    vatNo: 'N\u00b0 TVA',
+    company: 'Societe',
+    vatBreakRate: 'Taux TVA',
+    vatBreakBase: 'Base HT',
+    vatBreakAmount: 'Montant TVA',
+    bankLabel: 'Banque',
+    conditionsAndNotes: 'Conditions et notes',
+    freeField: 'Champ libre',
+    unit: 'Unite',
+    quoteNumber: 'Devis n\u00b0',
     vatExemptNotSubject: 'TVA non applicable, article 293 B du CGI',
     vatExemptFranceNoVat: 'Exon\u00e9ration de TVA, article 261 du CGI',
-    vatExemptOutsideFrance: 'TVA non applicable \u2014 prestation de services r\u00e9alis\u00e9e hors de France, article 259-1 du CGI',
+    vatExemptOutsideFrance:
+      'TVA non applicable \u2014 prestation de services r\u00e9alis\u00e9e hors de France, article 259-1 du CGI',
   }
 }
 
@@ -257,24 +341,34 @@ export function renderQuoteHtml(
     min-height: 297mm;
     position: relative;
     background: ${T.docBg};
-    ${isClassique
-      ? `background: linear-gradient(270deg, ${T.docBg}, ${settings.darkMode ? '#161618' : '#fff'} 23.44%, ${settings.darkMode ? '#161618' : '#fff'} 77.6%, ${T.docBg});`
-      : ''}
+    ${
+      isClassique
+        ? `background: linear-gradient(270deg, ${T.docBg}, ${settings.darkMode ? '#161618' : '#fff'} 23.44%, ${settings.darkMode ? '#161618' : '#fff'} 77.6%, ${T.docBg});`
+        : ''
+    }
     ${T.layout === 'lateral' ? 'display: flex;' : 'padding: 32px 40px 28px 40px; display: flex; flex-direction: column;'}
   }
 
-  ${isClassique ? `
+  ${
+    isClassique
+      ? `
   .page { letter-spacing: 0.5px; }
-  ` : ''}
+  `
+      : ''
+  }
 
   /* ── Lateral sidebar ── */
-  ${T.layout === 'lateral' ? `
+  ${
+    T.layout === 'lateral'
+      ? `
   .sidebar { width: 22%; background: ${ac}; padding: 28px 16px; color: #fff; }
   .sidebar h3 { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-bottom: 6px; }
   .sidebar p { font-size: 10px; margin-bottom: 3px; line-height: 1.4; }
   .sidebar .section { margin-bottom: 20px; }
   .main-content { flex: 1; padding: 32px 28px 28px 24px; display: flex; flex-direction: column; }
-  ` : ''}
+  `
+      : ''
+  }
 
   /* ── Header ── */
   .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
@@ -309,18 +403,24 @@ export function renderQuoteHtml(
   .banner-company { font-size: 18px; font-weight: 700; color: ${contrastText(ac)}; }
 
   /* ── Subject ── */
-  ${isClassique ? `
+  ${
+    isClassique
+      ? `
   .subject-block {
     border: 1px dashed ${T.borderLight}; background: ${T.docBg}; padding: 7px; margin-bottom: 16px;
   }
   .subject-block .subject-text { font-size: 16px; font-weight: 800; letter-spacing: 0.5px; color: ${ac}; }
-  ` : `
+  `
+      : `
   .subject-block { margin-bottom: 16px; font-size: 13px; color: ${T.text}; }
   .subject-label { font-weight: 600; }
-  `}
+  `
+  }
 
   /* ── Date bar ── */
-  ${isClassique ? `
+  ${
+    isClassique
+      ? `
   .date-bar { display: flex; align-items: flex-end; gap: 12px; margin-bottom: 16px; }
   .date-bar .date-title { flex: 1; font-size: 14px; font-weight: 600; color: ${T.text}; padding: 8px; }
   .date-bar .date-group { display: flex; flex-direction: column; }
@@ -331,14 +431,16 @@ export function renderQuoteHtml(
     font-size: 14px; color: ${T.text}; background: ${T.docBg};
   }
   .date-bar .date-value.dashed { border-style: dashed; }
-  ` : `
+  `
+      : `
   .date-bar {
     display: flex; gap: 16px; margin-bottom: 16px; padding: 10px 12px;
     background: ${ac}08; border: 1px solid ${ac}20; border-radius: ${T.borderRadius};
   }
   .date-bar .date-item { font-size: 11px; color: ${T.textMuted}; }
   .date-bar .date-item strong { font-weight: 600; color: ${T.text}; }
-  `}
+  `
+  }
 
   /* ── Client block ── */
   .client-block { display: flex; justify-content: flex-end; margin-bottom: 20px; }
@@ -383,7 +485,9 @@ export function renderQuoteHtml(
   /* ── Totals ── */
   .totals-wrap { display: flex; justify-content: flex-end; margin-bottom: 20px; }
 
-  ${isClassique ? `
+  ${
+    isClassique
+      ? `
   .totals-box { width: 280px; color: ${ac}; }
   .totals-rows { padding: 0 8px; display: flex; flex-direction: column; gap: 12px; }
   .total-row { display: flex; justify-content: space-between; align-items: center; }
@@ -400,7 +504,8 @@ export function renderQuoteHtml(
     font-size: 20px; font-weight: 800; letter-spacing: 0.5px;
     padding: 4px 12px; border-radius: 100px; background: ${ac}15;
   }
-  ` : `
+  `
+      : `
   .totals-box { width: 260px; }
   .total-row {
     display: flex; justify-content: space-between; padding: 6px 0;
@@ -418,7 +523,8 @@ export function renderQuoteHtml(
   }
   .total-final .label { font-size: 13px; font-weight: 700; color: ${T.text}; }
   .total-final .value { font-size: 15px; font-weight: 700; color: ${ac}; }
-  `}
+  `
+  }
 
   /* ── TVA breakdown ── */
   .tva-table { margin-bottom: 16px; width: auto; border-collapse: collapse; }
@@ -460,19 +566,23 @@ export function renderQuoteHtml(
   .bank-item strong { color: ${T.textMuted}; }
 
   /* ── Footer ── */
-  ${isClassique ? `
+  ${
+    isClassique
+      ? `
   .legal-footer {
     margin-top: 16px; padding-top: 12px; text-align: center;
     border: 1px dashed ${T.borderLight}; background: ${T.docBg}; padding: 6px 7px;
   }
   .legal-footer-text { font-size: 11px; color: ${T.textFooter}; line-height: 1.6; }
-  ` : `
+  `
+      : `
   .legal-footer {
     margin-top: 16px; padding-top: 12px; text-align: center;
     border-top: 2px solid ${T.footerBorder};
   }
   .legal-footer-text { font-size: 9px; color: ${T.textFooter}; line-height: 1.6; }
-  `}
+  `
+  }
 
   /* ── Grow top, pin bottom ── */
   .top-section { flex: 1; }
@@ -481,9 +591,37 @@ export function renderQuoteHtml(
 </head>
 <body>
 <div class="page">
-${T.layout === 'lateral'
-    ? renderLateral(quote, lines, client, company, settings, T, ac, docTitle, tva, discountAmount, lang, i)
-    : renderStandardPage(quote, lines, client, company, settings, T, ac, docTitle, tva, discountAmount, lang, i, isClassique)
+${
+  T.layout === 'lateral'
+    ? renderLateral(
+        quote,
+        lines,
+        client,
+        company,
+        settings,
+        T,
+        ac,
+        docTitle,
+        tva,
+        discountAmount,
+        lang,
+        i
+      )
+    : renderStandardPage(
+        quote,
+        lines,
+        client,
+        company,
+        settings,
+        T,
+        ac,
+        docTitle,
+        tva,
+        discountAmount,
+        lang,
+        i,
+        isClassique
+      )
 }
 </div>
 </body>
@@ -495,10 +633,19 @@ ${T.layout === 'lateral'
    ═══════════════════════════════════════════════════════════ */
 
 function renderStandardPage(
-  quote: QuoteData, lines: LineData[], client: ClientData | null, company: CompanyData | null,
-  settings: SettingsData, T: TemplateConfig, ac: string, docTitle: string,
-  tva: { rate: number; base: number; amount: number }[], discountAmount: number,
-  lang: string, i: I18n, isClassique: boolean,
+  quote: QuoteData,
+  lines: LineData[],
+  client: ClientData | null,
+  company: CompanyData | null,
+  settings: SettingsData,
+  T: TemplateConfig,
+  ac: string,
+  docTitle: string,
+  tva: { rate: number; base: number; amount: number }[],
+  discountAmount: number,
+  lang: string,
+  i: I18n,
+  isClassique: boolean
 ): string {
   let html = '<div class="top-section">'
 
@@ -506,9 +653,10 @@ function renderStandardPage(
   if (T.layout === 'banner') {
     html += `<div class="banner">
       <div class="logo">
-        ${quote.logoUrl
-          ? `<img src="${esc(quote.logoUrl)}" alt="Logo" style="border-radius:${quote.logoBorderRadius || 0}px" />`
-          : `<div class="banner-company">${esc(company?.tradeName || company?.legalName || '')}</div>`
+        ${
+          quote.logoUrl
+            ? `<img src="${esc(quote.logoUrl)}" alt="Logo" style="border-radius:${quote.logoBorderRadius || 0}px" />`
+            : `<div class="banner-company">${esc(company?.tradeName || company?.legalName || '')}</div>`
         }
       </div>
       <div style="text-align:right">
@@ -529,12 +677,16 @@ function renderStandardPage(
     if (company) {
       html += `<div style="font-size:12px;line-height:1.6;margin-top:${quote.logoUrl ? '8px' : '0'}">`
       html += `<div style="font-weight:600;font-size:13px;color:${T.text}">${esc(company.tradeName || company.legalName)}</div>`
-      if (company.addressLine1) html += `<div style="color:${T.textMuted}">${esc(company.addressLine1)}</div>`
-      if (company.postalCode || company.city) html += `<div style="color:${T.textMuted}">${esc(company.postalCode || '')} ${esc(company.city || '')}</div>`
+      if (company.addressLine1)
+        html += `<div style="color:${T.textMuted}">${esc(company.addressLine1)}</div>`
+      if (company.postalCode || company.city)
+        html += `<div style="color:${T.textMuted}">${esc(company.postalCode || '')} ${esc(company.city || '')}</div>`
       if (company.phone) html += `<div style="color:${T.textMuted}">${esc(company.phone)}</div>`
       if (company.email) html += `<div style="color:${T.textMuted}">${esc(company.email)}</div>`
-      if (company.siren) html += `<div style="font-size:10px;margin-top:2px;color:${T.textMuted}">SIREN : ${esc(company.siren)}</div>`
-      if (company.vatNumber) html += `<div style="font-size:10px;color:${T.textMuted}">${i.vatNo} : ${esc(company.vatNumber)}</div>`
+      if (company.siren)
+        html += `<div style="font-size:10px;margin-top:2px;color:${T.textMuted}">SIREN : ${esc(company.siren)}</div>`
+      if (company.vatNumber)
+        html += `<div style="font-size:10px;color:${T.textMuted}">${i.vatNo} : ${esc(company.vatNumber)}</div>`
       html += '</div>'
     }
     html += '</div>'
@@ -554,18 +706,22 @@ function renderStandardPage(
 
   // Company info below banner
   if (T.layout === 'banner' && company) {
-    html += '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">'
+    html +=
+      '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">'
     html += `<div style="font-size:12px;line-height:1.6;color:${T.text}">`
     html += `<div style="font-weight:600;font-size:13px">${esc(company.tradeName || company.legalName)}</div>`
     if (company.addressLine1) html += `<div>${esc(company.addressLine1)}</div>`
-    if (company.postalCode || company.city) html += `<div>${esc(company.postalCode || '')} ${esc(company.city || '')}</div>`
+    if (company.postalCode || company.city)
+      html += `<div>${esc(company.postalCode || '')} ${esc(company.city || '')}</div>`
     if (company.phone) html += `<div>${esc(company.phone)}</div>`
     if (company.email) html += `<div>${esc(company.email)}</div>`
     html += '</div>'
     html += `<div style="font-size:12px;text-align:right;line-height:1.8;color:${T.text}">`
     html += `<div>${i.quoteNumber} <strong>${esc(quote.quoteNumber)}</strong></div>`
-    if (company.siren) html += `<div style="font-size:10px;margin-top:2px">SIREN : ${esc(company.siren)}</div>`
-    if (company.vatNumber) html += `<div style="font-size:10px">${i.vatNo} : ${esc(company.vatNumber)}</div>`
+    if (company.siren)
+      html += `<div style="font-size:10px;margin-top:2px">SIREN : ${esc(company.siren)}</div>`
+    if (company.vatNumber)
+      html += `<div style="font-size:10px">${i.vatNo} : ${esc(company.vatNumber)}</div>`
     html += '</div></div>'
   }
 
@@ -639,18 +795,28 @@ function renderStandardPage(
    Client block
    ═══════════════════════════════════════════════════════════ */
 
-function renderClientBlock(client: ClientData | null, quote: QuoteData, T: TemplateConfig, _lang: string, i: I18n): string {
+function renderClientBlock(
+  client: ClientData | null,
+  quote: QuoteData,
+  T: TemplateConfig,
+  _lang: string,
+  i: I18n
+): string {
   if (!client) return ''
 
   let html = '<div class="client-block"><div class="client-card">'
   html += `<div class="client-name">${esc(client.displayName)}</div>`
   if (client.address) html += `<div class="client-line">${esc(client.address)}</div>`
-  if (client.addressComplement) html += `<div class="client-line">${esc(client.addressComplement)}</div>`
-  if (client.postalCode || client.city) html += `<div class="client-line">${esc(client.postalCode || '')} ${esc(client.city || '')}</div>`
-  if (client.country && client.country !== 'FR') html += `<div class="client-line">${esc(client.country)}</div>`
+  if (client.addressComplement)
+    html += `<div class="client-line">${esc(client.addressComplement)}</div>`
+  if (client.postalCode || client.city)
+    html += `<div class="client-line">${esc(client.postalCode || '')} ${esc(client.city || '')}</div>`
+  if (client.country && client.country !== 'FR')
+    html += `<div class="client-line">${esc(client.country)}</div>`
 
   if (quote.clientSiren) html += `<div class="client-info">SIREN : ${esc(quote.clientSiren)}</div>`
-  if (quote.clientVatNumber) html += `<div class="client-info">${i.vatNo} : ${esc(quote.clientVatNumber)}</div>`
+  if (quote.clientVatNumber)
+    html += `<div class="client-info">${i.vatNo} : ${esc(quote.clientVatNumber)}</div>`
 
   if (quote.deliveryAddress) {
     html += `<div style="border-top:1px solid ${T.borderLight};margin-top:8px;padding-top:8px">`
@@ -668,8 +834,13 @@ function renderClientBlock(client: ClientData | null, quote: QuoteData, T: Templ
    ═══════════════════════════════════════════════════════════ */
 
 function renderDateBar(
-  quote: QuoteData, docTitle: string, _T: TemplateConfig, _ac: string,
-  lang: string, i: I18n, isClassique: boolean,
+  quote: QuoteData,
+  docTitle: string,
+  _T: TemplateConfig,
+  _ac: string,
+  lang: string,
+  i: I18n,
+  isClassique: boolean
 ): string {
   if (isClassique) {
     let html = '<div class="date-bar">'
@@ -695,7 +866,14 @@ function renderDateBar(
    Lines table
    ═══════════════════════════════════════════════════════════ */
 
-function renderTable(lines: LineData[], quote: QuoteData, _T: TemplateConfig, _ac: string, lang: string, i: I18n): string {
+function renderTable(
+  lines: LineData[],
+  quote: QuoteData,
+  _T: TemplateConfig,
+  _ac: string,
+  lang: string,
+  i: I18n
+): string {
   const isDetailed = quote.billingType === 'detailed'
 
   let headerCols = `<th>${i.description}</th>`
@@ -733,8 +911,12 @@ function renderTable(lines: LineData[], quote: QuoteData, _T: TemplateConfig, _a
    ═══════════════════════════════════════════════════════════ */
 
 function renderTotals(
-  quote: QuoteData, tva: { rate: number; base: number; amount: number }[],
-  discountAmount: number, lang: string, i: I18n, isClassique: boolean,
+  quote: QuoteData,
+  tva: { rate: number; base: number; amount: number }[],
+  discountAmount: number,
+  lang: string,
+  i: I18n,
+  isClassique: boolean
 ): string {
   const isDetailed = quote.billingType === 'detailed'
   const totalTax = tva.reduce((s, tv) => s + tv.amount, 0)
@@ -766,9 +948,10 @@ function renderTotals(
       }
     }
     if (discountAmount > 0) {
-      const label = quote.globalDiscountType === 'percentage'
-        ? `${i.discount} (${quote.globalDiscountValue}%)`
-        : i.discount
+      const label =
+        quote.globalDiscountType === 'percentage'
+          ? `${i.discount} (${quote.globalDiscountValue}%)`
+          : i.discount
       html += `<div class="total-row discount"><span class="label">${label}</span><span class="value">-${fmtC(discountAmount, lang)}</span></div>`
     }
     html += `<div class="total-final"><span class="label">${isDetailed ? i.totalTTC : i.totalHT}</span><span class="value">${fmtC(quote.total, lang)}</span></div>`
@@ -783,7 +966,11 @@ function renderTotals(
    ═══════════════════════════════════════════════════════════ */
 
 function renderPaymentMethods(
-  company: CompanyData | null, settings: SettingsData, _T: TemplateConfig, lang: string, i: I18n,
+  company: CompanyData | null,
+  settings: SettingsData,
+  _T: TemplateConfig,
+  lang: string,
+  i: I18n
 ): string {
   // Payment methods are only shown on invoices, not on quotes
   if (settings.documentType === 'quote') return ''
@@ -793,7 +980,8 @@ function renderPaymentMethods(
   let methodLabel = ''
   if (method === 'bank_transfer') methodLabel = i.bankTransfer
   else if (method === 'cash') methodLabel = i.cash
-  else if ((method === 'custom' || method === 'other') && settings.customPaymentMethod) methodLabel = esc(settings.customPaymentMethod)
+  else if ((method === 'custom' || method === 'other') && settings.customPaymentMethod)
+    methodLabel = esc(settings.customPaymentMethod)
   else methodLabel = lang === 'en' ? 'Other' : 'Autre'
 
   let html = `<div class="payment-section"><div class="section-label">${lang === 'en' ? 'Payment method' : 'Moyen de paiement'}</div>`
@@ -802,7 +990,8 @@ function renderPaymentMethods(
   // Bank details
   if (method === 'bank_transfer' && company && (company.iban || company.bic || company.bankName)) {
     html += '<div style="margin-top:4px">'
-    if (company.bankName) html += `<div><strong>${i.bankLabel} :</strong> ${esc(company.bankName)}</div>`
+    if (company.bankName)
+      html += `<div><strong>${i.bankLabel} :</strong> ${esc(company.bankName)}</div>`
     if (company.iban) html += `<div><strong>IBAN :</strong> ${formatIban(company.iban)}</div>`
     if (company.bic) html += `<div><strong>BIC :</strong> ${esc(company.bic)}</div>`
     html += '</div>'
@@ -817,7 +1006,13 @@ function renderPaymentMethods(
    ═══════════════════════════════════════════════════════════ */
 
 function renderLegalFooter(
-  company: CompanyData | null, quote: QuoteData, settings: SettingsData, _T: TemplateConfig, _lang: string, i: I18n, isClassique: boolean,
+  company: CompanyData | null,
+  quote: QuoteData,
+  settings: SettingsData,
+  _T: TemplateConfig,
+  _lang: string,
+  i: I18n,
+  isClassique: boolean
 ): string {
   const footerMode = settings.footerMode === 'custom' ? 'custom' : 'company_info'
 
@@ -852,10 +1047,18 @@ function renderLegalFooter(
    ═══════════════════════════════════════════════════════════ */
 
 function renderLateral(
-  quote: QuoteData, lines: LineData[], client: ClientData | null, company: CompanyData | null,
-  settings: SettingsData, T: TemplateConfig, ac: string, docTitle: string,
-  tva: { rate: number; base: number; amount: number }[], discountAmount: number,
-  lang: string, i: I18n,
+  quote: QuoteData,
+  lines: LineData[],
+  client: ClientData | null,
+  company: CompanyData | null,
+  settings: SettingsData,
+  T: TemplateConfig,
+  ac: string,
+  docTitle: string,
+  tva: { rate: number; base: number; amount: number }[],
+  discountAmount: number,
+  lang: string,
+  i: I18n
 ): string {
   // Sidebar with company info
   let sidebar = '<div class="sidebar">'
@@ -868,7 +1071,8 @@ function renderLateral(
     sidebar += `<p style="font-weight:700">${esc(company.tradeName || company.legalName)}</p>`
     if (company.legalForm) sidebar += `<p>${esc(company.legalForm)}</p>`
     if (company.addressLine1) sidebar += `<p>${esc(company.addressLine1)}</p>`
-    if (company.postalCode || company.city) sidebar += `<p>${esc(company.postalCode || '')} ${esc(company.city || '')}</p>`
+    if (company.postalCode || company.city)
+      sidebar += `<p>${esc(company.postalCode || '')} ${esc(company.city || '')}</p>`
     sidebar += '</div>'
     if (company.siren || company.vatNumber) {
       sidebar += '<div class="section"><h3>Informations</h3>'
@@ -898,7 +1102,8 @@ function renderLateral(
     main += `<div style="margin-bottom:20px"><div class="address-label">${i.recipient}</div><div class="address-content">`
     main += `<div class="address-name">${esc(client.displayName)}</div>`
     if (client.address) main += `<div class="address-line">${esc(client.address)}</div>`
-    if (client.postalCode || client.city) main += `<div class="address-line">${esc(client.postalCode || '')} ${esc(client.city || '')}</div>`
+    if (client.postalCode || client.city)
+      main += `<div class="address-line">${esc(client.postalCode || '')} ${esc(client.city || '')}</div>`
     if (quote.deliveryAddress) {
       main += `<div style="border-top:1px solid ${T.clientBlockBorder};margin-top:6px;padding-top:6px">`
       main += `<div class="section-label">${i.deliveryAddress}</div>`
@@ -907,12 +1112,14 @@ function renderLateral(
     main += '</div></div>'
   }
 
-  if (quote.subject) main += `<div class="subject-block"><span class="subject-label">${i.subject} : </span>${esc(quote.subject)}</div>`
+  if (quote.subject)
+    main += `<div class="subject-block"><span class="subject-label">${i.subject} : </span>${esc(quote.subject)}</div>`
 
   // Dates
   main += `<div class="date-bar">`
   main += `<div class="date-item"><strong>${i.date} :</strong> ${fmtD(quote.issueDate, lang)}</div>`
-  if (quote.validityDate) main += `<div class="date-item"><strong>${i.validity} :</strong> ${fmtD(quote.validityDate, lang)}</div>`
+  if (quote.validityDate)
+    main += `<div class="date-item"><strong>${i.validity} :</strong> ${fmtD(quote.validityDate, lang)}</div>`
   main += '</div>'
 
   main += renderTable(lines, quote, T, ac, lang, i)
@@ -923,9 +1130,12 @@ function renderLateral(
 
   const lateralVatText = getVatExemptText(quote.vatExemptReason, i)
   if (lateralVatText) main += `<div class="vat-exempt">${lateralVatText}</div>`
-  if (quote.notes) main += `<div class="notes-section"><div class="section-label">${i.conditionsAndNotes}</div><div class="notes-text">${esc(quote.notes)}</div></div>`
-  if (quote.acceptanceConditions) main += `<div class="conditions-section"><div class="section-label">${i.acceptanceConditions}</div><div class="conditions-text">${esc(quote.acceptanceConditions)}</div></div>`
-  if (quote.freeField) main += `<div class="free-field-section"><div class="section-label">${i.freeField}</div><div class="free-field-text">${esc(quote.freeField)}</div></div>`
+  if (quote.notes)
+    main += `<div class="notes-section"><div class="section-label">${i.conditionsAndNotes}</div><div class="notes-text">${esc(quote.notes)}</div></div>`
+  if (quote.acceptanceConditions)
+    main += `<div class="conditions-section"><div class="section-label">${i.acceptanceConditions}</div><div class="conditions-text">${esc(quote.acceptanceConditions)}</div></div>`
+  if (quote.freeField)
+    main += `<div class="free-field-section"><div class="section-label">${i.freeField}</div><div class="free-field-text">${esc(quote.freeField)}</div></div>`
   if (quote.signatureField) {
     main += `<div class="signature-row">
       <div class="signature-box"><div class="section-label">${i.signatureIssuer}</div><div class="signature-area"></div></div>

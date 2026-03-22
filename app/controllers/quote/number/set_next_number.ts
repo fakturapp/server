@@ -12,10 +12,7 @@ export default class SetNextNumber {
     }
 
     // Only allow setting next number if no quotes exist yet
-    const result = await Quote.query()
-      .where('team_id', teamId)
-      .count('* as total')
-      .first()
+    const result = await Quote.query().where('team_id', teamId).count('* as total').first()
 
     const count = Number(result?.$extras.total ?? 0)
     if (count > 0) {

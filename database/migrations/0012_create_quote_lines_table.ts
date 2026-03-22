@@ -6,12 +6,7 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
-      table
-        .uuid('quote_id')
-        .notNullable()
-        .references('id')
-        .inTable('quotes')
-        .onDelete('CASCADE')
+      table.uuid('quote_id').notNullable().references('id').inTable('quotes').onDelete('CASCADE')
       table.integer('position').notNullable().defaultTo(0)
       table.string('description').notNullable()
       table.string('sale_type').nullable()

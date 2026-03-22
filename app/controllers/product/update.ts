@@ -14,10 +14,7 @@ export default class Update {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const product = await Product.query()
-      .where('id', params.id)
-      .where('team_id', teamId)
-      .first()
+    const product = await Product.query().where('id', params.id).where('team_id', teamId).first()
 
     if (!product) {
       return response.notFound({ message: 'Product not found' })

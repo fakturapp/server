@@ -6,7 +6,7 @@ export default class TwoFactorEnabledNotification extends BaseMail {
   subject = '2FA activée - Faktur'
 
   constructor(
-    private email: string,
+    email: string,
     private name?: string
   ) {
     super()
@@ -20,13 +20,11 @@ export default class TwoFactorEnabledNotification extends BaseMail {
         Bonjour${this.name ? ` <span style="color: #c7d2fe; font-weight: 500;">${this.name}</span>` : ''},<br><br>
         La double authentification (2FA) a &eacute;t&eacute; activ&eacute;e sur votre compte avec succ&egrave;s.
       </p>
-      ${infoBox("Votre compte est d&eacute;sormais mieux prot&eacute;g&eacute;. Un code de v&eacute;rification vous sera demand&eacute; &agrave; chaque connexion.", 'rgba(34,197,94,0.08)', 'rgba(34,197,94,0.15)', '#4ade80')}
+      ${infoBox('Votre compte est d&eacute;sormais mieux prot&eacute;g&eacute;. Un code de v&eacute;rification vous sera demand&eacute; &agrave; chaque connexion.', 'rgba(34,197,94,0.08)', 'rgba(34,197,94,0.15)', '#4ade80')}
       ${infoBox("Si vous n'&ecirc;tes pas &agrave; l'origine de cette modification, contactez le support imm&eacute;diatement.", 'rgba(245,158,11,0.08)', 'rgba(245,158,11,0.15)', '#fbbf24')}
     `
 
     this.message.html(wrapHtml(content, '2FA activée'))
-    this.message.text(
-      'La double authentification a été activée sur votre compte Faktur.'
-    )
+    this.message.text('La double authentification a été activée sur votre compte Faktur.')
   }
 }

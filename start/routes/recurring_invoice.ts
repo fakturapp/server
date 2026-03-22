@@ -8,7 +8,8 @@ const RecurringInvoiceCreate = () => import('#controllers/recurring_invoice/crud
 const RecurringInvoiceUpdate = () => import('#controllers/recurring_invoice/crud/update')
 const RecurringInvoiceDelete = () => import('#controllers/recurring_invoice/crud/delete')
 const RecurringInvoiceGenerate = () => import('#controllers/recurring_invoice/operations/generate')
-const RecurringInvoiceToggleActive = () => import('#controllers/recurring_invoice/operations/toggle_active')
+const RecurringInvoiceToggleActive = () =>
+  import('#controllers/recurring_invoice/operations/toggle_active')
 
 router
   .group(() => {

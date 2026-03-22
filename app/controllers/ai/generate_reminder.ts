@@ -59,14 +59,18 @@ export default class GenerateReminder {
     const dueDate = invoice.dueDate || invoice.issueDate
     const now = new Date()
     const due = new Date(dueDate)
-    const daysOverdue = Math.max(0, Math.floor((now.getTime() - due.getTime()) / (1000 * 60 * 60 * 24)))
+    const daysOverdue = Math.max(
+      0,
+      Math.floor((now.getTime() - due.getTime()) / (1000 * 60 * 60 * 24))
+    )
 
-    const tone = payload.tone || (daysOverdue > 30 ? 'urgent' : daysOverdue > 14 ? 'firm' : 'polite')
+    const tone =
+      payload.tone || (daysOverdue > 30 ? 'urgent' : daysOverdue > 14 ? 'firm' : 'polite')
 
     const toneDescriptions: Record<string, string> = {
-      polite: 'poli et cordial, c\'est un premier rappel amical',
-      firm: 'professionnel et ferme mais respectueux, c\'est un deuxième rappel',
-      urgent: 'urgent et direct, c\'est un dernier rappel avant mise en demeure',
+      polite: "poli et cordial, c'est un premier rappel amical",
+      firm: "professionnel et ferme mais respectueux, c'est un deuxième rappel",
+      urgent: "urgent et direct, c'est un dernier rappel avant mise en demeure",
     }
 
     const systemPrompt = `Tu es un assistant de facturation français. Génère un email de relance de paiement professionnel.

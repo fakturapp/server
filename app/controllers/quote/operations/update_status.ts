@@ -17,10 +17,7 @@ export default class UpdateStatus {
       return response.badRequest({ message: 'Invalid status' })
     }
 
-    const quote = await Quote.query()
-      .where('id', params.id)
-      .where('team_id', teamId)
-      .first()
+    const quote = await Quote.query().where('id', params.id).where('team_id', teamId).first()
 
     if (!quote) {
       return response.notFound({ message: 'Quote not found' })

@@ -10,10 +10,7 @@ export default class DocumentCount {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const result = await Quote.query()
-      .where('team_id', teamId)
-      .count('* as total')
-      .first()
+    const result = await Quote.query().where('team_id', teamId).count('* as total').first()
 
     const count = Number(result?.$extras.total ?? 0)
 

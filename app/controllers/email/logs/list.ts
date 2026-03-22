@@ -16,9 +16,7 @@ export default class ListEmailLogs {
     const documentType = request.qs().documentType as string | undefined
     const documentId = request.qs().documentId as string | undefined
 
-    const query = EmailLog.query()
-      .where('team_id', teamId)
-      .orderBy('created_at', 'desc')
+    const query = EmailLog.query().where('team_id', teamId).orderBy('created_at', 'desc')
 
     if (documentType) {
       query.where('document_type', documentType)

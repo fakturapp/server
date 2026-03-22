@@ -1,12 +1,18 @@
 import { BaseMail } from '@adonisjs/mail'
-import { ctaButton, validityTag, linkFallback, wrapHtml, getFrontendUrl } from './helpers/email_template.js'
+import {
+  ctaButton,
+  validityTag,
+  linkFallback,
+  wrapHtml,
+  getFrontendUrl,
+} from './helpers/email_template.js'
 
 export default class VerifyEmailNotification extends BaseMail {
   from = { address: 'noreply@authguard.net', name: 'Faktur' }
   subject = 'Vérifiez votre email - Faktur'
 
   constructor(
-    private email: string,
+    email: string,
     private token: string,
     private name?: string
   ) {

@@ -37,7 +37,10 @@ export default class CryptoRecover {
     // Get new KEK from memory (stored during login with new password)
     const newKek = keyStore.getKEK(user.id)
     if (!newKek) {
-      return response.unauthorized({ code: 'SESSION_EXPIRED', message: 'Session expired. Please log in again.' })
+      return response.unauthorized({
+        code: 'SESSION_EXPIRED',
+        message: 'Session expired. Please log in again.',
+      })
     }
 
     // Re-encrypt all team DEKs: decrypt with old KEK → encrypt with new KEK

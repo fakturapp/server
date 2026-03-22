@@ -89,29 +89,44 @@ export default class InvoiceSettingsUpdate {
       if (payload.template) settings.template = payload.template
       if (payload.darkMode !== undefined) settings.darkMode = payload.darkMode
       if (payload.documentFont) settings.documentFont = payload.documentFont
-      if (payload.eInvoicingEnabled !== undefined) settings.eInvoicingEnabled = payload.eInvoicingEnabled
-      if (payload.pdpProvider !== undefined) settings.pdpProvider = (payload.pdpProvider || null) as 'b2brouter' | 'sandbox' | null
+      if (payload.eInvoicingEnabled !== undefined)
+        settings.eInvoicingEnabled = payload.eInvoicingEnabled
+      if (payload.pdpProvider !== undefined)
+        settings.pdpProvider = (payload.pdpProvider || null) as 'b2brouter' | 'sandbox' | null
       if (payload.pdpApiKey && !payload.pdpApiKey.startsWith('••••••••')) {
         settings.pdpApiKey = pdpApiKeyToStore
       }
       if (payload.pdpSandbox !== undefined) settings.pdpSandbox = payload.pdpSandbox
-      if (payload.defaultSubject !== undefined) settings.defaultSubject = payload.defaultSubject || null
-      if (payload.defaultAcceptanceConditions !== undefined) settings.defaultAcceptanceConditions = payload.defaultAcceptanceConditions || null
-      if (payload.defaultSignatureField !== undefined) settings.defaultSignatureField = payload.defaultSignatureField
-      if (payload.defaultFreeField !== undefined) settings.defaultFreeField = payload.defaultFreeField || null
-      if (payload.defaultShowNotes !== undefined) settings.defaultShowNotes = payload.defaultShowNotes
-      if (payload.defaultVatExempt !== undefined) settings.defaultVatExempt = payload.defaultVatExempt
-      if (payload.defaultFooterText !== undefined) settings.defaultFooterText = payload.defaultFooterText || null
-      if (payload.defaultShowDeliveryAddress !== undefined) settings.defaultShowDeliveryAddress = payload.defaultShowDeliveryAddress
-      if (payload.defaultLanguage !== undefined) settings.defaultLanguage = payload.defaultLanguage || 'fr'
-      if (payload.quoteFilenamePattern !== undefined) settings.quoteFilenamePattern = payload.quoteFilenamePattern || 'DEV-{numero}'
-      if (payload.invoiceFilenamePattern !== undefined) settings.invoiceFilenamePattern = payload.invoiceFilenamePattern || 'FAC-{numero}'
+      if (payload.defaultSubject !== undefined)
+        settings.defaultSubject = payload.defaultSubject || null
+      if (payload.defaultAcceptanceConditions !== undefined)
+        settings.defaultAcceptanceConditions = payload.defaultAcceptanceConditions || null
+      if (payload.defaultSignatureField !== undefined)
+        settings.defaultSignatureField = payload.defaultSignatureField
+      if (payload.defaultFreeField !== undefined)
+        settings.defaultFreeField = payload.defaultFreeField || null
+      if (payload.defaultShowNotes !== undefined)
+        settings.defaultShowNotes = payload.defaultShowNotes
+      if (payload.defaultVatExempt !== undefined)
+        settings.defaultVatExempt = payload.defaultVatExempt
+      if (payload.defaultFooterText !== undefined)
+        settings.defaultFooterText = payload.defaultFooterText || null
+      if (payload.defaultShowDeliveryAddress !== undefined)
+        settings.defaultShowDeliveryAddress = payload.defaultShowDeliveryAddress
+      if (payload.defaultLanguage !== undefined)
+        settings.defaultLanguage = payload.defaultLanguage || 'fr'
+      if (payload.quoteFilenamePattern !== undefined)
+        settings.quoteFilenamePattern = payload.quoteFilenamePattern || 'DEV-{numero}'
+      if (payload.invoiceFilenamePattern !== undefined)
+        settings.invoiceFilenamePattern = payload.invoiceFilenamePattern || 'FAC-{numero}'
       if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'vat_exempt'
-      if (payload.logoBorderRadius !== undefined) settings.logoBorderRadius = payload.logoBorderRadius
+      if (payload.logoBorderRadius !== undefined)
+        settings.logoBorderRadius = payload.logoBorderRadius
       if (payload.aiKeyMode !== undefined) settings.aiKeyMode = payload.aiKeyMode || 'server'
       if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
       if (payload.aiProvider !== undefined) settings.aiProvider = payload.aiProvider || 'gemini'
-      if (payload.aiModel !== undefined) settings.aiModel = payload.aiModel || 'gemini-2.5-flash-lite'
+      if (payload.aiModel !== undefined)
+        settings.aiModel = payload.aiModel || 'gemini-2.5-flash-lite'
       if (payload.aiCustomApiKey && !payload.aiCustomApiKey.startsWith('••••••••')) {
         settings.aiCustomApiKey = aiCustomApiKeyToStore
       }
@@ -161,8 +176,12 @@ export default class InvoiceSettingsUpdate {
         aiProvider: settings.aiProvider || 'gemini',
         aiModel: settings.aiModel || 'gemini-2.5-flash-lite',
         aiCustomApiKey: settings.aiCustomApiKey ? '••••••••' : null,
-        aiApiKeyClaude: settings.aiApiKeyClaude ? '••••••••' + settings.aiApiKeyClaude.slice(-4) : null,
-        aiApiKeyGemini: settings.aiApiKeyGemini ? '••••••••' + settings.aiApiKeyGemini.slice(-4) : null,
+        aiApiKeyClaude: settings.aiApiKeyClaude
+          ? '••••••••' + settings.aiApiKeyClaude.slice(-4)
+          : null,
+        aiApiKeyGemini: settings.aiApiKeyGemini
+          ? '••••••••' + settings.aiApiKeyGemini.slice(-4)
+          : null,
         aiApiKeyGroq: settings.aiApiKeyGroq ? '••••••••' + settings.aiApiKeyGroq.slice(-4) : null,
       },
     })

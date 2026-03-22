@@ -11,7 +11,7 @@ export function encryptModelFields<T extends Record<string, any>>(
 ): void {
   for (const field of fields) {
     const value = model[field]
-    if (value != null && typeof value === 'string' && value.length > 0) {
+    if (value !== null && value !== undefined && typeof value === 'string' && value.length > 0) {
       ;(model as any)[field] = zeroAccessCryptoService.encryptField(value, dek)
     }
   }
@@ -29,7 +29,8 @@ export function decryptModelFields<T extends Record<string, any>>(
   for (const field of fields) {
     const value = model[field]
     if (
-      value != null &&
+      value !== null &&
+      value !== undefined &&
       typeof value === 'string' &&
       zeroAccessCryptoService.isEncryptedField(value)
     ) {
@@ -96,14 +97,7 @@ export const ENCRYPTED_FIELDS = {
 
   quoteLine: ['description', 'saleType', 'unit'] as const,
 
-  company: [
-    'phone',
-    'email',
-    'iban',
-    'bic',
-    'bankName',
-    'paymentConditions',
-  ] as const,
+  company: ['phone', 'email', 'iban', 'bic', 'bankName', 'paymentConditions'] as const,
 
   bankAccount: ['iban', 'bic'] as const,
 

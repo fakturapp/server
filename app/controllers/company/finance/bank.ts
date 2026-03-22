@@ -53,7 +53,11 @@ export default class Bank {
 
       encryptModelFields(bankData, [...ENCRYPTED_FIELDS.bankAccount], dek)
       // bankName on BankAccount is not in ENCRYPTED_FIELDS.bankAccount, encrypt manually
-      if (bankData.bankName && typeof bankData.bankName === 'string' && !zeroAccessCryptoService.isEncryptedField(bankData.bankName)) {
+      if (
+        bankData.bankName &&
+        typeof bankData.bankName === 'string' &&
+        !zeroAccessCryptoService.isEncryptedField(bankData.bankName)
+      ) {
         bankData.bankName = zeroAccessCryptoService.encryptField(bankData.bankName, dek)
       }
 

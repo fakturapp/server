@@ -7,12 +7,24 @@ import type { OcrProvider, OcrReceiptResult } from '#services/ocr/ocr_provider'
 export default class MockOcrProvider implements OcrProvider {
   async parseReceipt(_fileBuffer: Buffer, _mimeType: string): Promise<OcrReceiptResult> {
     const suppliers = [
-      'Amazon', 'FNAC', 'Boulanger', 'Leroy Merlin', 'Office Depot',
-      'Bureau Vallée', 'Darty', 'Total Energies', 'SNCF', 'Air France',
+      'Amazon',
+      'FNAC',
+      'Boulanger',
+      'Leroy Merlin',
+      'Office Depot',
+      'Bureau Vallée',
+      'Darty',
+      'Total Energies',
+      'SNCF',
+      'Air France',
     ]
     const descriptions = [
-      'Fournitures de bureau', 'Matériel informatique', 'Frais de déplacement',
-      'Repas professionnel', 'Abonnement logiciel', 'Consommables',
+      'Fournitures de bureau',
+      'Matériel informatique',
+      'Frais de déplacement',
+      'Repas professionnel',
+      'Abonnement logiciel',
+      'Consommables',
     ]
 
     const amount = Math.round((Math.random() * 200 + 10) * 100) / 100

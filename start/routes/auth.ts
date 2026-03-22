@@ -33,7 +33,9 @@ router
   .group(() => {
     router.post('/sign-up', [Signup, 'handle']).use(registerLimiter)
     router.post('/verify-email', [VerifyEmail, 'handle']).use(emailVerificationLimiter)
-    router.post('/resend-verification', [ResendVerification, 'handle']).use(emailVerificationLimiter)
+    router
+      .post('/resend-verification', [ResendVerification, 'handle'])
+      .use(emailVerificationLimiter)
 
     router.post('/login', [Login, 'handle']).use(loginLimiter)
     router.post('/login/2fa', [TwoFactorVerify, 'handle']).use(twoFactorLimiter)

@@ -27,7 +27,10 @@ export default class Import {
     const kek = keyStore.getKEK(user.id)
 
     if (!kek) {
-      return response.unauthorized({ code: 'SESSION_EXPIRED', message: 'Session expired. Please log in again.' })
+      return response.unauthorized({
+        code: 'SESSION_EXPIRED',
+        message: 'Session expired. Please log in again.',
+      })
     }
 
     const file = request.file('file', {
@@ -45,7 +48,9 @@ export default class Import {
 
     const teamName = request.input('teamName')
     if (!teamName || teamName.length < 2) {
-      return response.unprocessableEntity({ message: 'Le nom de l\'équipe est requis (min 2 caractères)' })
+      return response.unprocessableEntity({
+        message: "Le nom de l'équipe est requis (min 2 caractères)",
+      })
     }
 
     const decryptionPassword = request.input('decryptionPassword')
@@ -57,7 +62,9 @@ export default class Import {
     const magic = buffer.subarray(0, 7).toString()
     if (magic === 'FPDATA1') {
       if (!decryptionPassword) {
-        return response.unprocessableEntity({ message: 'Ce fichier est chiffré. Veuillez fournir un mot de passe.' })
+        return response.unprocessableEntity({
+          message: 'Ce fichier est chiffré. Veuillez fournir un mot de passe.',
+        })
       }
       try {
         buffer = Buffer.from(decryptBuffer(buffer, decryptionPassword))
@@ -95,7 +102,9 @@ export default class Import {
     const bankAccountsData = readJson('export/bank_accounts.json') || []
 
     if (!metadata || !teamData) {
-      return response.unprocessableEntity({ message: 'Format de fichier invalide : données manquantes' })
+      return response.unprocessableEntity({
+        message: 'Format de fichier invalide : données manquantes',
+      })
     }
 
     // Generate a new team DEK for the imported team
@@ -132,10 +141,7 @@ export default class Import {
 
       // Create invoice settings (no encrypted fields)
       if (settingsData) {
-        await InvoiceSetting.create(
-          { teamId: newTeam.id, ...settingsData },
-          { client: trx }
-        )
+        await InvoiceSetting.create({ teamId: newTeam.id, ...settingsData }, { client: trx })
       }
 
       // Create bank accounts (encrypt iban/bic)
@@ -155,8 +161,7 @@ export default class Import {
       // Create clients and build ID mapping (encrypt sensitive fields)
       const clientIdMap: Record<string, string> = {}
       for (const clientData2 of clientsData) {
-        const originalId = clientData2.originalId
-        const { originalId: _, ...rest } = clientData2
+        const { originalId, ...rest } = clientData2
         const clientRecord: Record<string, any> = { teamId: newTeam.id, ...rest }
         encryptModelFields(clientRecord, [...ENCRYPTED_FIELDS.client], teamDek)
         const newClient = await Client.create(clientRecord, { client: trx })
@@ -170,7 +175,7 @@ export default class Import {
         const { lines, clientId, sourceQuoteId, ...rest } = invData
         const invRecord: Record<string, any> = {
           teamId: newTeam.id,
-          clientId: clientId ? (clientIdMap[clientId] || null) : null,
+          clientId: clientId ? clientIdMap[clientId] || null : null,
           sourceQuoteId: null,
           ...rest,
         }
@@ -191,7 +196,7 @@ export default class Import {
         const { lines, clientId, ...rest } = qData
         const qRecord: Record<string, any> = {
           teamId: newTeam.id,
-          clientId: clientId ? (clientIdMap[clientId] || null) : null,
+          clientId: clientId ? clientIdMap[clientId] || null : null,
           ...rest,
         }
         encryptModelFields(qRecord, [...ENCRYPTED_FIELDS.quote], teamDek)
@@ -218,7 +223,9 @@ export default class Import {
 
     for (const dir of assetDirs) {
       const prefix = `export/assets/${dir}/`
-      const assetEntries = zip.getEntries().filter((e) => e.entryName.startsWith(prefix) && !e.isDirectory)
+      const assetEntries = zip
+        .getEntries()
+        .filter((e) => e.entryName.startsWith(prefix) && !e.isDirectory)
 
       for (const entry of assetEntries) {
         const ext = extname(entry.entryName) || '.png'

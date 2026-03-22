@@ -6,12 +6,7 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
-      table
-        .uuid('user_id')
-        .notNullable()
-        .references('id')
-        .inTable('users')
-        .onDelete('CASCADE')
+      table.uuid('user_id').notNullable().references('id').inTable('users').onDelete('CASCADE')
       table.string('provider', 50).notNullable() // 'google'
       table.string('provider_user_id', 255).notNullable()
       table.string('email', 255).notNullable()

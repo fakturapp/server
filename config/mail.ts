@@ -12,6 +12,7 @@ const mailConfig = defineConfig({
   mailers: {
     resend: transports.resend({
       key: env.get('RESEND_API_KEY', ''),
+      baseUrl: 'https://api.resend.com',
     }),
 
     smtp: transports.smtp({

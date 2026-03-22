@@ -49,9 +49,7 @@ export default class List {
     if (search) {
       const s = search.toLowerCase()
       items = items.filter(
-        (e) =>
-          e.description.toLowerCase().includes(s) ||
-          e.supplier?.toLowerCase().includes(s)
+        (e) => e.description.toLowerCase().includes(s) || e.supplier?.toLowerCase().includes(s)
       )
     }
 

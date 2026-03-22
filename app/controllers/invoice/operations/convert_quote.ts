@@ -46,7 +46,7 @@ export default class ConvertQuote {
       if (lastInvoice) {
         const match = lastInvoice.invoiceNumber.match(/^FAC-(\d+)$/)
         if (match) {
-          const num = parseInt(match[1], 10) + 1
+          const num = Number.parseInt(match[1], 10) + 1
           invoiceNumber = `FAC-${num.toString().padStart(3, '0')}`
         }
       }

@@ -6,18 +6,8 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
-      table
-        .uuid('team_id')
-        .notNullable()
-        .references('id')
-        .inTable('teams')
-        .onDelete('CASCADE')
-      table
-        .uuid('user_id')
-        .nullable()
-        .references('id')
-        .inTable('users')
-        .onDelete('CASCADE')
+      table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
+      table.uuid('user_id').nullable().references('id').inTable('users').onDelete('CASCADE')
       table.string('role').notNullable().defaultTo('member')
       table.string('status').notNullable().defaultTo('active')
       table.timestamp('invited_at').nullable()

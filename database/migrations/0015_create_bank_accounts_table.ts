@@ -6,12 +6,7 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable(this.tableName, (table) => {
       table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
-      table
-        .uuid('team_id')
-        .notNullable()
-        .references('id')
-        .inTable('teams')
-        .onDelete('CASCADE')
+      table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
       table.string('label', 255).notNullable()
       table.string('bank_name', 255).nullable()
       table.text('iban').nullable()

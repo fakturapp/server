@@ -4,8 +4,6 @@ import type UserRegistered from '#events/user_registered'
 
 export default class SendVerificationEmail {
   async handle(event: UserRegistered) {
-    await mail.sendLater(
-      new VerifyEmailNotification(event.email, event.token, event.name)
-    )
+    await mail.sendLater(new VerifyEmailNotification(event.email, event.token, event.name))
   }
 }

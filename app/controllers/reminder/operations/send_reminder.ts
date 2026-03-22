@@ -101,10 +101,16 @@ export default class SendReminder {
     const defaultSubject = `Rappel : Facture ${invoice.invoiceNumber} en attente de paiement`
     const defaultBody = `Bonjour,\n\nNous vous rappelons que la facture ${invoice.invoiceNumber} d'un montant de ${templateVars.montant} est arrivee a echeance le ${templateVars.date_echeance}.\n\nMerci de bien vouloir proceder au reglement.\n\nCordialement`
 
-    const emailSubject = payload.subject
-      || (settings?.emailSubjectTemplate ? applyTemplate(settings.emailSubjectTemplate, templateVars) : defaultSubject)
-    const emailBody = payload.body
-      || (settings?.emailBodyTemplate ? applyTemplate(settings.emailBodyTemplate, templateVars) : defaultBody)
+    const emailSubject =
+      payload.subject ||
+      (settings?.emailSubjectTemplate
+        ? applyTemplate(settings.emailSubjectTemplate, templateVars)
+        : defaultSubject)
+    const emailBody =
+      payload.body ||
+      (settings?.emailBodyTemplate
+        ? applyTemplate(settings.emailBodyTemplate, templateVars)
+        : defaultBody)
 
     // Generate PDF
     let pdfBuffer: Buffer
@@ -146,7 +152,12 @@ export default class SendReminder {
           attachments,
         })
       } else if (emailAccount.provider === 'smtp') {
-        if (!emailAccount.smtpHost || !emailAccount.smtpPort || !emailAccount.smtpUsername || !emailAccount.smtpPassword) {
+        if (
+          !emailAccount.smtpHost ||
+          !emailAccount.smtpPort ||
+          !emailAccount.smtpUsername ||
+          !emailAccount.smtpPassword
+        ) {
           throw new Error('SMTP config incomplete')
         }
         await SmtpService.sendEmail({

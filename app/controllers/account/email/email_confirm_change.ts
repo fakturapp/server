@@ -15,7 +15,7 @@ export default class EmailConfirmChange {
     const { code } = await request.validateUsing(validator)
 
     if (!user.pendingEmail || !user.securityCode || !user.securityCodeExpiresAt) {
-      return response.badRequest({ message: 'Aucun changement d\'email en cours' })
+      return response.badRequest({ message: "Aucun changement d'email en cours" })
     }
 
     if (user.securityCodeExpiresAt < DateTime.now()) {

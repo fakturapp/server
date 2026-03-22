@@ -8,7 +8,10 @@ export const createCreditNoteValidator = vine.compile(
     subject: vine.string().trim().maxLength(255).optional(),
     issueDate: vine.string().trim(),
     billingType: vine.enum(['quick', 'detailed']),
-    accentColor: vine.string().trim().regex(/^#[0-9a-fA-F]{6}$/),
+    accentColor: vine
+      .string()
+      .trim()
+      .regex(/^#[0-9a-fA-F]{6}$/),
     logoUrl: vine.string().trim().optional(),
     language: vine.enum(['fr', 'en']).optional(),
     notes: vine.string().trim().maxLength(2000).optional(),
@@ -21,7 +24,9 @@ export const createCreditNoteValidator = vine.compile(
     deliveryAddress: vine.string().trim().maxLength(500).optional(),
     clientSiren: vine.string().trim().maxLength(20).optional(),
     clientVatNumber: vine.string().trim().maxLength(30).optional(),
-    vatExemptReason: vine.enum(['none', 'not_subject', 'france_no_vat', 'outside_france']).optional(),
+    vatExemptReason: vine
+      .enum(['none', 'not_subject', 'france_no_vat', 'outside_france'])
+      .optional(),
     lines: vine.array(
       vine.object({
         description: vine.string().trim().maxLength(500),

@@ -13,9 +13,7 @@ export default class GmailAuthUrl {
 
     const returnTo = request.input('returnTo', '/dashboard/settings/email')
 
-    const state = EncryptionService.encrypt(
-      JSON.stringify({ teamId, userId: user.id, returnTo })
-    )
+    const state = EncryptionService.encrypt(JSON.stringify({ teamId, userId: user.id, returnTo }))
 
     const url = GmailOAuthService.getAuthUrl(state)
 

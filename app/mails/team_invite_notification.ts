@@ -5,7 +5,7 @@ export default class TeamInviteNotification extends BaseMail {
   from = { address: 'noreply@authguard.net', name: 'Faktur' }
 
   constructor(
-    private email: string,
+    email: string,
     private inviterName: string,
     private inviteUrl: string
   ) {

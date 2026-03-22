@@ -4,18 +4,8 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable('recurring_invoices', (table) => {
       table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
-      table
-        .uuid('team_id')
-        .notNullable()
-        .references('id')
-        .inTable('teams')
-        .onDelete('CASCADE')
-      table
-        .uuid('client_id')
-        .nullable()
-        .references('id')
-        .inTable('clients')
-        .onDelete('SET NULL')
+      table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
+      table.uuid('client_id').nullable().references('id').inTable('clients').onDelete('SET NULL')
       table.text('name').notNullable()
       table.string('frequency', 20).notNullable().defaultTo('monthly')
       table.integer('custom_interval_days').nullable()

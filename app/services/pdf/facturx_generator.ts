@@ -101,10 +101,14 @@ function getCountryCode(country?: string | null): string {
  */
 function getOperationCategoryCode(category?: 'service' | 'goods' | 'mixed' | null): string | null {
   switch (category) {
-    case 'service': return 'SERVICE'
-    case 'goods': return 'LIVRAISON'
-    case 'mixed': return 'MIXTE'
-    default: return null
+    case 'service':
+      return 'SERVICE'
+    case 'goods':
+      return 'LIVRAISON'
+    case 'mixed':
+      return 'MIXTE'
+    default:
+      return null
   }
 }
 
@@ -348,7 +352,11 @@ export function buildFacturXFromQuote(
   clientData: any | null,
   companyData: any | null
 ): FacturXDocument {
-  const { vatBreakdown, seller, buyer, lines } = buildCommonFacturXParts(linesData, clientData, companyData)
+  const { vatBreakdown, seller, buyer, lines } = buildCommonFacturXParts(
+    linesData,
+    clientData,
+    companyData
+  )
 
   return {
     documentNumber: quoteData.quoteNumber,
@@ -377,7 +385,11 @@ export function buildFacturXFromInvoice(
   clientData: any | null,
   companyData: any | null
 ): FacturXDocument {
-  const { vatBreakdown, seller, buyer, lines } = buildCommonFacturXParts(linesData, clientData, companyData)
+  const { vatBreakdown, seller, buyer, lines } = buildCommonFacturXParts(
+    linesData,
+    clientData,
+    companyData
+  )
 
   return {
     documentNumber: invoiceData.invoiceNumber,
@@ -441,7 +453,10 @@ function buildCommonFacturXParts(
 
   const buyer: FacturXBuyer | null = clientData
     ? {
-        name: clientData.displayName || clientData.companyName || `${clientData.firstName} ${clientData.lastName}`,
+        name:
+          clientData.displayName ||
+          clientData.companyName ||
+          `${clientData.firstName} ${clientData.lastName}`,
         siren: clientData.siren,
         vatNumber: clientData.vatNumber,
         address: clientData.address,

@@ -108,24 +108,51 @@ export default class FecExport {
       // Client debit line (411xxx)
       lines.push(
         [
-          'VE', 'Journal des ventes', num, date,
-          '411000', 'Clients', clientId, clientName,
-          inv.invoiceNumber, date, `Facture ${inv.invoiceNumber}`,
-          fecAmount(ttc), fecAmount(0),
-          '', '', date, fecAmount(ttc), 'EUR',
+          'VE',
+          'Journal des ventes',
+          num,
+          date,
+          '411000',
+          'Clients',
+          clientId,
+          clientName,
+          inv.invoiceNumber,
+          date,
+          `Facture ${inv.invoiceNumber}`,
+          fecAmount(ttc),
+          fecAmount(0),
+          '',
+          '',
+          date,
+          fecAmount(ttc),
+          'EUR',
         ].join('\t')
       )
 
       // Revenue credit line (706xxx for services, 707xxx for goods)
       const revenueAccount = inv.operationCategory === 'goods' ? '707000' : '706000'
-      const revenueLabel = inv.operationCategory === 'goods' ? 'Ventes de marchandises' : 'Prestations de services'
+      const revenueLabel =
+        inv.operationCategory === 'goods' ? 'Ventes de marchandises' : 'Prestations de services'
       lines.push(
         [
-          'VE', 'Journal des ventes', num, date,
-          revenueAccount, revenueLabel, '', '',
-          inv.invoiceNumber, date, `Facture ${inv.invoiceNumber}`,
-          fecAmount(0), fecAmount(ht),
-          '', '', date, fecAmount(ht), 'EUR',
+          'VE',
+          'Journal des ventes',
+          num,
+          date,
+          revenueAccount,
+          revenueLabel,
+          '',
+          '',
+          inv.invoiceNumber,
+          date,
+          `Facture ${inv.invoiceNumber}`,
+          fecAmount(0),
+          fecAmount(ht),
+          '',
+          '',
+          date,
+          fecAmount(ht),
+          'EUR',
         ].join('\t')
       )
 
@@ -133,11 +160,24 @@ export default class FecExport {
       if (tva > 0) {
         lines.push(
           [
-            'VE', 'Journal des ventes', num, date,
-            '445710', 'TVA collectée', '', '',
-            inv.invoiceNumber, date, `TVA Facture ${inv.invoiceNumber}`,
-            fecAmount(0), fecAmount(tva),
-            '', '', date, fecAmount(tva), 'EUR',
+            'VE',
+            'Journal des ventes',
+            num,
+            date,
+            '445710',
+            'TVA collectée',
+            '',
+            '',
+            inv.invoiceNumber,
+            date,
+            `TVA Facture ${inv.invoiceNumber}`,
+            fecAmount(0),
+            fecAmount(tva),
+            '',
+            '',
+            date,
+            fecAmount(tva),
+            'EUR',
           ].join('\t')
         )
       }
@@ -156,11 +196,24 @@ export default class FecExport {
       // Expense debit line (6xxxxx)
       lines.push(
         [
-          'HA', 'Journal des achats', num, date,
-          '625000', 'Charges externes', '', '',
-          `DEP-${exp.id.slice(0, 8)}`, date, exp.description || 'Dépense',
-          fecAmount(amount), fecAmount(0),
-          '', '', date, fecAmount(amount), 'EUR',
+          'HA',
+          'Journal des achats',
+          num,
+          date,
+          '625000',
+          'Charges externes',
+          '',
+          '',
+          `DEP-${exp.id.slice(0, 8)}`,
+          date,
+          exp.description || 'Dépense',
+          fecAmount(amount),
+          fecAmount(0),
+          '',
+          '',
+          date,
+          fecAmount(amount),
+          'EUR',
         ].join('\t')
       )
 
@@ -168,11 +221,24 @@ export default class FecExport {
       if (vatAmount > 0) {
         lines.push(
           [
-            'HA', 'Journal des achats', num, date,
-            '445660', 'TVA déductible', '', '',
-            `DEP-${exp.id.slice(0, 8)}`, date, `TVA ${exp.description || 'Dépense'}`,
-            fecAmount(vatAmount), fecAmount(0),
-            '', '', date, fecAmount(vatAmount), 'EUR',
+            'HA',
+            'Journal des achats',
+            num,
+            date,
+            '445660',
+            'TVA déductible',
+            '',
+            '',
+            `DEP-${exp.id.slice(0, 8)}`,
+            date,
+            `TVA ${exp.description || 'Dépense'}`,
+            fecAmount(vatAmount),
+            fecAmount(0),
+            '',
+            '',
+            date,
+            fecAmount(vatAmount),
+            'EUR',
           ].join('\t')
         )
       }
@@ -180,11 +246,24 @@ export default class FecExport {
       // Supplier credit line (401xxx)
       lines.push(
         [
-          'HA', 'Journal des achats', num, date,
-          '401000', 'Fournisseurs', '', exp.supplier || '',
-          `DEP-${exp.id.slice(0, 8)}`, date, exp.description || 'Dépense',
-          fecAmount(0), fecAmount(ttc),
-          '', '', date, fecAmount(ttc), 'EUR',
+          'HA',
+          'Journal des achats',
+          num,
+          date,
+          '401000',
+          'Fournisseurs',
+          '',
+          exp.supplier || '',
+          `DEP-${exp.id.slice(0, 8)}`,
+          date,
+          exp.description || 'Dépense',
+          fecAmount(0),
+          fecAmount(ttc),
+          '',
+          '',
+          date,
+          fecAmount(ttc),
+          'EUR',
         ].join('\t')
       )
 

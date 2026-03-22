@@ -68,7 +68,8 @@ export default class MindeeOcrProvider implements OcrProvider {
     return {
       supplier: prediction.supplier_name?.value ?? null,
       description: prediction.category?.value ?? null,
-      amount: totalAmount != null ? totalAmount - (totalTax ?? 0) : null,
+      amount:
+        totalAmount !== null && totalAmount !== undefined ? totalAmount - (totalTax ?? 0) : null,
       vatAmount: totalTax,
       vatRate,
       currency: prediction.locale?.currency ?? 'EUR',

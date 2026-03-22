@@ -39,8 +39,8 @@ export default class ConvertInvoice {
     let nextNum = 1
     if (lastCreditNote) {
       const numStr = lastCreditNote.creditNoteNumber.slice(prefix.length)
-      const parsed = parseInt(numStr, 10)
-      if (!isNaN(parsed)) nextNum = parsed + 1
+      const parsed = Number.parseInt(numStr, 10)
+      if (!Number.isNaN(parsed)) nextNum = parsed + 1
     }
 
     const creditNoteNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`

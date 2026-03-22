@@ -43,8 +43,8 @@ export default class Create {
       let nextNum = 1
       if (lastInvoice) {
         const numStr = lastInvoice.invoiceNumber.slice(prefix.length)
-        const parsed = parseInt(numStr, 10)
-        if (!isNaN(parsed)) nextNum = parsed + 1
+        const parsed = Number.parseInt(numStr, 10)
+        if (!Number.isNaN(parsed)) nextNum = parsed + 1
       }
 
       invoiceNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`

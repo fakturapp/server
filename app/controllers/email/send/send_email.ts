@@ -8,7 +8,11 @@ import CreditNote from '#models/credit_note/credit_note'
 import GmailOAuthService from '#services/email/gmail_oauth_service'
 import ResendUserService from '#services/email/resend_user_service'
 import SmtpService from '#services/email/smtp_service'
-import { generateInvoicePdf, generateQuotePdf, generateCreditNotePdf } from '#services/pdf/document_pdf_service'
+import {
+  generateInvoicePdf,
+  generateQuotePdf,
+  generateCreditNotePdf,
+} from '#services/pdf/document_pdf_service'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import { sendEmailValidator } from '#validators/email_validator'
 
@@ -78,10 +82,16 @@ export default class SendEmail {
     // Resolve document number for logging
     let documentNumber = ''
     if (payload.documentType === 'invoice') {
-      const inv = await Invoice.query().where('id', payload.documentId).where('team_id', teamId).first()
+      const inv = await Invoice.query()
+        .where('id', payload.documentId)
+        .where('team_id', teamId)
+        .first()
       documentNumber = inv?.invoiceNumber || payload.documentId
     } else if (payload.documentType === 'credit_note') {
-      const cn = await CreditNote.query().where('id', payload.documentId).where('team_id', teamId).first()
+      const cn = await CreditNote.query()
+        .where('id', payload.documentId)
+        .where('team_id', teamId)
+        .first()
       documentNumber = cn?.creditNoteNumber || payload.documentId
     } else {
       const q = await Quote.query().where('id', payload.documentId).where('team_id', teamId).first()
@@ -131,7 +141,12 @@ export default class SendEmail {
           attachments: allAttachments,
         })
       } else if (emailAccount.provider === 'smtp') {
-        if (!emailAccount.smtpHost || !emailAccount.smtpPort || !emailAccount.smtpUsername || !emailAccount.smtpPassword) {
+        if (
+          !emailAccount.smtpHost ||
+          !emailAccount.smtpPort ||
+          !emailAccount.smtpUsername ||
+          !emailAccount.smtpPassword
+        ) {
           throw new Error('Configuration SMTP incomplète')
         }
         await SmtpService.sendEmail({

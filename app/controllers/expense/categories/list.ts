@@ -10,9 +10,7 @@ export default class List {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const categories = await ExpenseCategory.query()
-      .where('team_id', teamId)
-      .orderBy('name', 'asc')
+    const categories = await ExpenseCategory.query().where('team_id', teamId).orderBy('name', 'asc')
 
     return response.ok({
       categories: categories.map((c) => ({

@@ -39,13 +39,15 @@ export default class CryptoWipe {
 
     const newKek = keyStore.getKEK(user.id)
     if (!newKek) {
-      return response.unauthorized({ code: 'SESSION_EXPIRED', message: 'Session expired. Please log in again.' })
+      return response.unauthorized({
+        code: 'SESSION_EXPIRED',
+        message: 'Session expired. Please log in again.',
+      })
     }
 
     await db.transaction(async (trx) => {
       // Find all teams owned by this user
-      const ownedTeams = await Team.query({ client: trx })
-        .where('ownerId', user.id)
+      const ownedTeams = await Team.query({ client: trx }).where('ownerId', user.id)
 
       for (const team of ownedTeams) {
         // CASCADE delete handles: team_members, company, clients, invoices,
@@ -55,9 +57,7 @@ export default class CryptoWipe {
       }
 
       // Remove memberships where user is NOT owner (invited teams)
-      await TeamMember.query({ client: trx })
-        .where('userId', user.id)
-        .delete()
+      await TeamMember.query({ client: trx }).where('userId', user.id).delete()
 
       // Reset user state
       user.useTransaction(trx)
@@ -75,7 +75,8 @@ export default class CryptoWipe {
     keyStore.storeKeys(user.id, newKek, '', Buffer.alloc(0))
 
     return response.ok({
-      message: 'Toutes les données ont été supprimées. Vous allez être redirigé vers la configuration.',
+      message:
+        'Toutes les données ont été supprimées. Vous allez être redirigé vers la configuration.',
       redirectTo: '/onboarding/team',
     })
   }

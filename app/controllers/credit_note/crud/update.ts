@@ -16,7 +16,10 @@ export default class Update {
       return response.badRequest({ message: 'No team selected' })
     }
 
-    const creditNote = await CreditNote.query().where('id', params.id).where('team_id', teamId).first()
+    const creditNote = await CreditNote.query()
+      .where('id', params.id)
+      .where('team_id', teamId)
+      .first()
 
     if (!creditNote) {
       return response.notFound({ message: 'Credit note not found' })

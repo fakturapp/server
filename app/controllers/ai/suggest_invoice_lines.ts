@@ -2,7 +2,11 @@ import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import Invoice from '#models/invoice/invoice'
 import AiService from '#services/ai/ai_service'
-import { decryptModelFields, decryptModelFieldsArray, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import {
+  decryptModelFields,
+  decryptModelFieldsArray,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 
 const suggestValidator = vine.compile(
   vine.object({
@@ -51,9 +55,10 @@ export default class SuggestInvoiceLines {
       }
     }
 
-    const historyContext = historyLines.length > 0
-      ? `Historique des dernières factures pour ce client:\n${historyLines.slice(0, 15).join('\n')}`
-      : 'Aucun historique de facturation pour ce client.'
+    const historyContext =
+      historyLines.length > 0
+        ? `Historique des dernières factures pour ce client:\n${historyLines.slice(0, 15).join('\n')}`
+        : 'Aucun historique de facturation pour ce client.'
 
     const userDescription = payload.description
       ? `\nDescription de la prestation à facturer: ${payload.description}`
@@ -82,7 +87,9 @@ Règles:
 
     try {
       const result = await ai.generate(
-        teamId, dek, systemPrompt,
+        teamId,
+        dek,
+        systemPrompt,
         `${historyContext}${userDescription}`,
         1024
       )

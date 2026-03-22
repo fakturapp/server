@@ -19,6 +19,10 @@ export const createExpenseValidator = vine.compile(
 export const createExpenseCategoryValidator = vine.compile(
   vine.object({
     name: vine.string().trim().maxLength(100),
-    color: vine.string().trim().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+    color: vine
+      .string()
+      .trim()
+      .regex(/^#[0-9a-fA-F]{6}$/)
+      .optional(),
   })
 )

@@ -1,9 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Client from '#models/client/client'
-import {
-  decryptModelFieldsArray,
-  ENCRYPTED_FIELDS,
-} from '#services/crypto/field_encryption_helper'
+import { decryptModelFieldsArray, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class List {
   async handle(ctx: HttpContext) {

@@ -3,17 +3,9 @@ import { BaseSchema } from '@adonisjs/lucid/schema'
 export default class extends BaseSchema {
   async up() {
     this.schema.createTable('expense_categories', (table) => {
-      table
-        .uuid('id')
-        .primary()
-        .defaultTo(this.raw('gen_random_uuid()'))
+      table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
 
-      table
-        .uuid('team_id')
-        .notNullable()
-        .references('id')
-        .inTable('teams')
-        .onDelete('CASCADE')
+      table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
 
       table.string('name', 100).notNullable()
       table.string('color', 7).nullable() // hex color
@@ -25,17 +17,9 @@ export default class extends BaseSchema {
     })
 
     this.schema.createTable('expenses', (table) => {
-      table
-        .uuid('id')
-        .primary()
-        .defaultTo(this.raw('gen_random_uuid()'))
+      table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
 
-      table
-        .uuid('team_id')
-        .notNullable()
-        .references('id')
-        .inTable('teams')
-        .onDelete('CASCADE')
+      table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
 
       table
         .uuid('category_id')

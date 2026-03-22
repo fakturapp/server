@@ -15,7 +15,12 @@ import keyStore from '#services/crypto/key_store'
 
 export default class Login {
   async handle({ request, response }: HttpContext) {
-    const { email, password, code, turnstileToken } = request.only(['email', 'password', 'code', 'turnstileToken'])
+    const { email, password, code, turnstileToken } = request.only([
+      'email',
+      'password',
+      'code',
+      'turnstileToken',
+    ])
 
     await request.validateUsing(loginValidator)
 

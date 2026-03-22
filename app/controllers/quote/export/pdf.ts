@@ -66,31 +66,35 @@ export default class Pdf {
             vatRate: l.vatRate,
             total: l.total,
           }))
-          const clientData = quote.client ? {
-            displayName: quote.client.displayName,
-            companyName: quote.client.companyName,
-            firstName: quote.client.firstName,
-            lastName: quote.client.lastName,
-            email: quote.client.email,
-            address: quote.client.address,
-            postalCode: quote.client.postalCode,
-            city: quote.client.city,
-            country: quote.client.country,
-            siren: quote.client.siren,
-            vatNumber: quote.client.vatNumber,
-          } : null
-          const companyData = company ? {
-            legalName: company.legalName,
-            siren: company.siren,
-            siret: company.siret,
-            vatNumber: company.vatNumber,
-            addressLine1: company.addressLine1,
-            postalCode: company.postalCode,
-            city: company.city,
-            country: company.country,
-            email: company.email,
-            phone: company.phone,
-          } : null
+          const clientData = quote.client
+            ? {
+                displayName: quote.client.displayName,
+                companyName: quote.client.companyName,
+                firstName: quote.client.firstName,
+                lastName: quote.client.lastName,
+                email: quote.client.email,
+                address: quote.client.address,
+                postalCode: quote.client.postalCode,
+                city: quote.client.city,
+                country: quote.client.country,
+                siren: quote.client.siren,
+                vatNumber: quote.client.vatNumber,
+              }
+            : null
+          const companyData = company
+            ? {
+                legalName: company.legalName,
+                siren: company.siren,
+                siret: company.siret,
+                vatNumber: company.vatNumber,
+                addressLine1: company.addressLine1,
+                postalCode: company.postalCode,
+                city: company.city,
+                country: company.country,
+                email: company.email,
+                phone: company.phone,
+              }
+            : null
 
           const facturxDoc = buildFacturXFromQuote(quoteData, linesData, clientData, companyData)
           const facturxXml = generateFacturXXml(facturxDoc)

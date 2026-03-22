@@ -32,9 +32,10 @@ export default class GoogleCallback {
     try {
       profile = await GoogleAuthService.exchangeCodeForProfile(code)
     } catch {
-      const errorRedirect = state.intent === 'link'
-        ? `${frontendUrl}/oauth/callback?error=oauth_failed`
-        : `${frontendUrl}/login?error=oauth_failed`
+      const errorRedirect =
+        state.intent === 'link'
+          ? `${frontendUrl}/oauth/callback?error=oauth_failed`
+          : `${frontendUrl}/login?error=oauth_failed`
       return response.redirect(errorRedirect)
     }
 

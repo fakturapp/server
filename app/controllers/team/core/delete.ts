@@ -38,7 +38,7 @@ export default class Delete {
       .first()
 
     if (!membership || membership.role !== 'super_admin') {
-      return response.forbidden({ message: 'Seul le propriétaire peut supprimer l\'équipe' })
+      return response.forbidden({ message: "Seul le propriétaire peut supprimer l'équipe" })
     }
 
     // Verify team name matches
@@ -48,7 +48,7 @@ export default class Delete {
     }
 
     if (team.name !== payload.teamName) {
-      return response.unprocessableEntity({ message: 'Le nom de l\'équipe ne correspond pas' })
+      return response.unprocessableEntity({ message: "Le nom de l'équipe ne correspond pas" })
     }
 
     // Verify password
@@ -60,22 +60,24 @@ export default class Delete {
     // Cascade delete in transaction
     await db.transaction(async (trx) => {
       // Delete invoice lines (via invoices)
-      const invoiceIds = await Invoice.query({ client: trx })
-        .where('teamId', teamId)
-        .select('id')
+      const invoiceIds = await Invoice.query({ client: trx }).where('teamId', teamId).select('id')
       if (invoiceIds.length > 0) {
         await InvoiceLine.query({ client: trx })
-          .whereIn('invoiceId', invoiceIds.map((i) => i.id))
+          .whereIn(
+            'invoiceId',
+            invoiceIds.map((i) => i.id)
+          )
           .delete()
       }
 
       // Delete quote lines (via quotes)
-      const quoteIds = await Quote.query({ client: trx })
-        .where('teamId', teamId)
-        .select('id')
+      const quoteIds = await Quote.query({ client: trx }).where('teamId', teamId).select('id')
       if (quoteIds.length > 0) {
         await QuoteLine.query({ client: trx })
-          .whereIn('quoteId', quoteIds.map((q) => q.id))
+          .whereIn(
+            'quoteId',
+            quoteIds.map((q) => q.id)
+          )
           .delete()
       }
 

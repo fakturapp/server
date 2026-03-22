@@ -6,9 +6,17 @@ import { DateTime } from 'luxon'
  * Available chart types that users can display on their dashboard.
  */
 const AVAILABLE_CHARTS = [
-  { key: 'revenue', label: 'CA HT (facturé)', description: 'Chiffre d\'affaires hors taxes facturé par mois' },
-  { key: 'collected', label: 'CA encaissé', description: 'Chiffre d\'affaires encaissé par mois' },
-  { key: 'micro', label: 'Seuils micro-entrepreneur', description: 'CA cumulé vs seuils micro-entrepreneur' },
+  {
+    key: 'revenue',
+    label: 'CA HT (facturé)',
+    description: "Chiffre d'affaires hors taxes facturé par mois",
+  },
+  { key: 'collected', label: 'CA encaissé', description: "Chiffre d'affaires encaissé par mois" },
+  {
+    key: 'micro',
+    label: 'Seuils micro-entrepreneur',
+    description: 'CA cumulé vs seuils micro-entrepreneur',
+  },
 ]
 
 /**
@@ -73,7 +81,8 @@ export default class Charts {
       }
     }
 
-    const data: { month: string; label: string; subtotal: number; total: number; count: number }[] = []
+    const data: { month: string; label: string; subtotal: number; total: number; count: number }[] =
+      []
     for (let i = 11; i >= 0; i--) {
       const dt = now.minus({ months: i }).startOf('month')
       const monthKey = dt.toFormat('yyyy-MM')
@@ -113,7 +122,7 @@ export default class Charts {
       .from('invoices')
       .where('team_id', teamId)
       .where('status', 'paid')
-      .whereRaw("COALESCE(paid_date, issue_date) >= ?", [twelveMonthsAgo])
+      .whereRaw('COALESCE(paid_date, issue_date) >= ?', [twelveMonthsAgo])
       .select(db.raw("to_char(COALESCE(paid_date, issue_date)::date, 'YYYY-MM') as month"))
       .sum('subtotal as subtotal')
       .sum('total as total')
@@ -131,7 +140,8 @@ export default class Charts {
       }
     }
 
-    const data: { month: string; label: string; subtotal: number; total: number; count: number }[] = []
+    const data: { month: string; label: string; subtotal: number; total: number; count: number }[] =
+      []
     for (let i = 11; i >= 0; i--) {
       const dt = now.minus({ months: i }).startOf('month')
       const monthKey = dt.toFormat('yyyy-MM')

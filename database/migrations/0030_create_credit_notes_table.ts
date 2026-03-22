@@ -4,18 +4,8 @@ export default class extends BaseSchema {
   async up() {
     this.schema.createTable('credit_notes', (table) => {
       table.uuid('id').primary().defaultTo(this.raw('gen_random_uuid()'))
-      table
-        .uuid('team_id')
-        .notNullable()
-        .references('id')
-        .inTable('teams')
-        .onDelete('CASCADE')
-      table
-        .uuid('client_id')
-        .nullable()
-        .references('id')
-        .inTable('clients')
-        .onDelete('SET NULL')
+      table.uuid('team_id').notNullable().references('id').inTable('teams').onDelete('CASCADE')
+      table.uuid('client_id').nullable().references('id').inTable('clients').onDelete('SET NULL')
       table
         .uuid('source_invoice_id')
         .nullable()

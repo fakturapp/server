@@ -13,7 +13,10 @@ export default class Signup {
     const data = await request.validateUsing(registerValidator)
 
     // Verify Turnstile captcha
-    const turnstileValid = await TurnstileService.verifyToken(data.turnstileToken || '', request.ip())
+    const turnstileValid = await TurnstileService.verifyToken(
+      data.turnstileToken || '',
+      request.ip()
+    )
     if (!turnstileValid) {
       return response.forbidden({ message: 'Captcha verification failed' })
     }

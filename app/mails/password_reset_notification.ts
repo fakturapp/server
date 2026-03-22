@@ -13,7 +13,7 @@ export default class PasswordResetNotification extends BaseMail {
   subject = 'Réinitialisation du mot de passe - Faktur'
 
   constructor(
-    private email: string,
+    email: string,
     private token: string,
     private name?: string
   ) {

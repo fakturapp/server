@@ -24,7 +24,12 @@ export default class VaultMiddleware {
     // Auto-recovery: if keyStore is empty (server restart), try to restore from DB
     if (!dek) {
       const sessionKeyHex = ctx.request.header('X-Vault-Key')
-      dek = await this.tryRecoverFromDb(user.id, user.currentTeamId, String(user.currentAccessToken.identifier), sessionKeyHex)
+      dek = await this.tryRecoverFromDb(
+        user.id,
+        user.currentTeamId,
+        String(user.currentAccessToken.identifier),
+        sessionKeyHex
+      )
     }
 
     if (!dek) {

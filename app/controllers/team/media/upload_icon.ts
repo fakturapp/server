@@ -23,7 +23,7 @@ export default class UploadIcon {
     if (useCompanyLogo) {
       const company = await team.related('company').query().first()
       if (!company?.logoUrl) {
-        return response.badRequest({ message: 'Aucun logo d\'entreprise trouvé' })
+        return response.badRequest({ message: "Aucun logo d'entreprise trouvé" })
       }
       team.iconUrl = company.logoUrl
       await team.save()

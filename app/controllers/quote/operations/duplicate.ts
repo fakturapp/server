@@ -40,7 +40,7 @@ export default class Duplicate {
       if (lastQuote) {
         const match = lastQuote.quoteNumber.match(/^DEV-(\d+)$/)
         if (match) {
-          const num = parseInt(match[1], 10) + 1
+          const num = Number.parseInt(match[1], 10) + 1
           quoteNumber = `DEV-${num.toString().padStart(3, '0')}`
         }
       }

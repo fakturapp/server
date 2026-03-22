@@ -18,10 +18,7 @@ export default class UpdateStatus {
       return response.badRequest({ message: 'Invalid status' })
     }
 
-    const invoice = await Invoice.query()
-      .where('id', params.id)
-      .where('team_id', teamId)
-      .first()
+    const invoice = await Invoice.query().where('id', params.id).where('team_id', teamId).first()
 
     if (!invoice) {
       return response.notFound({ message: 'Invoice not found' })
@@ -41,6 +38,8 @@ export default class UpdateStatus {
 
     await invoice.save()
 
-    return response.ok({ invoice: { id: invoice.id, status: invoice.status, paidDate: invoice.paidDate } })
+    return response.ok({
+      invoice: { id: invoice.id, status: invoice.status, paidDate: invoice.paidDate },
+    })
   }
 }

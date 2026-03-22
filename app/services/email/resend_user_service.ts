@@ -31,9 +31,7 @@ export default class ResendUserService {
     const apiKey = EncryptionService.decrypt(params.encryptedApiKey)
     const resend = new Resend(apiKey)
 
-    const fromHeader = params.fromName
-      ? `${params.fromName} <${params.from}>`
-      : params.from
+    const fromHeader = params.fromName ? `${params.fromName} <${params.from}>` : params.from
 
     const resendAttachments = params.attachments?.map((att) => ({
       filename: att.filename,

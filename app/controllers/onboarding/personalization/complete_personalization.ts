@@ -6,7 +6,11 @@ import Company from '#models/team/company'
 const personalizeValidator = vine.compile(
   vine.object({
     template: vine.string().trim().maxLength(30).optional(),
-    accentColor: vine.string().trim().regex(/^#[0-9a-fA-F]{6}$/).optional(),
+    accentColor: vine
+      .string()
+      .trim()
+      .regex(/^#[0-9a-fA-F]{6}$/)
+      .optional(),
     billingType: vine.enum(['quick', 'detailed']).optional(),
     vatExemptReason: vine
       .enum(['none', 'not_subject', 'france_no_vat', 'outside_france'])
@@ -30,9 +34,7 @@ export default class CompletePersonalization {
 
     const payload = await request.validateUsing(personalizeValidator)
 
-    const quotePattern = payload.quotePrefix
-      ? `${payload.quotePrefix}{annee}-{numero}`
-      : undefined
+    const quotePattern = payload.quotePrefix ? `${payload.quotePrefix}{annee}-{numero}` : undefined
     const invoicePattern = payload.invoicePrefix
       ? `${payload.invoicePrefix}{annee}-{numero}`
       : undefined

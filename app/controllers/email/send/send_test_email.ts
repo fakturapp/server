@@ -77,7 +77,12 @@ export default class SendTestEmail {
           body: testBody,
         })
       } else if (emailAccount.provider === 'smtp') {
-        if (!emailAccount.smtpHost || !emailAccount.smtpPort || !emailAccount.smtpUsername || !emailAccount.smtpPassword) {
+        if (
+          !emailAccount.smtpHost ||
+          !emailAccount.smtpPort ||
+          !emailAccount.smtpUsername ||
+          !emailAccount.smtpPassword
+        ) {
           return response.badRequest({ message: 'Configuration SMTP incomplète' })
         }
 

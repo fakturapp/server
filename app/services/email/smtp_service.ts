@@ -53,9 +53,7 @@ export default class SmtpService {
       connectionTimeout: 15_000,
     })
 
-    const fromHeader = params.fromName
-      ? `${params.fromName} <${params.from}>`
-      : params.from
+    const fromHeader = params.fromName ? `${params.fromName} <${params.from}>` : params.from
 
     const mailAttachments = params.attachments?.map((att) => ({
       filename: att.filename,

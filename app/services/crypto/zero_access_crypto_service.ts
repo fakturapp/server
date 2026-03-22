@@ -123,7 +123,9 @@ class ZeroAccessCryptoService {
    */
   deriveInviteKey(inviteToken: string): Buffer {
     const ikm = Buffer.from(inviteToken, 'hex')
-    return Buffer.from(crypto.hkdfSync('sha256', ikm, Buffer.alloc(0), 'factorpro-invite-key', this.keyLength))
+    return Buffer.from(
+      crypto.hkdfSync('sha256', ikm, Buffer.alloc(0), 'factorpro-invite-key', this.keyLength)
+    )
   }
 }
 

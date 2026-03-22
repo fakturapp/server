@@ -57,7 +57,9 @@ export default class ClaudeService {
   ): Promise<string> {
     const apiKey = await this.getApiKey(teamId, dek)
     if (!apiKey) {
-      throw new Error('No API key configured. Set ANTHROPIC_API_KEY or add a custom key in settings.')
+      throw new Error(
+        'No API key configured. Set ANTHROPIC_API_KEY or add a custom key in settings.'
+      )
     }
 
     const model = await this.getModel(teamId)

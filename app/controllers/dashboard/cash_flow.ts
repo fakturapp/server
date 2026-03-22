@@ -74,7 +74,10 @@ export default class CashFlow {
           }
         }
         for (const exp of pastExpenses) {
-          if (exp.expenseDate >= monthStart.toISODate()! && exp.expenseDate <= monthEnd.toISODate()!) {
+          if (
+            exp.expenseDate >= monthStart.toISODate()! &&
+            exp.expenseDate <= monthEnd.toISODate()!
+          ) {
             expenseTotal += (Number(exp.amount) || 0) + (Number(exp.vatAmount) || 0)
           }
         }
@@ -135,9 +138,9 @@ export default class CashFlow {
         forecastExpenses: Math.round(totalForecastExpenses * 100) / 100,
         forecastNet: Math.round((totalForecastIncome - totalForecastExpenses) * 100) / 100,
         outstandingCount: outstandingInvoices.length,
-        outstandingTotal: Math.round(
-          outstandingInvoices.reduce((s, i) => s + (Number(i.total) || 0), 0) * 100
-        ) / 100,
+        outstandingTotal:
+          Math.round(outstandingInvoices.reduce((s, i) => s + (Number(i.total) || 0), 0) * 100) /
+          100,
         recurringCount: recurringInvoices.length,
       },
     })

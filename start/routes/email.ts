@@ -36,7 +36,9 @@ router
 
     // Send (POST only — reject GET with 405)
     router.post('/send', [SendEmail, 'handle'])
-    router.get('/send', async ({ response }) => response.status(405).send({ message: 'Method not allowed. Use POST.' }))
+    router.get('/send', async ({ response }) =>
+      response.status(405).send({ message: 'Method not allowed. Use POST.' })
+    )
     router.post('/test', [SendTestEmail, 'handle'])
 
     // Templates

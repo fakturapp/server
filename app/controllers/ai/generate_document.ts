@@ -44,7 +44,8 @@ export default class GenerateDocument {
       if (company.legalForm) parts.push(`Forme juridique : ${company.legalForm}`)
       if (company.city) parts.push(`Ville : ${company.city}`)
       if (company.country) parts.push(`Pays : ${company.country}`)
-      if (parts.length > 0) companyContext = `\nEntreprise émettrice :\n${parts.map((p) => `- ${p}`).join('\n')}`
+      if (parts.length > 0)
+        companyContext = `\nEntreprise émettrice :\n${parts.map((p) => `- ${p}`).join('\n')}`
     }
 
     // Load client info if provided
@@ -70,7 +71,8 @@ export default class GenerateDocument {
         if (client.email) parts.push(`Email : ${client.email}`)
         if (client.address) parts.push(`Adresse : ${client.address}`)
         if (client.city) parts.push(`Ville : ${client.city}`)
-        if (parts.length > 0) clientContext = `\nClient destinataire :\n${parts.map((p) => `- ${p}`).join('\n')}`
+        if (parts.length > 0)
+          clientContext = `\nClient destinataire :\n${parts.map((p) => `- ${p}`).join('\n')}`
       }
     }
 
@@ -137,7 +139,7 @@ EXEMPLE DE RÉPONSE VALIDE :
         payload.prompt,
         2048,
         payload.provider,
-        payload.model,
+        payload.model
       )
 
       // Parse JSON from response — strip markdown code fences if present
@@ -177,7 +179,8 @@ EXEMPLE DE RÉPONSE VALIDE :
 
       // Ensure notes and acceptanceConditions are strings
       document.notes = typeof document.notes === 'string' ? document.notes : ''
-      document.acceptanceConditions = typeof document.acceptanceConditions === 'string' ? document.acceptanceConditions : ''
+      document.acceptanceConditions =
+        typeof document.acceptanceConditions === 'string' ? document.acceptanceConditions : ''
 
       return response.ok({ document })
     } catch (error: any) {
@@ -188,7 +191,9 @@ EXEMPLE DE RÉPONSE VALIDE :
       }
 
       if (msg.includes('API error')) {
-        return response.status(502).send({ message: 'Le service IA est temporairement indisponible.', error: msg })
+        return response
+          .status(502)
+          .send({ message: 'Le service IA est temporairement indisponible.', error: msg })
       }
 
       return response.internalServerError({ message: 'AI generation failed', error: msg })
