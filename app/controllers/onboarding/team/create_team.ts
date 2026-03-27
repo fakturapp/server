@@ -5,6 +5,7 @@ import TeamMember from '#models/team/team_member'
 import { createTeamValidator } from '#validators/auth/onboarding_validators'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
+import RecoveryKeyGenerated from '#events/recovery_key_generated'
 
 export default class CreateTeam {
   async handle({ auth, request, response }: HttpContext) {
@@ -33,6 +34,11 @@ export default class CreateTeam {
     const teamDek = zeroAccessCryptoService.generateDEK()
     const encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
 
+    // Generate recovery key and encrypt DEK with recovery KEK
+    const recoveryKey = zeroAccessCryptoService.generateRecoveryKey()
+    const recoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(recoveryKey)
+    const encryptedTeamDekRecovery = zeroAccessCryptoService.encryptDEK(teamDek, recoveryKEK)
+
     await TeamMember.create({
       teamId: team.id,
       userId: user.id,
@@ -40,13 +46,22 @@ export default class CreateTeam {
       status: 'active',
       joinedAt: DateTime.now(),
       encryptedTeamDek,
+      encryptedTeamDekRecovery,
       dekVersion: 1,
     })
 
     keyStore.storeDEK(user.id, team.id, teamDek)
 
+    // Save recovery key hash and flag
+    user.recoveryKeyHash = zeroAccessCryptoService.hashRecoveryKey(recoveryKey)
+    user.hasRecoveryKey = true
     user.currentTeamId = team.id
     await user.save()
+
+    // Send recovery key by email
+    RecoveryKeyGenerated.dispatch(user.email, recoveryKey, user.fullName ?? undefined)
+
+    const formatted = zeroAccessCryptoService.formatRecoveryKey(recoveryKey)
 
     return response.created({
       message: 'Team created successfully',
@@ -55,6 +70,7 @@ export default class CreateTeam {
         name: team.name,
         iconUrl: team.iconUrl,
       },
+      recoveryKey: formatted,
     })
   }
 }

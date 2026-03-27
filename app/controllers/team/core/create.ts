@@ -59,6 +59,8 @@ export default class Create {
     // Send recovery key by email
     RecoveryKeyGenerated.dispatch(user.email, recoveryKey, user.fullName ?? undefined)
 
+    const formatted = zeroAccessCryptoService.formatRecoveryKey(recoveryKey)
+
     return response.created({
       message: 'Team created successfully',
       team: {
@@ -66,6 +68,7 @@ export default class Create {
         name: team.name,
         iconUrl: team.iconUrl,
       },
+      recoveryKey: formatted,
     })
   }
 }

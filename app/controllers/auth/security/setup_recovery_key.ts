@@ -63,6 +63,8 @@ export default class SetupRecoveryKey {
     // Send email with recovery key
     RecoveryKeyGenerated.dispatch(user.email, recoveryKey, user.fullName ?? undefined)
 
-    return response.ok({ message: 'Recovery key sent by email' })
+    const formatted = zeroAccessCryptoService.formatRecoveryKey(recoveryKey)
+
+    return response.ok({ message: 'Recovery key sent by email', recoveryKey: formatted })
   }
 }

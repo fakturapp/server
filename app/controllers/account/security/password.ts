@@ -79,6 +79,10 @@ export default class Password {
       }
     }
 
-    return response.ok({ message: 'Password changed successfully' })
+    const formatted = newRecoveryKey
+      ? zeroAccessCryptoService.formatRecoveryKey(newRecoveryKey)
+      : undefined
+
+    return response.ok({ message: 'Password changed successfully', recoveryKey: formatted })
   }
 }
