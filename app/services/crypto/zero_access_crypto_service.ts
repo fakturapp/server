@@ -127,6 +127,38 @@ class ZeroAccessCryptoService {
       crypto.hkdfSync('sha256', ikm, Buffer.alloc(0), 'factorpro-invite-key', this.keyLength)
     )
   }
+
+  /**
+   * Generate a random 128-bit recovery key (16 bytes → 32 hex chars uppercase).
+   */
+  generateRecoveryKey(): string {
+    return crypto.randomBytes(16).toString('hex').toUpperCase()
+  }
+
+  /**
+   * Format a recovery key for display: XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX-XXXX
+   */
+  formatRecoveryKey(key: string): string {
+    return key.match(/.{4}/g)!.join('-')
+  }
+
+  /**
+   * Derive a Recovery KEK from a recovery key using HKDF-SHA256.
+   * The recovery key is never stored — only its SHA-256 hash.
+   */
+  deriveRecoveryKEK(recoveryKeyHex: string): Buffer {
+    const ikm = Buffer.from(recoveryKeyHex, 'hex')
+    return Buffer.from(
+      crypto.hkdfSync('sha256', ikm, Buffer.alloc(0), 'factorpro-recovery-kek', this.keyLength)
+    )
+  }
+
+  /**
+   * Hash a recovery key with SHA-256 for verification.
+   */
+  hashRecoveryKey(recoveryKeyHex: string): string {
+    return crypto.createHash('sha256').update(recoveryKeyHex).digest('hex')
+  }
 }
 
 export default new ZeroAccessCryptoService()

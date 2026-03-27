@@ -10,48 +10,86 @@ import keyStore from '#services/crypto/key_store'
 
 const unlockValidator = vine.compile(
   vine.object({
-    password: vine.string(),
+    password: vine.string().optional(),
+    recoveryKey: vine.string().optional(),
   })
 )
 
 export default class VaultUnlock {
   async handle({ auth, request, response }: HttpContext) {
     const user = auth.user!
-    const { password } = await request.validateUsing(unlockValidator)
+    const { password, recoveryKey } = await request.validateUsing(unlockValidator)
 
-    // Verify password
-    const passwordValid = await User.verifyCredentials(user.email, password)
-      .then(() => true)
-      .catch(() => false)
-
-    if (!passwordValid) {
-      return response.unauthorized({ message: 'Mot de passe incorrect' })
+    if (!password && !recoveryKey) {
+      return response.badRequest({ message: 'Password or recovery key is required' })
     }
 
-    // Derive KEK from password
-    if (!user.saltKdf) {
-      return response.badRequest({ message: 'No encryption salt found for this account' })
-    }
+    let kek: Buffer
 
-    const salt = Buffer.from(user.saltKdf, 'hex')
-    const kek = await zeroAccessCryptoService.deriveKEK(password, salt)
+    if (recoveryKey) {
+      // Recovery key flow: derive recovery KEK and decrypt DEK from recovery column
+      const normalizedKey = recoveryKey.replace(/-/g, '').toUpperCase()
+      const recoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(normalizedKey)
 
-    // Load team DEK if user has a current team
-    if (user.currentTeamId && !user.cryptoResetNeeded) {
-      const teamMember = await TeamMember.query()
-        .where('teamId', user.currentTeamId)
-        .where('userId', user.id)
-        .where('status', 'active')
-        .first()
+      if (user.currentTeamId && !user.cryptoResetNeeded) {
+        const teamMember = await TeamMember.query()
+          .where('teamId', user.currentTeamId)
+          .where('userId', user.id)
+          .where('status', 'active')
+          .first()
 
-      if (teamMember?.encryptedTeamDek) {
-        const teamDek = zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
-        keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+        if (!teamMember?.encryptedTeamDekRecovery) {
+          return response.badRequest({ message: 'Aucune clef de secours configurée pour ce compte' })
+        }
+
+        try {
+          const teamDek = zeroAccessCryptoService.decryptDEK(
+            teamMember.encryptedTeamDekRecovery,
+            recoveryKEK
+          )
+          // We don't have the password KEK, so store a dummy KEK — vault is unlocked via recovery
+          kek = recoveryKEK
+          keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+        } catch {
+          return response.unauthorized({ message: 'Clef de secours incorrecte' })
+        }
       } else {
+        kek = recoveryKEK
         keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
       }
     } else {
-      keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
+      // Password flow (existing behavior)
+      const passwordValid = await User.verifyCredentials(user.email, password!)
+        .then(() => true)
+        .catch(() => false)
+
+      if (!passwordValid) {
+        return response.unauthorized({ message: 'Mot de passe incorrect' })
+      }
+
+      if (!user.saltKdf) {
+        return response.badRequest({ message: 'No encryption salt found for this account' })
+      }
+
+      const salt = Buffer.from(user.saltKdf, 'hex')
+      kek = await zeroAccessCryptoService.deriveKEK(password!, salt)
+
+      if (user.currentTeamId && !user.cryptoResetNeeded) {
+        const teamMember = await TeamMember.query()
+          .where('teamId', user.currentTeamId)
+          .where('userId', user.id)
+          .where('status', 'active')
+          .first()
+
+        if (teamMember?.encryptedTeamDek) {
+          const teamDek = zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
+          keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+        } else {
+          keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
+        }
+      } else {
+        keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
+      }
     }
 
     // Dual-key split: encrypt KEK with sessionKey (client) then ENCRYPTION_KEY (server)

@@ -4,6 +4,7 @@ import TeamMember from '#models/team/team_member'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 import { changePasswordValidator } from '#validators/account_validator'
+import RecoveryKeyGenerated from '#events/recovery_key_generated'
 
 export default class Password {
   async handle({ auth, request, response }: HttpContext) {
@@ -27,16 +28,25 @@ export default class Password {
     const newSalt = zeroAccessCryptoService.generateSalt()
     const newKek = await zeroAccessCryptoService.deriveKEK(payload.password, newSalt)
 
-    // Re-encrypt all team DEKs with new KEK
+    // Re-encrypt all team DEKs with new KEK + regenerate recovery key
+    let newRecoveryKey: string | null = null
     if (oldKek) {
       const memberships = await TeamMember.query()
         .where('userId', user.id)
         .where('status', 'active')
         .whereNotNull('encryptedTeamDek')
 
+      // Generate new recovery key for all memberships
+      newRecoveryKey = zeroAccessCryptoService.generateRecoveryKey()
+      const newRecoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(newRecoveryKey)
+
       for (const membership of memberships) {
         const teamDek = zeroAccessCryptoService.decryptDEK(membership.encryptedTeamDek!, oldKek)
         membership.encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, newKek)
+        membership.encryptedTeamDekRecovery = zeroAccessCryptoService.encryptDEK(
+          teamDek,
+          newRecoveryKEK
+        )
         await membership.save()
 
         // Update cached DEK
@@ -47,7 +57,19 @@ export default class Password {
     // Update user password and salt
     user.password = payload.password
     user.saltKdf = newSalt.toString('hex')
+
+    // Update recovery key hash
+    if (newRecoveryKey) {
+      user.recoveryKeyHash = zeroAccessCryptoService.hashRecoveryKey(newRecoveryKey)
+      user.hasRecoveryKey = true
+    }
+
     await user.save()
+
+    // Send new recovery key by email
+    if (newRecoveryKey) {
+      RecoveryKeyGenerated.dispatch(user.email, newRecoveryKey, user.fullName ?? undefined)
+    }
 
     // Update KEK in memory
     if (user.currentTeamId) {

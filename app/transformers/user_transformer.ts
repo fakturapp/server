@@ -19,6 +19,7 @@ export default class UserTransformer extends BaseTransformer<User> {
         'initials',
       ]),
       cryptoResetNeeded: this.resource.cryptoResetNeeded || false,
+      hasRecoveryKey: this.resource.hasRecoveryKey || false,
     }
   }
 }
