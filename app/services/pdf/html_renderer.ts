@@ -98,6 +98,21 @@ function esc(str: string | null | undefined): string {
     .replace(/"/g, '&quot;')
 }
 
+/** Escape HTML then convert markdown formatting → HTML tags + newlines → <br> */
+function formatText(str: string | null | undefined): string {
+  if (!str) return ''
+  let html = esc(str)
+  // Bold: **text**
+  html = html.replace(/\*\*(.+?)\*\*/g, '<strong>$1</strong>')
+  // Underline: __text__ (before italic)
+  html = html.replace(/__(.+?)__/g, '<u>$1</u>')
+  // Italic: *text*
+  html = html.replace(/\*(.+?)\*/g, '<em>$1</em>')
+  // Newlines
+  html = html.replace(/\n/g, '<br>')
+  return html
+}
+
 function formatIban(iban: string): string {
   const clean = iban.replace(/\s/g, '')
   // Format in groups of 4
@@ -759,17 +774,17 @@ function renderStandardPage(
 
   // Notes
   if (quote.notes) {
-    html += `<div class="notes-section"><div class="section-label">${i.conditionsAndNotes}</div><div class="notes-text">${esc(quote.notes)}</div></div>`
+    html += `<div class="notes-section"><div class="section-label">${i.conditionsAndNotes}</div><div class="notes-text">${formatText(quote.notes)}</div></div>`
   }
 
   // Acceptance conditions
   if (quote.acceptanceConditions) {
-    html += `<div class="conditions-section"><div class="section-label">${i.acceptanceConditions}</div><div class="conditions-text">${esc(quote.acceptanceConditions)}</div></div>`
+    html += `<div class="conditions-section"><div class="section-label">${i.acceptanceConditions}</div><div class="conditions-text">${formatText(quote.acceptanceConditions)}</div></div>`
   }
 
   // Free field
   if (quote.freeField) {
-    html += `<div class="free-field-section"><div class="section-label">${i.freeField}</div><div class="free-field-text">${esc(quote.freeField)}</div></div>`
+    html += `<div class="free-field-section"><div class="section-label">${i.freeField}</div><div class="free-field-text">${formatText(quote.freeField)}</div></div>`
   }
 
   // Signature
@@ -821,7 +836,7 @@ function renderClientBlock(
   if (quote.deliveryAddress) {
     html += `<div style="border-top:1px solid ${T.borderLight};margin-top:8px;padding-top:8px">`
     html += `<div class="section-label">${i.deliveryAddress}</div>`
-    html += `<div class="client-line" style="white-space:pre-line">${esc(quote.deliveryAddress)}</div>`
+    html += `<div class="client-line" style="white-space:pre-line">${formatText(quote.deliveryAddress)}</div>`
     html += '</div>'
   }
 
@@ -1020,7 +1035,7 @@ function renderLegalFooter(
   if (footerMode === 'custom') {
     const text = quote.footerText || ''
     if (!text) return ''
-    return `<div class="legal-footer"><div class="legal-footer-text">${esc(text)}</div></div>`
+    return `<div class="legal-footer"><div class="legal-footer-text">${formatText(text)}</div></div>`
   }
 
   // Company info
@@ -1107,7 +1122,7 @@ function renderLateral(
     if (quote.deliveryAddress) {
       main += `<div style="border-top:1px solid ${T.clientBlockBorder};margin-top:6px;padding-top:6px">`
       main += `<div class="section-label">${i.deliveryAddress}</div>`
-      main += `<div class="address-line">${esc(quote.deliveryAddress)}</div></div>`
+      main += `<div class="address-line">${formatText(quote.deliveryAddress)}</div></div>`
     }
     main += '</div></div>'
   }
@@ -1131,11 +1146,11 @@ function renderLateral(
   const lateralVatText = getVatExemptText(quote.vatExemptReason, i)
   if (lateralVatText) main += `<div class="vat-exempt">${lateralVatText}</div>`
   if (quote.notes)
-    main += `<div class="notes-section"><div class="section-label">${i.conditionsAndNotes}</div><div class="notes-text">${esc(quote.notes)}</div></div>`
+    main += `<div class="notes-section"><div class="section-label">${i.conditionsAndNotes}</div><div class="notes-text">${formatText(quote.notes)}</div></div>`
   if (quote.acceptanceConditions)
-    main += `<div class="conditions-section"><div class="section-label">${i.acceptanceConditions}</div><div class="conditions-text">${esc(quote.acceptanceConditions)}</div></div>`
+    main += `<div class="conditions-section"><div class="section-label">${i.acceptanceConditions}</div><div class="conditions-text">${formatText(quote.acceptanceConditions)}</div></div>`
   if (quote.freeField)
-    main += `<div class="free-field-section"><div class="section-label">${i.freeField}</div><div class="free-field-text">${esc(quote.freeField)}</div></div>`
+    main += `<div class="free-field-section"><div class="section-label">${i.freeField}</div><div class="free-field-text">${formatText(quote.freeField)}</div></div>`
   if (quote.signatureField) {
     main += `<div class="signature-row">
       <div class="signature-box"><div class="section-label">${i.signatureIssuer}</div><div class="signature-area"></div></div>
