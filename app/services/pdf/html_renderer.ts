@@ -903,12 +903,12 @@ function renderTable(
   let rows = ''
   lines.forEach((line, idx) => {
     if (line.saleType === 'section') {
-      rows += `<tr class="section-row"><td colspan="${isDetailed ? 6 : 2}">${esc(line.description)}</td></tr>`
+      rows += `<tr class="section-row"><td colspan="${isDetailed ? 6 : 2}">${formatText(line.description)}</td></tr>`
       return
     }
     const cls = idx % 2 === 0 ? 'even' : 'odd'
     const lineTotal = isDetailed ? line.quantity * line.unitPrice : line.unitPrice
-    rows += `<tr class="${cls}"><td>${esc(line.description)}</td>`
+    rows += `<tr class="${cls}"><td>${formatText(line.description)}</td>`
     if (isDetailed) {
       rows += `<td class="center">${line.quantity}</td>`
       rows += `<td class="unit-col">${esc(line.unit || '')}</td>`
