@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
+import env from '#start/env'
 import AuthProvider from '#models/account/auth_provider'
 import TeamMember from '#models/team/team_member'
 import keyStore from '#services/crypto/key_store'
@@ -38,11 +39,18 @@ export default class Me {
       }
     }
 
+    const adminEmails = (env.get('ADMIN_EMAILS') || '')
+      .split(',')
+      .map((e) => e.trim().toLowerCase())
+      .filter(Boolean)
+    const isAdmin = adminEmails.includes(user.email.toLowerCase())
+
     return response.ok({
       user: {
         ...(await ctx.serialize.withoutWrapping(UserTransformer.transform(user))),
         hasGoogleProvider: !!googleProvider,
         vaultLocked,
+        isAdmin,
       },
     })
   }

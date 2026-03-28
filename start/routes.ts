@@ -21,6 +21,7 @@ import '#start/routes/expense'
 import '#start/routes/tax'
 import '#start/routes/export'
 import '#start/routes/ai'
+import '#start/routes/admin'
 
 router.get(API_PREFIX + '/', async () => {
   return {

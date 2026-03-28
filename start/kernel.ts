@@ -49,4 +49,5 @@ export const middleware = router.named({
   twoFactorVerified: () => import('#middleware/auth/two_factor_verified_middleware'),
   onboardingCompleted: () => import('#middleware/auth/onboarding_completed_middleware'),
   vault: () => import('#middleware/crypto/vault_middleware'),
+  admin: () => import('#middleware/auth/admin_middleware'),
 })

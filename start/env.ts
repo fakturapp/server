@@ -71,4 +71,7 @@ export default await Env.create(new URL('../', import.meta.url), {
   ANTHROPIC_API_KEY: Env.schema.string.optional(),
   GEMINI_API_KEY: Env.schema.string.optional(),
   GROQ_API_KEY: Env.schema.string.optional(),
+
+  // Admin (comma-separated emails)
+  ADMIN_EMAILS: Env.schema.string.optional(),
 })
