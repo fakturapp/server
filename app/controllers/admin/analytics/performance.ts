@@ -2,15 +2,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import db from '@adonisjs/lucid/services/db'
 
-const METRIC_THRESHOLDS: Record<string, { good: number; poor: number }> = {
-  LCP: { good: 2500, poor: 4000 },
-  FID: { good: 100, poor: 300 },
-  CLS: { good: 0.1, poor: 0.25 },
-  INP: { good: 200, poor: 500 },
-  FCP: { good: 1800, poor: 3000 },
-  TTFB: { good: 800, poor: 1800 },
-}
-
 export default class AnalyticsPerformance {
   async handle({ request, response }: HttpContext) {
     const period = request.input('period', '7d')

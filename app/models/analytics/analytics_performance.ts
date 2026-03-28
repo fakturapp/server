@@ -26,7 +26,7 @@ export default class AnalyticsPerformance extends BaseModel {
   declare rating: string
 
   @column()
-  declare pagePath: string
+  declare pagePath: string | null
 
   @column()
   declare connectionType: string | null

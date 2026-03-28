@@ -19,7 +19,7 @@ export default class AnalyticsErrors {
         occurrenceCount: number
         errorType: string
         errorMessage: string
-        pagePath: string
+        pagePath: string | null
         browser: string | null
         os: string | null
         isResolved: boolean

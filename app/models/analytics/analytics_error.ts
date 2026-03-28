@@ -29,7 +29,7 @@ export default class AnalyticsError extends BaseModel {
   declare stackTraceEncrypted: string | null
 
   @column()
-  declare pagePath: string
+  declare pagePath: string | null
 
   @column()
   declare browser: string | null

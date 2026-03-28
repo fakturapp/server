@@ -23,7 +23,7 @@ export default class AnalyticsEvent extends BaseModel {
   declare eventName: string
 
   @column()
-  declare pagePath: string
+  declare pagePath: string | null
 
   @column()
   declare pagePathFullEncrypted: string | null

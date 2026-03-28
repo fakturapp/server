@@ -37,7 +37,7 @@ export async function getGeoFromIp(ip: string): Promise<GeoResult> {
 
     if (!response.ok) return UNKNOWN_GEO
 
-    const data = await response.json()
+    const data: any = await response.json()
 
     if (data.status !== 'success') return UNKNOWN_GEO
 

@@ -7,7 +7,7 @@ export default class AdminMiddleware {
     const user = auth.user!
 
     const adminEmails = (env.get('ADMIN_EMAILS') || '')
-      .split(',')
+      .split(/[,;]/)
       .map((e) => e.trim().toLowerCase())
       .filter(Boolean)
 
