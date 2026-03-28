@@ -2215,4 +2215,112 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/bug_reports').default['update']>>>
     }
   }
+  'analytics_ingest': {
+    methods: ["POST"]
+    pattern: '/api/v1/analytics/ingest'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/analytics_validator').ingestValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/analytics_validator').ingestValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/analytics/ingest').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/analytics/ingest').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'analytics_consent': {
+    methods: ["POST"]
+    pattern: '/api/v1/analytics/consent'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/analytics_validator').consentValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/analytics_validator').consentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/analytics/consent').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/analytics/consent').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'analytics_overview': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/analytics/overview'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/analytics/overview').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/analytics/overview').default['handle']>>>
+    }
+  }
+  'analytics_pages': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/analytics/pages'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/analytics/pages').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/analytics/pages').default['handle']>>>
+    }
+  }
+  'analytics_features': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/analytics/features'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/analytics/features').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/analytics/features').default['handle']>>>
+    }
+  }
+  'analytics_errors': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/analytics/errors'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/analytics/errors').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/analytics/errors').default['handle']>>>
+    }
+  }
+  'analytics_errors.resolve': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/admin/analytics/errors/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/analytics/errors').default['resolve']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/analytics/errors').default['resolve']>>>
+    }
+  }
+  'analytics_performance': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/analytics/performance'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/analytics/performance').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/analytics/performance').default['handle']>>>
+    }
+  }
+  'analytics_users': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/admin/analytics/users'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/analytics/users').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/analytics/users').default['handle']>>>
+    }
+  }
 }

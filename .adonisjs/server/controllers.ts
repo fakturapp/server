@@ -34,16 +34,16 @@ export const controllers = {
     },
   },
   admin: {
-    BugReports: () => import('#controllers/admin/bug_reports'),
-    Feedbacks: () => import('#controllers/admin/feedbacks'),
     analytics: {
+      Errors: () => import('#controllers/admin/analytics/errors'),
+      Features: () => import('#controllers/admin/analytics/features'),
       Overview: () => import('#controllers/admin/analytics/overview'),
       Pages: () => import('#controllers/admin/analytics/pages'),
-      Features: () => import('#controllers/admin/analytics/features'),
-      Errors: () => import('#controllers/admin/analytics/errors'),
       Performance: () => import('#controllers/admin/analytics/performance'),
       Users: () => import('#controllers/admin/analytics/users'),
     },
+    BugReports: () => import('#controllers/admin/bug_reports'),
+    Feedbacks: () => import('#controllers/admin/feedbacks'),
   },
   ai: {
     ChatDocument: () => import('#controllers/ai/chat_document'),
@@ -53,6 +53,10 @@ export const controllers = {
     GenerateReminder: () => import('#controllers/ai/generate_reminder'),
     GenerateText: () => import('#controllers/ai/generate_text'),
     SuggestInvoiceLines: () => import('#controllers/ai/suggest_invoice_lines'),
+  },
+  analytics: {
+    Consent: () => import('#controllers/analytics/consent'),
+    Ingest: () => import('#controllers/analytics/ingest'),
   },
   auth: {
     oauth: {
@@ -336,9 +340,5 @@ export const controllers = {
       TransferOwnership: () => import('#controllers/team/members/transfer_ownership'),
       UpdateRole: () => import('#controllers/team/members/update_role'),
     },
-  },
-  analytics: {
-    Ingest: () => import('#controllers/analytics/ingest'),
-    Consent: () => import('#controllers/analytics/consent'),
   },
 }

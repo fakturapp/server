@@ -195,4 +195,14 @@ export interface ApiDefinition {
     index: typeof routes['admin_bug_reports.index']
     update: typeof routes['admin_bug_reports.update']
   }
+  analyticsIngest: typeof routes['analytics_ingest']
+  analyticsConsent: typeof routes['analytics_consent']
+  analyticsOverview: typeof routes['analytics_overview']
+  analyticsPages: typeof routes['analytics_pages']
+  analyticsFeatures: typeof routes['analytics_features']
+  analyticsErrors: typeof routes['analytics_errors'] & {
+    resolve: typeof routes['analytics_errors.resolve']
+  }
+  analyticsPerformance: typeof routes['analytics_performance']
+  analyticsUsers: typeof routes['analytics_users']
 }

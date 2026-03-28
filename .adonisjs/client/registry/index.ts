@@ -1110,6 +1110,60 @@ const routes = {
     tokens: [{"old":"/api/v1/admin/bug-reports/:id","type":0,"val":"api","end":""},{"old":"/api/v1/admin/bug-reports/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/bug-reports/:id","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/bug-reports/:id","type":0,"val":"bug-reports","end":""},{"old":"/api/v1/admin/bug-reports/:id","type":1,"val":"id","end":""}],
     types: placeholder as Registry['admin_bug_reports.update']['types'],
   },
+  'analytics_ingest': {
+    methods: ["POST"],
+    pattern: '/api/v1/analytics/ingest',
+    tokens: [{"old":"/api/v1/analytics/ingest","type":0,"val":"api","end":""},{"old":"/api/v1/analytics/ingest","type":0,"val":"v1","end":""},{"old":"/api/v1/analytics/ingest","type":0,"val":"analytics","end":""},{"old":"/api/v1/analytics/ingest","type":0,"val":"ingest","end":""}],
+    types: placeholder as Registry['analytics_ingest']['types'],
+  },
+  'analytics_consent': {
+    methods: ["POST"],
+    pattern: '/api/v1/analytics/consent',
+    tokens: [{"old":"/api/v1/analytics/consent","type":0,"val":"api","end":""},{"old":"/api/v1/analytics/consent","type":0,"val":"v1","end":""},{"old":"/api/v1/analytics/consent","type":0,"val":"analytics","end":""},{"old":"/api/v1/analytics/consent","type":0,"val":"consent","end":""}],
+    types: placeholder as Registry['analytics_consent']['types'],
+  },
+  'analytics_overview': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/admin/analytics/overview',
+    tokens: [{"old":"/api/v1/admin/analytics/overview","type":0,"val":"api","end":""},{"old":"/api/v1/admin/analytics/overview","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/analytics/overview","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/analytics/overview","type":0,"val":"analytics","end":""},{"old":"/api/v1/admin/analytics/overview","type":0,"val":"overview","end":""}],
+    types: placeholder as Registry['analytics_overview']['types'],
+  },
+  'analytics_pages': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/admin/analytics/pages',
+    tokens: [{"old":"/api/v1/admin/analytics/pages","type":0,"val":"api","end":""},{"old":"/api/v1/admin/analytics/pages","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/analytics/pages","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/analytics/pages","type":0,"val":"analytics","end":""},{"old":"/api/v1/admin/analytics/pages","type":0,"val":"pages","end":""}],
+    types: placeholder as Registry['analytics_pages']['types'],
+  },
+  'analytics_features': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/admin/analytics/features',
+    tokens: [{"old":"/api/v1/admin/analytics/features","type":0,"val":"api","end":""},{"old":"/api/v1/admin/analytics/features","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/analytics/features","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/analytics/features","type":0,"val":"analytics","end":""},{"old":"/api/v1/admin/analytics/features","type":0,"val":"features","end":""}],
+    types: placeholder as Registry['analytics_features']['types'],
+  },
+  'analytics_errors': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/admin/analytics/errors',
+    tokens: [{"old":"/api/v1/admin/analytics/errors","type":0,"val":"api","end":""},{"old":"/api/v1/admin/analytics/errors","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/analytics/errors","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/analytics/errors","type":0,"val":"analytics","end":""},{"old":"/api/v1/admin/analytics/errors","type":0,"val":"errors","end":""}],
+    types: placeholder as Registry['analytics_errors']['types'],
+  },
+  'analytics_errors.resolve': {
+    methods: ["PATCH"],
+    pattern: '/api/v1/admin/analytics/errors/:id',
+    tokens: [{"old":"/api/v1/admin/analytics/errors/:id","type":0,"val":"api","end":""},{"old":"/api/v1/admin/analytics/errors/:id","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/analytics/errors/:id","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/analytics/errors/:id","type":0,"val":"analytics","end":""},{"old":"/api/v1/admin/analytics/errors/:id","type":0,"val":"errors","end":""},{"old":"/api/v1/admin/analytics/errors/:id","type":1,"val":"id","end":""}],
+    types: placeholder as Registry['analytics_errors.resolve']['types'],
+  },
+  'analytics_performance': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/admin/analytics/performance',
+    tokens: [{"old":"/api/v1/admin/analytics/performance","type":0,"val":"api","end":""},{"old":"/api/v1/admin/analytics/performance","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/analytics/performance","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/analytics/performance","type":0,"val":"analytics","end":""},{"old":"/api/v1/admin/analytics/performance","type":0,"val":"performance","end":""}],
+    types: placeholder as Registry['analytics_performance']['types'],
+  },
+  'analytics_users': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/admin/analytics/users',
+    tokens: [{"old":"/api/v1/admin/analytics/users","type":0,"val":"api","end":""},{"old":"/api/v1/admin/analytics/users","type":0,"val":"v1","end":""},{"old":"/api/v1/admin/analytics/users","type":0,"val":"admin","end":""},{"old":"/api/v1/admin/analytics/users","type":0,"val":"analytics","end":""},{"old":"/api/v1/admin/analytics/users","type":0,"val":"users","end":""}],
+    types: placeholder as Registry['analytics_users']['types'],
+  },
 } as const satisfies Record<string, AdonisEndpoint>
 
 export { routes }
