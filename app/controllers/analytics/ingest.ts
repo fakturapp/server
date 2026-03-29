@@ -23,7 +23,11 @@ export default class AnalyticsIngest {
     const ip = request.ip()
     const userAgent = request.header('user-agent') || ''
 
-    await ingestAnalytics(payload, ip, userAgent, userId)
+    try {
+      await ingestAnalytics(payload, ip, userAgent, userId)
+    } catch {
+      // Gracefully handle missing analytics tables (migrations not yet run)
+    }
 
     return response.ok({ ok: true })
   }
