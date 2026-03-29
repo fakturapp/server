@@ -828,7 +828,7 @@ export class InvoiceSettingSchema extends BaseModel {
 }
 
 export class InvoiceSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'paidDate', 'paymentMethod', 'paymentTerms', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
+  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'companySnapshot', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'paidDate', 'paymentMethod', 'paymentTerms', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
   $columns = InvoiceSchema.$columns
   @column()
   declare accentColor: string
@@ -848,6 +848,8 @@ export class InvoiceSchema extends BaseModel {
   declare clientVatNumber: string | null
   @column()
   declare comment: string | null
+  @column()
+  declare companySnapshot: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
@@ -1044,7 +1046,7 @@ export class QuoteLineSchema extends BaseModel {
 }
 
 export class QuoteSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'quoteNumber', 'signatureField', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'validityDate', 'vatExemptReason'] as const
+  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'companySnapshot', 'createdAt', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'quoteNumber', 'signatureField', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'validityDate', 'vatExemptReason'] as const
   $columns = QuoteSchema.$columns
   @column()
   declare accentColor: string
@@ -1062,6 +1064,8 @@ export class QuoteSchema extends BaseModel {
   declare clientVatNumber: string | null
   @column()
   declare comment: string | null
+  @column()
+  declare companySnapshot: string | null
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
