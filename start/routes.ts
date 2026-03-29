@@ -36,3 +36,18 @@ router.get(API_PREFIX + '/', async () => {
 router.get(API_PREFIX + '/health', async () => {
   return { status: 'ok' }
 })
+
+// Diagnostic endpoint — remove after debugging
+router.get('/debug/routes', async () => {
+  const routes = router.toJSON()
+  const allRoutes = Object.values(routes)
+    .flat()
+    .map((r: any) => ({ method: r.methods?.join(',') || r.method, pattern: r.pattern }))
+  return {
+    prefix: API_PREFIX,
+    totalRoutes: allRoutes.length,
+    feedbackRoutes: allRoutes.filter((r: any) => r.pattern?.includes('feedback')),
+    analyticsRoutes: allRoutes.filter((r: any) => r.pattern?.includes('analytics')),
+    allPatterns: allRoutes.map((r: any) => `${r.method} ${r.pattern}`),
+  }
+})
