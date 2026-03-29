@@ -17,20 +17,24 @@ export default class NextNumber {
       return response.ok({ nextNumber: settings.nextInvoiceNumber })
     }
 
+    const pattern = settings?.invoiceFilenamePattern || 'FAK-{annee}-{numero}'
+    const currentYear = new Date().getFullYear().toString()
+    const prefix = pattern.replace('{annee}', currentYear).replace('{numero}', '')
+
     const lastInvoice = await Invoice.query()
       .where('team_id', teamId)
+      .where('invoice_number', 'like', `${prefix}%`)
       .orderBy('created_at', 'desc')
       .first()
 
-    let nextNumber = 'FAC-001'
-
+    let nextNum = 1
     if (lastInvoice) {
-      const match = lastInvoice.invoiceNumber.match(/^FAC-(\d+)$/)
-      if (match) {
-        const num = Number.parseInt(match[1], 10) + 1
-        nextNumber = `FAC-${num.toString().padStart(3, '0')}`
-      }
+      const numStr = lastInvoice.invoiceNumber.slice(prefix.length)
+      const parsed = Number.parseInt(numStr, 10)
+      if (!Number.isNaN(parsed)) nextNum = parsed + 1
     }
+
+    const nextNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`
 
     return response.ok({ nextNumber })
   }

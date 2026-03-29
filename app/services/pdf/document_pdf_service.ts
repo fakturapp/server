@@ -181,7 +181,9 @@ export async function generateInvoicePdf(
     total: l.total,
   }))
 
-  const clientData = buildClientData(invoice.client)
+  const clientData = invoice.clientSnapshot
+    ? JSON.parse(invoice.clientSnapshot)
+    : buildClientData(invoice.client)
   const companyData = buildCompanyData(company)
 
   // Override bank info from linked bank account
@@ -306,7 +308,9 @@ export async function generateQuotePdf(
     total: l.total,
   }))
 
-  const clientData = buildClientData(quote.client)
+  const clientData = quote.clientSnapshot
+    ? JSON.parse(quote.clientSnapshot)
+    : buildClientData(quote.client)
   const companyData = buildCompanyData(company)
 
   const html = renderQuoteHtml(quoteData, linesData, clientData, companyData, settingsData)

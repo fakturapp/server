@@ -83,6 +83,7 @@ export default class Update {
       paymentMethod: payload.paymentMethod || null,
       bankAccountId: payload.bankAccountId || null,
       vatExemptReason: payload.vatExemptReason || 'none',
+      clientSnapshot: payload.clientSnapshot ? JSON.stringify(payload.clientSnapshot) : null,
     }
 
     encryptModelFields(invoiceUpdateData, [...ENCRYPTED_FIELDS.invoice], dek)

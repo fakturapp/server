@@ -17,20 +17,24 @@ export default class NextNumber {
       return response.ok({ nextNumber: settings.nextQuoteNumber })
     }
 
+    const pattern = settings?.quoteFilenamePattern || 'DEV-{annee}-{numero}'
+    const currentYear = new Date().getFullYear().toString()
+    const prefix = pattern.replace('{annee}', currentYear).replace('{numero}', '')
+
     const lastQuote = await Quote.query()
       .where('team_id', teamId)
+      .where('quote_number', 'like', `${prefix}%`)
       .orderBy('created_at', 'desc')
       .first()
 
-    let nextNumber = 'DEV-001'
-
+    let nextNum = 1
     if (lastQuote) {
-      const match = lastQuote.quoteNumber.match(/^DEV-(\d+)$/)
-      if (match) {
-        const num = Number.parseInt(match[1], 10) + 1
-        nextNumber = `DEV-${num.toString().padStart(3, '0')}`
-      }
+      const numStr = lastQuote.quoteNumber.slice(prefix.length)
+      const parsed = Number.parseInt(numStr, 10)
+      if (!Number.isNaN(parsed)) nextNum = parsed + 1
     }
+
+    const nextNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`
 
     return response.ok({ nextNumber })
   }

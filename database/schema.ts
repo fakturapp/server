@@ -7,6 +7,154 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AnalyticsErrorSchema extends BaseModel {
+  static $columns = ['browser', 'createdAt', 'errorMessage', 'errorMessageFullEncrypted', 'errorType', 'fingerprint', 'id', 'isResolved', 'occurrenceCount', 'os', 'pagePath', 'sessionId', 'stackTraceEncrypted', 'timestamp', 'userId'] as const
+  $columns = AnalyticsErrorSchema.$columns
+  @column()
+  declare browser: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare errorMessage: string
+  @column()
+  declare errorMessageFullEncrypted: string | null
+  @column()
+  declare errorType: string
+  @column()
+  declare fingerprint: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isResolved: boolean | null
+  @column()
+  declare occurrenceCount: number | null
+  @column()
+  declare os: string | null
+  @column()
+  declare pagePath: string | null
+  @column()
+  declare sessionId: string | null
+  @column()
+  declare stackTraceEncrypted: string | null
+  @column.dateTime()
+  declare timestamp: DateTime
+  @column()
+  declare userId: string | null
+}
+
+export class AnalyticsEventSchema extends BaseModel {
+  static $columns = ['createdAt', 'eventName', 'eventType', 'id', 'metadata', 'metadataEncrypted', 'pagePath', 'pagePathFullEncrypted', 'sessionId', 'timestamp', 'userId'] as const
+  $columns = AnalyticsEventSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare eventName: string
+  @column()
+  declare eventType: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare metadata: any | null
+  @column()
+  declare metadataEncrypted: string | null
+  @column()
+  declare pagePath: string | null
+  @column()
+  declare pagePathFullEncrypted: string | null
+  @column()
+  declare sessionId: string
+  @column.dateTime()
+  declare timestamp: DateTime
+  @column()
+  declare userId: string | null
+}
+
+export class AnalyticsPerformanceSchema extends BaseModel {
+  static $columns = ['connectionType', 'createdAt', 'deviceType', 'id', 'metricName', 'metricValue', 'pagePath', 'rating', 'sessionId', 'timestamp', 'userId'] as const
+  $columns = AnalyticsPerformanceSchema.$columns
+  @column()
+  declare connectionType: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare deviceType: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare metricName: string
+  @column()
+  declare metricValue: string
+  @column()
+  declare pagePath: string | null
+  @column()
+  declare rating: string
+  @column()
+  declare sessionId: string | null
+  @column.dateTime()
+  declare timestamp: DateTime
+  @column()
+  declare userId: string | null
+}
+
+export class AnalyticsSessionSchema extends BaseModel {
+  static $columns = ['browser', 'browserVersion', 'cityEncrypted', 'country', 'countryNameEncrypted', 'createdAt', 'deviceType', 'durationSeconds', 'endedAt', 'entryPage', 'eventCount', 'exitPage', 'id', 'ipAddressEncrypted', 'ipHash', 'isAuthenticated', 'language', 'os', 'pageCount', 'referrerEncrypted', 'screenHeight', 'screenWidth', 'sessionToken', 'startedAt', 'updatedAt', 'userAgentEncrypted', 'userId'] as const
+  $columns = AnalyticsSessionSchema.$columns
+  @column()
+  declare browser: string | null
+  @column()
+  declare browserVersion: string | null
+  @column()
+  declare cityEncrypted: string | null
+  @column()
+  declare country: string | null
+  @column()
+  declare countryNameEncrypted: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare deviceType: string | null
+  @column()
+  declare durationSeconds: number | null
+  @column.dateTime()
+  declare endedAt: DateTime | null
+  @column()
+  declare entryPage: string | null
+  @column()
+  declare eventCount: number | null
+  @column()
+  declare exitPage: string | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare ipAddressEncrypted: string | null
+  @column()
+  declare ipHash: string
+  @column()
+  declare isAuthenticated: boolean | null
+  @column()
+  declare language: string | null
+  @column()
+  declare os: string | null
+  @column()
+  declare pageCount: number | null
+  @column()
+  declare referrerEncrypted: string | null
+  @column()
+  declare screenHeight: number | null
+  @column()
+  declare screenWidth: number | null
+  @column()
+  declare sessionToken: string
+  @column.dateTime()
+  declare startedAt: DateTime
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column()
+  declare userAgentEncrypted: string | null
+  @column()
+  declare userId: string | null
+}
+
 export class AuditLogSchema extends BaseModel {
   static $columns = ['action', 'createdAt', 'id', 'ipAddress', 'metadata', 'resourceId', 'resourceType', 'severity', 'userAgent', 'userId'] as const
   $columns = AuditLogSchema.$columns
@@ -259,6 +407,29 @@ export class CompanySchema extends BaseModel {
   declare vatNumber: string | null
   @column()
   declare website: string | null
+}
+
+export class CookieConsentSchema extends BaseModel {
+  static $columns = ['action', 'consentAnalytics', 'consentEssential', 'createdAt', 'id', 'ipAddressEncrypted', 'userAgentEncrypted', 'userId', 'visitorId'] as const
+  $columns = CookieConsentSchema.$columns
+  @column()
+  declare action: string
+  @column()
+  declare consentAnalytics: boolean | null
+  @column()
+  declare consentEssential: boolean | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare ipAddressEncrypted: string | null
+  @column()
+  declare userAgentEncrypted: string | null
+  @column()
+  declare userId: string | null
+  @column()
+  declare visitorId: string
 }
 
 export class CreditNoteLineSchema extends BaseModel {
@@ -657,7 +828,7 @@ export class InvoiceSettingSchema extends BaseModel {
 }
 
 export class InvoiceSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'paidDate', 'paymentMethod', 'paymentTerms', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
+  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'paidDate', 'paymentMethod', 'paymentTerms', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
   $columns = InvoiceSchema.$columns
   @column()
   declare accentColor: string
@@ -671,6 +842,8 @@ export class InvoiceSchema extends BaseModel {
   declare clientId: string | null
   @column()
   declare clientSiren: string | null
+  @column()
+  declare clientSnapshot: string | null
   @column()
   declare clientVatNumber: string | null
   @column()
@@ -871,7 +1044,7 @@ export class QuoteLineSchema extends BaseModel {
 }
 
 export class QuoteSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'quoteNumber', 'signatureField', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'validityDate', 'vatExemptReason'] as const
+  static $columns = ['accentColor', 'acceptanceConditions', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'createdAt', 'deliveryAddress', 'documentTitle', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'issueDate', 'language', 'logoUrl', 'notes', 'quoteNumber', 'signatureField', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'validityDate', 'vatExemptReason'] as const
   $columns = QuoteSchema.$columns
   @column()
   declare accentColor: string
@@ -883,6 +1056,8 @@ export class QuoteSchema extends BaseModel {
   declare clientId: string | null
   @column()
   declare clientSiren: string | null
+  @column()
+  declare clientSnapshot: string | null
   @column()
   declare clientVatNumber: string | null
   @column()

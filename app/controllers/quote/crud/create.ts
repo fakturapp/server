@@ -108,6 +108,7 @@ export default class Create {
       taxAmount: Math.round(taxAmount * 100) / 100,
       total: Math.round(total * 100) / 100,
       vatExemptReason: payload.vatExemptReason || 'none',
+      clientSnapshot: payload.clientSnapshot ? JSON.stringify(payload.clientSnapshot) : null,
     }
 
     encryptModelFields(quoteData, [...ENCRYPTED_FIELDS.quote], dek)

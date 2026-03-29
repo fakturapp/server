@@ -30,7 +30,7 @@ export default class Create {
       await settings.save()
     } else {
       // Generate next invoice number from pattern
-      const pattern = settings?.invoiceFilenamePattern || 'FAC-{annee}-{numero}'
+      const pattern = settings?.invoiceFilenamePattern || 'FAK-{annee}-{numero}'
       const currentYear = new Date().getFullYear().toString()
       const prefix = pattern.replace('{annee}', currentYear).replace('{numero}', '')
 
@@ -113,6 +113,7 @@ export default class Create {
       paymentMethod: payload.paymentMethod || null,
       bankAccountId: payload.bankAccountId || null,
       vatExemptReason: payload.vatExemptReason || 'none',
+      clientSnapshot: payload.clientSnapshot ? JSON.stringify(payload.clientSnapshot) : null,
     }
 
     encryptModelFields(invoiceData, [...ENCRYPTED_FIELDS.invoice], dek)

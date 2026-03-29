@@ -23,6 +23,24 @@ export const createQuoteValidator = vine.compile(
     deliveryAddress: vine.string().trim().maxLength(500).optional(),
     clientSiren: vine.string().trim().maxLength(20).optional(),
     clientVatNumber: vine.string().trim().maxLength(30).optional(),
+    clientSnapshot: vine
+      .object({
+        type: vine.enum(['company', 'individual']).optional(),
+        displayName: vine.string().trim().maxLength(255).optional(),
+        companyName: vine.string().trim().maxLength(255).optional().nullable(),
+        firstName: vine.string().trim().maxLength(100).optional().nullable(),
+        lastName: vine.string().trim().maxLength(100).optional().nullable(),
+        email: vine.string().trim().maxLength(255).optional().nullable(),
+        phone: vine.string().trim().maxLength(30).optional().nullable(),
+        address: vine.string().trim().maxLength(500).optional().nullable(),
+        addressComplement: vine.string().trim().maxLength(500).optional().nullable(),
+        postalCode: vine.string().trim().maxLength(20).optional().nullable(),
+        city: vine.string().trim().maxLength(100).optional().nullable(),
+        country: vine.string().trim().maxLength(100).optional(),
+        siren: vine.string().trim().maxLength(20).optional().nullable(),
+        vatNumber: vine.string().trim().maxLength(30).optional().nullable(),
+      })
+      .optional(),
     vatExemptReason: vine
       .enum(['none', 'not_subject', 'france_no_vat', 'outside_france'])
       .optional(),

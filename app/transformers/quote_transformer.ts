@@ -33,6 +33,7 @@ export default class QuoteTransformer extends BaseTransformer<Quote> {
         'comment',
         'vatExemptReason',
         'clientId',
+        'clientSnapshot',
         'createdAt',
       ]),
       clientName: this.resource.client?.displayName || null,

@@ -39,6 +39,7 @@ export default class InvoiceTransformer extends BaseTransformer<Invoice> {
         'operationCategory',
         'bankAccountId',
         'clientId',
+        'clientSnapshot',
         'createdAt',
       ]),
       clientName: this.resource.client?.displayName || null,

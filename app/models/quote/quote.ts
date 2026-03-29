@@ -87,6 +87,9 @@ export default class Quote extends BaseModel {
   @column()
   declare vatExemptReason: 'none' | 'not_subject' | 'france_no_vat' | 'outside_france'
 
+  @column()
+  declare clientSnapshot: string | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

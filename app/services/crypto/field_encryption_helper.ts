@@ -79,6 +79,7 @@ export const ENCRYPTED_FIELDS = {
     'clientVatNumber',
     'comment',
     'paymentTerms',
+    'clientSnapshot',
   ] as const,
 
   invoiceLine: ['description', 'saleType', 'unit'] as const,
@@ -93,6 +94,7 @@ export const ENCRYPTED_FIELDS = {
     'clientSiren',
     'clientVatNumber',
     'comment',
+    'clientSnapshot',
   ] as const,
 
   quoteLine: ['description', 'saleType', 'unit'] as const,
