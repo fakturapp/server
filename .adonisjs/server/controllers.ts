@@ -32,6 +32,17 @@ export const controllers = {
       Enable: () => import('#controllers/account/two_factor/enable'),
       Setup: () => import('#controllers/account/two_factor/setup'),
     },
+    delete: {
+      Helpers: () => import('#controllers/account/delete/_helpers'),
+      Start: () => import('#controllers/account/delete/start'),
+      Teams: () => import('#controllers/account/delete/teams'),
+      ResolveTeam: () => import('#controllers/account/delete/resolve_team'),
+      VerifyName: () => import('#controllers/account/delete/verify_name'),
+      SendCode: () => import('#controllers/account/delete/send_code'),
+      VerifyCode: () => import('#controllers/account/delete/verify_code'),
+      VerifyPassword: () => import('#controllers/account/delete/verify_password'),
+      Confirm: () => import('#controllers/account/delete/confirm'),
+    },
   },
   admin: {
     analytics: {
@@ -323,6 +334,7 @@ export const controllers = {
       Show: () => import('#controllers/team/core/show'),
       Switch: () => import('#controllers/team/core/switch'),
       Update: () => import('#controllers/team/core/update'),
+      Leave: () => import('#controllers/team/core/leave'),
     },
     invitations: {
       AcceptInvite: () => import('#controllers/team/invitations/accept_invite'),

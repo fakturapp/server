@@ -29,6 +29,14 @@ export type ScannedRoutes = {
     'sessions_list': { paramsTuple?: []; params?: {} }
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'account_delete': { paramsTuple?: []; params?: {} }
+    'deletion_start': { paramsTuple?: []; params?: {} }
+    'deletion_teams': { paramsTuple?: []; params?: {} }
+    'deletion_resolve_team': { paramsTuple?: []; params?: {} }
+    'deletion_verify_name': { paramsTuple?: []; params?: {} }
+    'deletion_send_code': { paramsTuple?: []; params?: {} }
+    'deletion_verify_code': { paramsTuple?: []; params?: {} }
+    'deletion_verify_password': { paramsTuple?: []; params?: {} }
+    'deletion_confirm': { paramsTuple?: []; params?: {} }
     'two_factor_setup': { paramsTuple?: []; params?: {} }
     'two_factor_enable': { paramsTuple?: []; params?: {} }
     'two_factor_disable': { paramsTuple?: []; params?: {} }
@@ -58,6 +66,7 @@ export type ScannedRoutes = {
     'team_show': { paramsTuple?: []; params?: {} }
     'team_update': { paramsTuple?: []; params?: {} }
     'team_delete': { paramsTuple?: []; params?: {} }
+    'team_leave': { paramsTuple?: []; params?: {} }
     'upload_icon': { paramsTuple?: []; params?: {} }
     'team_switch': { paramsTuple?: []; params?: {} }
     'team_export': { paramsTuple?: []; params?: {} }
@@ -214,6 +223,12 @@ export type ScannedRoutes = {
     'setup_recovery_key': { paramsTuple?: []; params?: {} }
     'vault_unlock': { paramsTuple?: []; params?: {} }
     'upload_avatar': { paramsTuple?: []; params?: {} }
+    'deletion_start': { paramsTuple?: []; params?: {} }
+    'deletion_resolve_team': { paramsTuple?: []; params?: {} }
+    'deletion_verify_name': { paramsTuple?: []; params?: {} }
+    'deletion_send_code': { paramsTuple?: []; params?: {} }
+    'deletion_verify_code': { paramsTuple?: []; params?: {} }
+    'deletion_verify_password': { paramsTuple?: []; params?: {} }
     'two_factor_setup': { paramsTuple?: []; params?: {} }
     'two_factor_enable': { paramsTuple?: []; params?: {} }
     'two_factor_disable': { paramsTuple?: []; params?: {} }
@@ -228,6 +243,7 @@ export type ScannedRoutes = {
     'skip_company': { paramsTuple?: []; params?: {} }
     'complete_personalization': { paramsTuple?: []; params?: {} }
     'team_create': { paramsTuple?: []; params?: {} }
+    'team_leave': { paramsTuple?: []; params?: {} }
     'upload_icon': { paramsTuple?: []; params?: {} }
     'team_switch': { paramsTuple?: []; params?: {} }
     'team_export': { paramsTuple?: []; params?: {} }
@@ -280,6 +296,7 @@ export type ScannedRoutes = {
     'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
     'sessions_list': { paramsTuple?: []; params?: {} }
+    'deletion_teams': { paramsTuple?: []; params?: {} }
     'list_providers': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
@@ -356,6 +373,7 @@ export type ScannedRoutes = {
     'serve_avatar': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'profile_show': { paramsTuple?: []; params?: {} }
     'sessions_list': { paramsTuple?: []; params?: {} }
+    'deletion_teams': { paramsTuple?: []; params?: {} }
     'list_providers': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
@@ -448,6 +466,7 @@ export type ScannedRoutes = {
   DELETE: {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'account_delete': { paramsTuple?: []; params?: {} }
+    'deletion_confirm': { paramsTuple?: []; params?: {} }
     'team_delete': { paramsTuple?: []; params?: {} }
     'revoke_invite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'remove_member': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

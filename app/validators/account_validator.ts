@@ -20,6 +20,39 @@ export const deleteAccountValidator = vine.compile(
   })
 )
 
+export const deletionVerifyNameValidator = vine.compile(
+  vine.object({
+    fullName: vine.string().trim(),
+  })
+)
+
+export const deletionVerifyCodeValidator = vine.compile(
+  vine.object({
+    code: vine.string().trim(),
+  })
+)
+
+export const deletionVerifyPasswordValidator = vine.compile(
+  vine.object({
+    password: vine.string(),
+  })
+)
+
+export const deletionConfirmValidator = vine.compile(
+  vine.object({
+    confirmText: vine.string().trim(),
+  })
+)
+
+export const deletionResolveTeamValidator = vine.compile(
+  vine.object({
+    teamId: vine.string().uuid(),
+    action: vine.enum(['delete', 'transfer', 'leave']),
+    password: vine.string().optional(),
+    transferToUserId: vine.string().uuid().optional(),
+  })
+)
+
 export const updateProfileValidator = vine.compile(
   vine.object({
     fullName: vine.string().trim().minLength(2).maxLength(255).optional(),

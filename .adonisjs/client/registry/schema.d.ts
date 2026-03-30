@@ -307,6 +307,102 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/profile/delete').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'deletion_start': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/delete/start'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/delete/start').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/delete/start').default['handle']>>>
+    }
+  }
+  'deletion_teams': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/account/delete/teams'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/delete/teams').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/delete/teams').default['handle']>>>
+    }
+  }
+  'deletion_resolve_team': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/delete/resolve-team'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/delete/resolve_team').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/delete/resolve_team').default['handle']>>>
+    }
+  }
+  'deletion_verify_name': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/delete/verify-name'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/delete/verify_name').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/delete/verify_name').default['handle']>>>
+    }
+  }
+  'deletion_send_code': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/delete/send-code'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/delete/send_code').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/delete/send_code').default['handle']>>>
+    }
+  }
+  'deletion_verify_code': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/delete/verify-code'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/delete/verify_code').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/delete/verify_code').default['handle']>>>
+    }
+  }
+  'deletion_verify_password': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/delete/verify-password'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/delete/verify_password').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/delete/verify_password').default['handle']>>>
+    }
+  }
+  'deletion_confirm': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/account/delete/confirm'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/delete/confirm').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/delete/confirm').default['handle']>>>
+    }
+  }
   'two_factor_setup': {
     methods: ["POST"]
     pattern: '/api/v1/account/2fa/setup'
@@ -653,6 +749,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/core/delete').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/core/delete').default['handle']>>>
+    }
+  }
+  'team_leave': {
+    methods: ["POST"]
+    pattern: '/api/v1/team/leave'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/core/leave').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/core/leave').default['handle']>>>
     }
   }
   'upload_icon': {

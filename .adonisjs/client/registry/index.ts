@@ -156,6 +156,54 @@ const routes = {
     tokens: [{"old":"/api/v1/account","type":0,"val":"api","end":""},{"old":"/api/v1/account","type":0,"val":"v1","end":""},{"old":"/api/v1/account","type":0,"val":"account","end":""}],
     types: placeholder as Registry['account_delete']['types'],
   },
+  'deletion_start': {
+    methods: ["POST"],
+    pattern: '/api/v1/account/delete/start',
+    tokens: [{"old":"/api/v1/account/delete/start","type":0,"val":"api","end":""},{"old":"/api/v1/account/delete/start","type":0,"val":"v1","end":""},{"old":"/api/v1/account/delete/start","type":0,"val":"account","end":""},{"old":"/api/v1/account/delete/start","type":0,"val":"delete","end":""},{"old":"/api/v1/account/delete/start","type":0,"val":"start","end":""}],
+    types: placeholder as Registry['deletion_start']['types'],
+  },
+  'deletion_teams': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/account/delete/teams',
+    tokens: [{"old":"/api/v1/account/delete/teams","type":0,"val":"api","end":""},{"old":"/api/v1/account/delete/teams","type":0,"val":"v1","end":""},{"old":"/api/v1/account/delete/teams","type":0,"val":"account","end":""},{"old":"/api/v1/account/delete/teams","type":0,"val":"delete","end":""},{"old":"/api/v1/account/delete/teams","type":0,"val":"teams","end":""}],
+    types: placeholder as Registry['deletion_teams']['types'],
+  },
+  'deletion_resolve_team': {
+    methods: ["POST"],
+    pattern: '/api/v1/account/delete/resolve-team',
+    tokens: [{"old":"/api/v1/account/delete/resolve-team","type":0,"val":"api","end":""},{"old":"/api/v1/account/delete/resolve-team","type":0,"val":"v1","end":""},{"old":"/api/v1/account/delete/resolve-team","type":0,"val":"account","end":""},{"old":"/api/v1/account/delete/resolve-team","type":0,"val":"delete","end":""},{"old":"/api/v1/account/delete/resolve-team","type":0,"val":"resolve-team","end":""}],
+    types: placeholder as Registry['deletion_resolve_team']['types'],
+  },
+  'deletion_verify_name': {
+    methods: ["POST"],
+    pattern: '/api/v1/account/delete/verify-name',
+    tokens: [{"old":"/api/v1/account/delete/verify-name","type":0,"val":"api","end":""},{"old":"/api/v1/account/delete/verify-name","type":0,"val":"v1","end":""},{"old":"/api/v1/account/delete/verify-name","type":0,"val":"account","end":""},{"old":"/api/v1/account/delete/verify-name","type":0,"val":"delete","end":""},{"old":"/api/v1/account/delete/verify-name","type":0,"val":"verify-name","end":""}],
+    types: placeholder as Registry['deletion_verify_name']['types'],
+  },
+  'deletion_send_code': {
+    methods: ["POST"],
+    pattern: '/api/v1/account/delete/send-code',
+    tokens: [{"old":"/api/v1/account/delete/send-code","type":0,"val":"api","end":""},{"old":"/api/v1/account/delete/send-code","type":0,"val":"v1","end":""},{"old":"/api/v1/account/delete/send-code","type":0,"val":"account","end":""},{"old":"/api/v1/account/delete/send-code","type":0,"val":"delete","end":""},{"old":"/api/v1/account/delete/send-code","type":0,"val":"send-code","end":""}],
+    types: placeholder as Registry['deletion_send_code']['types'],
+  },
+  'deletion_verify_code': {
+    methods: ["POST"],
+    pattern: '/api/v1/account/delete/verify-code',
+    tokens: [{"old":"/api/v1/account/delete/verify-code","type":0,"val":"api","end":""},{"old":"/api/v1/account/delete/verify-code","type":0,"val":"v1","end":""},{"old":"/api/v1/account/delete/verify-code","type":0,"val":"account","end":""},{"old":"/api/v1/account/delete/verify-code","type":0,"val":"delete","end":""},{"old":"/api/v1/account/delete/verify-code","type":0,"val":"verify-code","end":""}],
+    types: placeholder as Registry['deletion_verify_code']['types'],
+  },
+  'deletion_verify_password': {
+    methods: ["POST"],
+    pattern: '/api/v1/account/delete/verify-password',
+    tokens: [{"old":"/api/v1/account/delete/verify-password","type":0,"val":"api","end":""},{"old":"/api/v1/account/delete/verify-password","type":0,"val":"v1","end":""},{"old":"/api/v1/account/delete/verify-password","type":0,"val":"account","end":""},{"old":"/api/v1/account/delete/verify-password","type":0,"val":"delete","end":""},{"old":"/api/v1/account/delete/verify-password","type":0,"val":"verify-password","end":""}],
+    types: placeholder as Registry['deletion_verify_password']['types'],
+  },
+  'deletion_confirm': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/account/delete/confirm',
+    tokens: [{"old":"/api/v1/account/delete/confirm","type":0,"val":"api","end":""},{"old":"/api/v1/account/delete/confirm","type":0,"val":"v1","end":""},{"old":"/api/v1/account/delete/confirm","type":0,"val":"account","end":""},{"old":"/api/v1/account/delete/confirm","type":0,"val":"delete","end":""},{"old":"/api/v1/account/delete/confirm","type":0,"val":"confirm","end":""}],
+    types: placeholder as Registry['deletion_confirm']['types'],
+  },
   'two_factor_setup': {
     methods: ["POST"],
     pattern: '/api/v1/account/2fa/setup',
@@ -329,6 +377,12 @@ const routes = {
     pattern: '/api/v1/team',
     tokens: [{"old":"/api/v1/team","type":0,"val":"api","end":""},{"old":"/api/v1/team","type":0,"val":"v1","end":""},{"old":"/api/v1/team","type":0,"val":"team","end":""}],
     types: placeholder as Registry['team_delete']['types'],
+  },
+  'team_leave': {
+    methods: ["POST"],
+    pattern: '/api/v1/team/leave',
+    tokens: [{"old":"/api/v1/team/leave","type":0,"val":"api","end":""},{"old":"/api/v1/team/leave","type":0,"val":"v1","end":""},{"old":"/api/v1/team/leave","type":0,"val":"team","end":""},{"old":"/api/v1/team/leave","type":0,"val":"leave","end":""}],
+    types: placeholder as Registry['team_leave']['types'],
   },
   'upload_icon': {
     methods: ["POST"],

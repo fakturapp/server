@@ -5,6 +5,14 @@ import { API_PREFIX } from '#start/routes/_prefix'
 const ProfileShow = () => import('#controllers/account/profile/show')
 const ProfileUpdate = () => import('#controllers/account/profile/update')
 const AccountDelete = () => import('#controllers/account/profile/delete')
+const DeletionStart = () => import('#controllers/account/delete/start')
+const DeletionTeams = () => import('#controllers/account/delete/teams')
+const DeletionResolveTeam = () => import('#controllers/account/delete/resolve_team')
+const DeletionVerifyName = () => import('#controllers/account/delete/verify_name')
+const DeletionSendCode = () => import('#controllers/account/delete/send_code')
+const DeletionVerifyCode = () => import('#controllers/account/delete/verify_code')
+const DeletionVerifyPassword = () => import('#controllers/account/delete/verify_password')
+const DeletionConfirm = () => import('#controllers/account/delete/confirm')
 const UploadAvatar = () => import('#controllers/account/profile/upload_avatar')
 const ServeAvatar = () => import('#controllers/account/profile/serve_avatar')
 
@@ -36,6 +44,16 @@ router
     router.get('/sessions', [SessionsList, 'handle'])
     router.delete('/sessions/:id', [SessionRevoke, 'handle'])
     router.delete('/', [AccountDelete, 'handle'])
+
+    // Account deletion flow
+    router.post('/delete/start', [DeletionStart, 'handle'])
+    router.get('/delete/teams', [DeletionTeams, 'handle'])
+    router.post('/delete/resolve-team', [DeletionResolveTeam, 'handle'])
+    router.post('/delete/verify-name', [DeletionVerifyName, 'handle'])
+    router.post('/delete/send-code', [DeletionSendCode, 'handle'])
+    router.post('/delete/verify-code', [DeletionVerifyCode, 'handle'])
+    router.post('/delete/verify-password', [DeletionVerifyPassword, 'handle'])
+    router.delete('/delete/confirm', [DeletionConfirm, 'handle'])
 
     router.post('/2fa/setup', [TwoFactorSetup, 'handle'])
     router.post('/2fa/enable', [TwoFactorEnable, 'handle'])
