@@ -32,7 +32,7 @@ export const updateInvoiceSettingsValidator = vine.compile(
     logoBorderRadius: vine.number().min(0).max(50).optional(),
     aiKeyMode: vine.enum(['server', 'custom']).optional(),
     aiEnabled: vine.boolean().optional(),
-    aiProvider: vine.enum(['claude', 'gemini', 'groq']).optional(),
+    aiProvider: vine.enum(['claude', 'gemini', 'groq']).optional(), // Only groq is used in UI, kept for backward compat
     aiModel: vine.string().trim().maxLength(100).optional(),
     aiCustomApiKey: vine.string().trim().maxLength(500).optional().nullable(),
     aiApiKeyClaude: vine.string().trim().maxLength(500).optional().nullable(),

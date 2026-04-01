@@ -5,6 +5,17 @@
 
 export const controllers = {
   account: {
+    delete: {
+      Helpers: () => import('#controllers/account/delete/_helpers'),
+      Confirm: () => import('#controllers/account/delete/confirm'),
+      ResolveTeam: () => import('#controllers/account/delete/resolve_team'),
+      SendCode: () => import('#controllers/account/delete/send_code'),
+      Start: () => import('#controllers/account/delete/start'),
+      Teams: () => import('#controllers/account/delete/teams'),
+      VerifyCode: () => import('#controllers/account/delete/verify_code'),
+      VerifyName: () => import('#controllers/account/delete/verify_name'),
+      VerifyPassword: () => import('#controllers/account/delete/verify_password'),
+    },
     email: {
       EmailConfirmChange: () => import('#controllers/account/email/email_confirm_change'),
       EmailRequestChange: () => import('#controllers/account/email/email_request_change'),
@@ -31,17 +42,6 @@ export const controllers = {
       Disable: () => import('#controllers/account/two_factor/disable'),
       Enable: () => import('#controllers/account/two_factor/enable'),
       Setup: () => import('#controllers/account/two_factor/setup'),
-    },
-    delete: {
-      Helpers: () => import('#controllers/account/delete/_helpers'),
-      Start: () => import('#controllers/account/delete/start'),
-      Teams: () => import('#controllers/account/delete/teams'),
-      ResolveTeam: () => import('#controllers/account/delete/resolve_team'),
-      VerifyName: () => import('#controllers/account/delete/verify_name'),
-      SendCode: () => import('#controllers/account/delete/send_code'),
-      VerifyCode: () => import('#controllers/account/delete/verify_code'),
-      VerifyPassword: () => import('#controllers/account/delete/verify_password'),
-      Confirm: () => import('#controllers/account/delete/confirm'),
     },
   },
   admin: {
@@ -330,11 +330,11 @@ export const controllers = {
       Delete: () => import('#controllers/team/core/delete'),
       Export: () => import('#controllers/team/core/export'),
       Import: () => import('#controllers/team/core/import'),
+      Leave: () => import('#controllers/team/core/leave'),
       List: () => import('#controllers/team/core/list'),
       Show: () => import('#controllers/team/core/show'),
       Switch: () => import('#controllers/team/core/switch'),
       Update: () => import('#controllers/team/core/update'),
-      Leave: () => import('#controllers/team/core/leave'),
     },
     invitations: {
       AcceptInvite: () => import('#controllers/team/invitations/accept_invite'),
