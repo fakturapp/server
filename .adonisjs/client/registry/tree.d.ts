@@ -196,6 +196,7 @@ export interface ApiDefinition {
   generateDocument: typeof routes['generate_document']
   chatDocument: typeof routes['chat_document']
   checkProviders: typeof routes['check_providers']
+  aiQuota: typeof routes['ai_quota']
   adminFeedbacks: typeof routes['admin_feedbacks']
   adminBugReports: {
     index: typeof routes['admin_bug_reports.index']

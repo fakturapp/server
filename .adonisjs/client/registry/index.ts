@@ -1128,6 +1128,12 @@ const routes = {
     tokens: [{"old":"/api/v1/ai/providers","type":0,"val":"api","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/providers","type":0,"val":"providers","end":""}],
     types: placeholder as Registry['check_providers']['types'],
   },
+  'ai_quota': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/ai/quota',
+    tokens: [{"old":"/api/v1/ai/quota","type":0,"val":"api","end":""},{"old":"/api/v1/ai/quota","type":0,"val":"v1","end":""},{"old":"/api/v1/ai/quota","type":0,"val":"ai","end":""},{"old":"/api/v1/ai/quota","type":0,"val":"quota","end":""}],
+    types: placeholder as Registry['ai_quota']['types'],
+  },
   'admin_feedbacks': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/admin/feedbacks',

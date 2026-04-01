@@ -2251,6 +2251,18 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/check_providers').default['handle']>>>
     }
   }
+  'ai_quota': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/ai/quota'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/ai/ai_quota').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/ai/ai_quota').default['handle']>>>
+    }
+  }
   'admin_feedbacks': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/admin/feedbacks'

@@ -191,6 +191,7 @@ export type ScannedRoutes = {
     'generate_document': { paramsTuple?: []; params?: {} }
     'chat_document': { paramsTuple?: []; params?: {} }
     'check_providers': { paramsTuple?: []; params?: {} }
+    'ai_quota': { paramsTuple?: []; params?: {} }
     'admin_feedbacks': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.index': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -356,6 +357,7 @@ export type ScannedRoutes = {
     'fec_export': { paramsTuple?: []; params?: {} }
     'dashboard_summary': { paramsTuple?: []; params?: {} }
     'check_providers': { paramsTuple?: []; params?: {} }
+    'ai_quota': { paramsTuple?: []; params?: {} }
     'admin_feedbacks': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.index': { paramsTuple?: []; params?: {} }
     'analytics_overview': { paramsTuple?: []; params?: {} }
@@ -433,6 +435,7 @@ export type ScannedRoutes = {
     'fec_export': { paramsTuple?: []; params?: {} }
     'dashboard_summary': { paramsTuple?: []; params?: {} }
     'check_providers': { paramsTuple?: []; params?: {} }
+    'ai_quota': { paramsTuple?: []; params?: {} }
     'admin_feedbacks': { paramsTuple?: []; params?: {} }
     'admin_bug_reports.index': { paramsTuple?: []; params?: {} }
     'analytics_overview': { paramsTuple?: []; params?: {} }

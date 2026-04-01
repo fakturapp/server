@@ -57,6 +57,7 @@ export const controllers = {
     Feedbacks: () => import('#controllers/admin/feedbacks'),
   },
   ai: {
+    AiQuota: () => import('#controllers/ai/ai_quota'),
     ChatDocument: () => import('#controllers/ai/chat_document'),
     CheckProviders: () => import('#controllers/ai/check_providers'),
     DashboardSummary: () => import('#controllers/ai/dashboard_summary'),
