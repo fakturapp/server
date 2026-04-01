@@ -9,6 +9,7 @@ const GenerateReminder = () => import('#controllers/ai/generate_reminder')
 const GenerateDocument = () => import('#controllers/ai/generate_document')
 const ChatDocument = () => import('#controllers/ai/chat_document')
 const CheckProviders = () => import('#controllers/ai/check_providers')
+const AiQuota = () => import('#controllers/ai/ai_quota')
 
 router
   .group(() => {
@@ -19,6 +20,7 @@ router
     router.post('/generate-document', [GenerateDocument, 'handle'])
     router.post('/chat-document', [ChatDocument, 'handle'])
     router.get('/providers', [CheckProviders, 'handle'])
+    router.get('/quota', [AiQuota, 'handle'])
   })
   .prefix(API_PREFIX + '/ai')
   .use(middleware.auth())
