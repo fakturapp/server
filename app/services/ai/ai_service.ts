@@ -16,6 +16,7 @@ const DEFAULT_MODELS: Record<AiProvider, string> = {
   groq: 'llama-3.3-70b-versatile',
 }
 
+
 // Default env key names
 const ENV_KEYS: Record<AiProvider, string> = {
   claude: 'ANTHROPIC_API_KEY',
@@ -50,7 +51,7 @@ export default class AiService {
       return overrideProvider as AiProvider
     }
     const settings = await InvoiceSetting.findBy('teamId', teamId)
-    return (settings?.aiProvider as AiProvider) || 'gemini'
+    return (settings?.aiProvider as AiProvider) || 'groq'
   }
 
   /**
