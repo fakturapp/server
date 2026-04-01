@@ -32,6 +32,11 @@ const ListProviders = () => import('#controllers/account/providers/list')
 const LinkProvider = () => import('#controllers/account/providers/link')
 const UnlinkProvider = () => import('#controllers/account/providers/unlink')
 
+const PasskeyRegisterOptions = () => import('#controllers/account/passkeys/register_options')
+const PasskeyRegisterVerify = () => import('#controllers/account/passkeys/register_verify')
+const PasskeyList = () => import('#controllers/account/passkeys/list')
+const PasskeyDelete = () => import('#controllers/account/passkeys/delete')
+
 // Public routes
 router.get(API_PREFIX + '/avatars/:filename', [ServeAvatar, 'handle'])
 
@@ -68,6 +73,12 @@ router
     router.get('/providers', [ListProviders, 'handle'])
     router.post('/providers/link', [LinkProvider, 'handle'])
     router.post('/providers/unlink', [UnlinkProvider, 'handle'])
+
+    // Passkeys
+    router.post('/passkeys/register-options', [PasskeyRegisterOptions, 'handle'])
+    router.post('/passkeys/register-verify', [PasskeyRegisterVerify, 'handle'])
+    router.get('/passkeys', [PasskeyList, 'handle'])
+    router.delete('/passkeys/:id', [PasskeyDelete, 'handle'])
   })
   .prefix(API_PREFIX + '/account')
   .use(middleware.auth())

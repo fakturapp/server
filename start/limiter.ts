@@ -75,6 +75,17 @@ export const analyticsLimiter = limiter.define('analytics', (ctx) => {
     })
 })
 
+/** Passkey: 10 requests per 15 minutes per IP */
+export const passkeyLimiter = limiter.define('passkey', (ctx) => {
+  return limiter
+    .allowRequests(10)
+    .every('15 minutes')
+    .usingKey(ctx.request.ip())
+    .limitExceeded((error) => {
+      error.setMessage('Trop de tentatives passkey. Réessayez plus tard.')
+    })
+})
+
 /** Global API: 1000 requests per hour per IP */
 export const apiLimiter = limiter.define('api', (ctx) => {
   return limiter
