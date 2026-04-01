@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import AiService from '#services/ai/ai_service'
+import AiQuotaService from '#services/ai/ai_quota_service'
 import Client from '#models/client/client'
 import Company from '#models/team/company'
 import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
@@ -10,7 +11,7 @@ const generateDocumentValidator = vine.compile(
     type: vine.enum(['invoice', 'quote']),
     prompt: vine.string().trim().minLength(5).maxLength(2000),
     clientId: vine.string().trim().optional(),
-    provider: vine.enum(['claude', 'gemini', 'groq']).optional(),
+    provider: vine.enum(['groq']).optional(),
     model: vine.string().trim().maxLength(100).optional(),
   })
 )
@@ -28,6 +29,11 @@ export default class GenerateDocument {
 
     if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
+    }
+
+    const quota = await AiQuotaService.checkQuota(teamId)
+    if (!quota.allowed) {
+      return response.tooManyRequests({ message: 'Quota IA dépassé.', quota })
     }
 
     const payload = await request.validateUsing(generateDocumentValidator)
@@ -180,6 +186,7 @@ EXEMPLE DE RÉPONSE VALIDE :
       document.acceptanceConditions =
         typeof document.acceptanceConditions === 'string' ? document.acceptanceConditions : ''
 
+      await AiQuotaService.recordUsage(teamId, user.id, payload.model || 'default', 'generate-document')
       return response.ok({ document })
     } catch (error: any) {
       const msg = error.message || 'Unknown error'

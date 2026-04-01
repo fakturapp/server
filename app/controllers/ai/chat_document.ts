@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import AiService from '#services/ai/ai_service'
+import AiQuotaService from '#services/ai/ai_quota_service'
 
 const chatDocumentValidator = vine.compile(
   vine.object({
@@ -30,7 +31,7 @@ const chatDocumentValidator = vine.compile(
       .optional(),
     type: vine.enum(['invoice', 'quote']),
     detailLevel: vine.enum(['rapide', 'complet']).optional(),
-    provider: vine.enum(['claude', 'gemini', 'groq']).optional(),
+    provider: vine.enum(['groq']).optional(),
     model: vine.string().trim().maxLength(100).optional(),
     mode: vine.enum(['edition', 'question', 'libre']).optional(),
     source: vine.enum(['faktur', 'apikey']).optional(),
@@ -206,6 +207,15 @@ export default class ChatDocument {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
     }
 
+    // Check quota before processing
+    const quota = await AiQuotaService.checkQuota(teamId)
+    if (!quota.allowed) {
+      return response.tooManyRequests({
+        message: 'Quota IA dépassé. Veuillez attendre avant de réessayer.',
+        quota,
+      })
+    }
+
     const payload = await request.validateUsing(chatDocumentValidator)
     const mode = payload.mode || 'edition'
     const docType = payload.type === 'invoice' ? 'facture' : 'devis'
@@ -256,6 +266,9 @@ export default class ChatDocument {
       }
 
       const parsed = JSON.parse(jsonMatch[0])
+
+      // Record usage after successful AI call
+      await AiQuotaService.recordUsage(teamId, user.id, payload.model || 'default', 'chat-document')
 
       // ── Question mode — just return the message ────────────────
       if (mode === 'question') {

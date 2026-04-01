@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import AiService from '#services/ai/ai_service'
+import AiQuotaService from '#services/ai/ai_quota_service'
 
 const generateTextValidator = vine.compile(
   vine.object({
@@ -43,6 +44,11 @@ export default class GenerateText {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
     }
 
+    const quota = await AiQuotaService.checkQuota(teamId)
+    if (!quota.allowed) {
+      return response.tooManyRequests({ message: 'Quota IA dépassé.', quota })
+    }
+
     const payload = await request.validateUsing(generateTextValidator)
     const systemPrompt = PROMPTS[payload.type] || PROMPTS.free_text
     const lang = payload.language || 'fr'
@@ -52,6 +58,7 @@ export default class GenerateText {
 
     try {
       const result = await AiService.generate(teamId, dek, systemPrompt, userPrompt, 512)
+      await AiQuotaService.recordUsage(teamId, user.id, 'default', 'generate-text')
       return response.ok({ text: result.trim() })
     } catch (error: any) {
       return response.internalServerError({ message: 'AI generation failed', error: error.message })

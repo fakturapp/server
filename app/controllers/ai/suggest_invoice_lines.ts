@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import Invoice from '#models/invoice/invoice'
 import AiService from '#services/ai/ai_service'
+import AiQuotaService from '#services/ai/ai_quota_service'
 import {
   decryptModelFields,
   decryptModelFieldsArray,
@@ -28,6 +29,11 @@ export default class SuggestInvoiceLines {
 
     if (!(await AiService.isEnabled(teamId))) {
       return response.forbidden({ message: 'AI is not enabled. Activate it in Settings > AI.' })
+    }
+
+    const quota = await AiQuotaService.checkQuota(teamId)
+    if (!quota.allowed) {
+      return response.tooManyRequests({ message: 'Quota IA dépassé.', quota })
     }
 
     const payload = await request.validateUsing(suggestValidator)
@@ -99,6 +105,7 @@ Règles:
       }
 
       const lines = JSON.parse(jsonMatch[0])
+      await AiQuotaService.recordUsage(teamId, user.id, 'default', 'suggest-invoice-lines')
       return response.ok({ lines })
     } catch (error: any) {
       return response.internalServerError({ message: 'AI suggestion failed', error: error.message })
