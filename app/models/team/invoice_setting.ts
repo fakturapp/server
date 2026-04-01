@@ -103,9 +103,6 @@ export default class InvoiceSetting extends BaseModel {
   declare nextQuoteNumber: string | null
 
   @column()
-  declare aiKeyMode: 'server' | 'custom'
-
-  @column()
   declare aiEnabled: boolean
 
   @column()
@@ -113,18 +110,6 @@ export default class InvoiceSetting extends BaseModel {
 
   @column()
   declare aiModel: string
-
-  @column()
-  declare aiCustomApiKey: string | null
-
-  @column()
-  declare aiApiKeyClaude: string | null
-
-  @column()
-  declare aiApiKeyGemini: string | null
-
-  @column()
-  declare aiApiKeyGroq: string | null
 
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
