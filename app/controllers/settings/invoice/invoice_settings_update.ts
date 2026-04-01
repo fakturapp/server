@@ -21,26 +21,6 @@ export default class InvoiceSettingsUpdate {
       pdpApiKeyToStore = zeroAccessCryptoService.encryptField(payload.pdpApiKey, dek)
     }
 
-    // Encrypt aiCustomApiKey if provided
-    let aiCustomApiKeyToStore: string | null = null
-    if (payload.aiCustomApiKey && payload.aiCustomApiKey !== '••••••••') {
-      aiCustomApiKeyToStore = zeroAccessCryptoService.encryptField(payload.aiCustomApiKey, dek)
-    }
-
-    // Encrypt per-provider keys if provided
-    let aiApiKeyClaudeToStore: string | null = null
-    if (payload.aiApiKeyClaude && !payload.aiApiKeyClaude.startsWith('••••••••')) {
-      aiApiKeyClaudeToStore = zeroAccessCryptoService.encryptField(payload.aiApiKeyClaude, dek)
-    }
-    let aiApiKeyGeminiToStore: string | null = null
-    if (payload.aiApiKeyGemini && !payload.aiApiKeyGemini.startsWith('••••••••')) {
-      aiApiKeyGeminiToStore = zeroAccessCryptoService.encryptField(payload.aiApiKeyGemini, dek)
-    }
-    let aiApiKeyGroqToStore: string | null = null
-    if (payload.aiApiKeyGroq && !payload.aiApiKeyGroq.startsWith('••••••••')) {
-      aiApiKeyGroqToStore = zeroAccessCryptoService.encryptField(payload.aiApiKeyGroq, dek)
-    }
-
     let settings = await InvoiceSetting.findBy('teamId', user.currentTeamId)
 
     if (!settings) {
@@ -71,14 +51,9 @@ export default class InvoiceSettingsUpdate {
         invoiceFilenamePattern: payload.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: payload.footerMode || 'vat_exempt',
         logoBorderRadius: payload.logoBorderRadius ?? 0,
-        aiKeyMode: payload.aiKeyMode || 'server',
         aiEnabled: payload.aiEnabled ?? false,
-        aiProvider: payload.aiProvider || 'gemini',
-        aiModel: payload.aiModel || 'gemini-2.5-flash-lite',
-        aiCustomApiKey: aiCustomApiKeyToStore,
-        aiApiKeyClaude: aiApiKeyClaudeToStore,
-        aiApiKeyGemini: aiApiKeyGeminiToStore,
-        aiApiKeyGroq: aiApiKeyGroqToStore,
+        aiProvider: 'groq',
+        aiModel: payload.aiModel || 'llama-3.3-70b-versatile',
       })
     } else {
       settings.billingType = payload.billingType
@@ -122,23 +97,10 @@ export default class InvoiceSettingsUpdate {
       if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'vat_exempt'
       if (payload.logoBorderRadius !== undefined)
         settings.logoBorderRadius = payload.logoBorderRadius
-      if (payload.aiKeyMode !== undefined) settings.aiKeyMode = payload.aiKeyMode || 'server'
       if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
-      if (payload.aiProvider !== undefined) settings.aiProvider = payload.aiProvider || 'gemini'
+      settings.aiProvider = 'groq'
       if (payload.aiModel !== undefined)
-        settings.aiModel = payload.aiModel || 'gemini-2.5-flash-lite'
-      if (payload.aiCustomApiKey && !payload.aiCustomApiKey.startsWith('••••••••')) {
-        settings.aiCustomApiKey = aiCustomApiKeyToStore
-      }
-      if (payload.aiApiKeyClaude && !payload.aiApiKeyClaude.startsWith('••••••••')) {
-        settings.aiApiKeyClaude = aiApiKeyClaudeToStore
-      }
-      if (payload.aiApiKeyGemini && !payload.aiApiKeyGemini.startsWith('••••••••')) {
-        settings.aiApiKeyGemini = aiApiKeyGeminiToStore
-      }
-      if (payload.aiApiKeyGroq && !payload.aiApiKeyGroq.startsWith('••••••••')) {
-        settings.aiApiKeyGroq = aiApiKeyGroqToStore
-      }
+        settings.aiModel = payload.aiModel || 'llama-3.3-70b-versatile'
       await settings.save()
     }
 
@@ -171,18 +133,9 @@ export default class InvoiceSettingsUpdate {
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: settings.footerMode || 'vat_exempt',
         logoBorderRadius: settings.logoBorderRadius ?? 0,
-        aiKeyMode: settings.aiKeyMode || 'server',
         aiEnabled: settings.aiEnabled ?? false,
-        aiProvider: settings.aiProvider || 'gemini',
-        aiModel: settings.aiModel || 'gemini-2.5-flash-lite',
-        aiCustomApiKey: settings.aiCustomApiKey ? '••••••••' : null,
-        aiApiKeyClaude: settings.aiApiKeyClaude
-          ? '••••••••' + settings.aiApiKeyClaude.slice(-4)
-          : null,
-        aiApiKeyGemini: settings.aiApiKeyGemini
-          ? '••••••••' + settings.aiApiKeyGemini.slice(-4)
-          : null,
-        aiApiKeyGroq: settings.aiApiKeyGroq ? '••••••••' + settings.aiApiKeyGroq.slice(-4) : null,
+        aiProvider: 'groq',
+        aiModel: settings.aiModel || 'llama-3.3-70b-versatile',
       },
     })
   }

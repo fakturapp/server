@@ -46,14 +46,9 @@ export default class InvoiceSettingsShow {
           invoiceFilenamePattern: 'FAC-{numero}',
           footerMode: 'vat_exempt',
           logoBorderRadius: 0,
-          aiKeyMode: 'server',
           aiEnabled: false,
-          aiProvider: 'gemini',
-          aiModel: 'gemini-2.5-flash-lite',
-          aiCustomApiKey: null,
-          aiApiKeyClaude: null,
-          aiApiKeyGemini: null,
-          aiApiKeyGroq: null,
+          aiProvider: 'groq',
+          aiModel: 'llama-3.3-70b-versatile',
         },
       })
     }
@@ -87,18 +82,9 @@ export default class InvoiceSettingsShow {
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: settings.footerMode || 'vat_exempt',
         logoBorderRadius: settings.logoBorderRadius ?? 0,
-        aiKeyMode: settings.aiKeyMode || 'server',
         aiEnabled: settings.aiEnabled ?? false,
-        aiProvider: settings.aiProvider || 'gemini',
-        aiModel: settings.aiModel || 'gemini-2.5-flash-lite',
-        aiCustomApiKey: settings.aiCustomApiKey ? '••••••••' : null,
-        aiApiKeyClaude: settings.aiApiKeyClaude
-          ? '••••••••' + settings.aiApiKeyClaude.slice(-4)
-          : null,
-        aiApiKeyGemini: settings.aiApiKeyGemini
-          ? '••••••••' + settings.aiApiKeyGemini.slice(-4)
-          : null,
-        aiApiKeyGroq: settings.aiApiKeyGroq ? '••••••••' + settings.aiApiKeyGroq.slice(-4) : null,
+        aiProvider: 'groq',
+        aiModel: settings.aiModel || 'llama-3.3-70b-versatile',
       },
     })
   }

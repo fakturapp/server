@@ -4,7 +4,6 @@ import AiService from '#services/ai/ai_service'
 export default class CheckProviders {
   async handle(ctx: HttpContext) {
     const { auth, response } = ctx
-    const dek: Buffer = (ctx as any).dek
     const user = auth.user!
     const teamId = user.currentTeamId
 
@@ -16,8 +15,8 @@ export default class CheckProviders {
       return response.forbidden({ message: 'AI is not enabled.' })
     }
 
-    const providers = await AiService.getAvailableProviders(teamId, dek)
-
-    return response.ok({ providers })
+    return response.ok({
+      providers: [{ provider: 'groq', available: true, source: 'server' }],
+    })
   }
 }
