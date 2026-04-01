@@ -40,7 +40,7 @@
     "#config/*": "./config/*.js"
   },
   "devDependencies": {
-    "@adonisjs/assembler": "^8.3.0",
+    "@adonisjs/assembler": "^8.4.0",
     "@adonisjs/eslint-config": "^3.0.0",
     "@adonisjs/prettier-config": "^1.4.5",
     "@adonisjs/tsconfig": "^2.0.0",
@@ -62,20 +62,20 @@
   },
   "dependencies": {
     "@adonisjs/auth": "^10.0.0",
-    "@adonisjs/core": "^7.2.0",
+    "@adonisjs/core": "^7.3.0",
     "@adonisjs/cors": "^3.0.0",
     "@adonisjs/limiter": "^3.0.1",
-    "@adonisjs/lucid": "^22.3.0",
-    "@adonisjs/mail": "^10.1.1",
+    "@adonisjs/lucid": "^22.4.1",
+    "@adonisjs/mail": "^10.2.0",
     "@adonisjs/session": "^8.0.0",
     "@adonisjs/shield": "^9.0.0",
-    "@aws-sdk/client-s3": "^3.1019.0",
+    "@aws-sdk/client-s3": "^3.1021.0",
     "@japa/api-client": "^3.2.1",
     "@tuyau/core": "^1.2.2",
     "@types/adm-zip": "^0.5.8",
     "@types/archiver": "^7.0.0",
     "@vinejs/vine": "^4.3.0",
-    "adm-zip": "^0.5.16",
+    "adm-zip": "^0.5.17",
     "archiver": "^7.0.1",
     "argon2": "^0.44.0",
     "googleapis": "^171.4.0",
@@ -86,7 +86,7 @@
     "puppeteer": "^24.40.0",
     "qrcode": "^1.5.4",
     "reflect-metadata": "^0.2.2",
-    "resend": "^6.9.4",
+    "resend": "^6.10.0",
     "speakeasy": "^2.0.0"
   },
   "hotHook": {
