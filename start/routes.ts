@@ -30,14 +30,14 @@ const CreateFeedback = () => import('#controllers/feedback/create')
 const MyFeedback = () => import('#controllers/feedback/mine')
 const CreateBugReport = () => import('#controllers/bug_report/create')
 
-router
+const feedbackGroup = router
   .group(() => {
     router.post('/feedback', [CreateFeedback, 'handle'])
     router.get('/feedback/mine', [MyFeedback, 'handle'])
     router.post('/bug-report', [CreateBugReport, 'handle'])
   })
   .use(middleware.auth())
-  .prefix(API_PREFIX)
+if (API_PREFIX) feedbackGroup.prefix(API_PREFIX)
 
 router.get(API_PREFIX + '/', async () => {
   return {
