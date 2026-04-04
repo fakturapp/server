@@ -28,6 +28,7 @@ export const createShareLinkValidator = vine.compile(
 export const updateShareLinkValidator = vine.compile(
   vine.object({
     permission: vine.enum(['viewer', 'editor']).optional(),
+    visibility: vine.enum(['team', 'anyone']).optional(),
     isActive: vine.boolean().optional(),
   })
 )

@@ -25,6 +25,7 @@ export default class Update {
     }
 
     if (payload.permission !== undefined) link.permission = payload.permission
+    if (payload.visibility !== undefined) link.visibility = payload.visibility
     if (payload.isActive !== undefined) link.isActive = payload.isActive
 
     await link.save()
@@ -35,6 +36,7 @@ export default class Update {
         id: link.id,
         token: link.token,
         permission: link.permission,
+        visibility: link.visibility,
         isActive: link.isActive,
       },
     })
