@@ -24,6 +24,7 @@ import '#start/routes/export'
 import '#start/routes/ai'
 import '#start/routes/admin'
 import '#start/routes/analytics'
+import '#start/routes/collaboration'
 
 // Feedback & bug report routes (inline to avoid import issues)
 const CreateFeedback = () => import('#controllers/feedback/create')
