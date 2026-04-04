@@ -121,9 +121,27 @@ export function initWebSocket(httpServer: HttpServer) {
 
   // ── Connection handler ────────────────────────────────────────────────
 
+  // Track connected sockets per user to prevent connection flooding
+  const userSocketCount = new Map<string, number>()
+  const MAX_SOCKETS_PER_USER = 5
+
   collabNs.on('connection', (socket: Socket) => {
     const userData = (socket as any).user
     const userId = (socket as any).userId as string
+
+    // Limit concurrent connections per user
+    const count = userSocketCount.get(userId) || 0
+    if (count >= MAX_SOCKETS_PER_USER) {
+      socket.emit('error', { message: 'Too many concurrent connections' })
+      socket.disconnect(true)
+      return
+    }
+    userSocketCount.set(userId, count + 1)
+    socket.on('disconnect', () => {
+      const c = userSocketCount.get(userId) || 1
+      if (c <= 1) userSocketCount.delete(userId)
+      else userSocketCount.set(userId, c - 1)
+    })
 
     // ── Join a document room ──────────────────────────────────────────
 
