@@ -26,6 +26,11 @@ export default class ValidateLink {
       return response.gone({ message: 'This share link has expired' })
     }
 
+    // Check visibility: 'team' means only team members can access
+    if (link.visibility === 'team' && user.currentTeamId !== link.teamId) {
+      return response.forbidden({ message: 'This link is restricted to team members' })
+    }
+
     // Check if the user is the document owner (same team) — skip creating a share
     if (user.currentTeamId === link.teamId) {
       return response.ok({

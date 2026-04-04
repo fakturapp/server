@@ -30,7 +30,13 @@ export default class DocumentShareLink extends BaseModel {
   declare createdByUserId: string
 
   @column()
+  declare visibility: 'team' | 'anyone'
+
+  @column()
   declare isActive: boolean
+
+  @column()
+  declare autoExpire: boolean
 
   @column.dateTime()
   declare expiresAt: DateTime | null

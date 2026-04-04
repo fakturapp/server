@@ -31,6 +31,8 @@ export default class Create {
       documentId: payload.documentId,
       token,
       permission: payload.permission,
+      visibility: payload.visibility || 'team',
+      autoExpire: payload.autoExpire ?? false,
       createdByUserId: user.id,
       isActive: true,
     })
@@ -41,6 +43,8 @@ export default class Create {
         id: link.id,
         token: link.token,
         permission: link.permission,
+        visibility: link.visibility,
+        autoExpire: link.autoExpire,
         isActive: link.isActive,
         expiresAt: link.expiresAt?.toISO() ?? null,
         createdAt: link.createdAt.toISO(),

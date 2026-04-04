@@ -34,6 +34,8 @@ export default class List {
         id: link.id,
         token: link.token,
         permission: link.permission,
+        visibility: link.visibility,
+        autoExpire: link.autoExpire,
         isActive: link.isActive,
         expiresAt: link.expiresAt?.toISO() ?? null,
         createdAt: link.createdAt.toISO(),

@@ -20,6 +20,8 @@ export const createShareLinkValidator = vine.compile(
     documentType: vine.enum(['invoice', 'quote', 'credit_note']),
     documentId: vine.string().trim().uuid(),
     permission: vine.enum(['viewer', 'editor']),
+    visibility: vine.enum(['team', 'anyone']).optional(),
+    autoExpire: vine.boolean().optional(),
   })
 )
 

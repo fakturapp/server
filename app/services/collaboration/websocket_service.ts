@@ -343,6 +343,21 @@ async function handleLeaveRoom(socket: Socket, userId: string) {
       room.collaborators.delete(userId)
       socket.to(roomKey).emit('collaborator-left', { userId })
 
+      // Auto-expire share links created by this user
+      const [docType, docId] = roomKey.split(':')
+      if (docType && docId) {
+        import('#models/collaboration/document_share_link').then(({ default: DocumentShareLink }) => {
+          DocumentShareLink.query()
+            .where('document_type', docType)
+            .where('document_id', docId)
+            .where('created_by_user_id', userId)
+            .where('auto_expire', true)
+            .where('is_active', true)
+            .update({ isActive: false })
+            .catch(() => {})
+        })
+      }
+
       if (room.collaborators.size === 0) {
         rooms.delete(roomKey)
       }
