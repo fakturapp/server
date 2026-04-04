@@ -321,25 +321,34 @@ export function initWebSocket(httpServer: HttpServer) {
   return io
 }
 
-function handleLeaveRoom(socket: Socket, userId: string) {
+async function handleLeaveRoom(socket: Socket, userId: string) {
   const roomKey = (socket as any).currentRoom
   if (!roomKey) return
 
-  const room = rooms.get(roomKey)
-  if (room) {
-    room.collaborators.delete(userId)
-
-    // Notify others
-    socket.to(roomKey).emit('collaborator-left', { userId })
-
-    // Clean up empty rooms
-    if (room.collaborators.size === 0) {
-      rooms.delete(roomKey)
-    }
-  }
-
   socket.leave(roomKey)
   ;(socket as any).currentRoom = null
+
+  const room = rooms.get(roomKey)
+  if (!room) return
+
+  // Check if the user has other active sockets in this room
+  // (handles multiple browser tabs for the same user)
+  if (io) {
+    const collabNs = io.of('/collaboration')
+    const socketsInRoom = await collabNs.in(roomKey).fetchSockets()
+    const userStillPresent = socketsInRoom.some(
+      (s) => (s as any).userId === userId && s.id !== socket.id
+    )
+
+    if (!userStillPresent) {
+      room.collaborators.delete(userId)
+      socket.to(roomKey).emit('collaborator-left', { userId })
+
+      if (room.collaborators.size === 0) {
+        rooms.delete(roomKey)
+      }
+    }
+  }
 }
 
 /**
