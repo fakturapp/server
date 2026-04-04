@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Invoice from '#models/invoice/invoice'
+import { broadcastDocumentDeleted } from '#services/collaboration/websocket_service'
 
 export default class Delete {
   async handle({ auth, params, response }: HttpContext) {
@@ -17,6 +18,7 @@ export default class Delete {
     }
 
     await invoice.delete()
+    broadcastDocumentDeleted('invoice', params.id)
 
     return response.ok({ message: 'Invoice deleted' })
   }

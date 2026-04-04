@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Quote from '#models/quote/quote'
+import { broadcastDocumentDeleted } from '#services/collaboration/websocket_service'
 
 export default class Delete {
   async handle({ auth, params, response }: HttpContext) {
@@ -17,6 +18,7 @@ export default class Delete {
     }
 
     await quote.delete()
+    broadcastDocumentDeleted('quote', params.id)
 
     return response.ok({ message: 'Quote deleted' })
   }

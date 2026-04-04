@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import CreditNote from '#models/credit_note/credit_note'
+import { broadcastDocumentDeleted } from '#services/collaboration/websocket_service'
 
 export default class Delete {
   async handle({ auth, params, response }: HttpContext) {
@@ -20,6 +21,7 @@ export default class Delete {
     }
 
     await creditNote.delete()
+    broadcastDocumentDeleted('credit_note', params.id)
 
     return response.ok({ message: 'Credit note deleted' })
   }

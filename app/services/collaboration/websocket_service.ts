@@ -324,6 +324,25 @@ function handleLeaveRoom(socket: Socket, userId: string) {
 }
 
 /**
+ * Broadcast that a document was deleted — all collaborators should leave.
+ */
+export function broadcastDocumentDeleted(
+  documentType: string,
+  documentId: string,
+) {
+  if (!io) return
+
+  const roomKey = getRoomKey(documentType, documentId)
+  const collabNs = io.of('/collaboration')
+  collabNs.to(roomKey).emit('document-deleted', {
+    message: 'This document has been deleted',
+  })
+
+  // Clean up the room
+  rooms.delete(roomKey)
+}
+
+/**
  * Broadcast that a document was saved, so other collaborators can refresh.
  */
 export function broadcastDocumentSaved(
