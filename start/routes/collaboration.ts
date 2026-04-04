@@ -23,17 +23,17 @@ const CheckAccess = () => import('#controllers/collaboration/access/check_access
 
 const collabGroup = router
   .group(() => {
-    // Document shares (invite by email)
+    // Document shares (invite by email) — admin only for write ops
     router.get('/shares/:documentType/:documentId', [ShareList, 'handle'])
-    router.post('/shares', [ShareCreate, 'handle']).use(collaborationShareLimiter)
-    router.patch('/shares/:shareId', [ShareUpdate, 'handle'])
-    router.delete('/shares/:shareId', [ShareRevoke, 'handle'])
+    router.post('/shares', [ShareCreate, 'handle']).use(middleware.admin()).use(collaborationShareLimiter)
+    router.patch('/shares/:shareId', [ShareUpdate, 'handle']).use(middleware.admin())
+    router.delete('/shares/:shareId', [ShareRevoke, 'handle']).use(middleware.admin())
 
-    // Share links
+    // Share links — admin only for write ops
     router.get('/share-links/:documentType/:documentId', [LinkList, 'handle'])
-    router.post('/share-links', [LinkCreate, 'handle']).use(collaborationShareLimiter)
-    router.patch('/share-links/:linkId', [LinkUpdate, 'handle'])
-    router.delete('/share-links/:linkId', [LinkDestroy, 'handle'])
+    router.post('/share-links', [LinkCreate, 'handle']).use(middleware.admin()).use(collaborationShareLimiter)
+    router.patch('/share-links/:linkId', [LinkUpdate, 'handle']).use(middleware.admin())
+    router.delete('/share-links/:linkId', [LinkDestroy, 'handle']).use(middleware.admin())
 
     // Access check
     router.get('/access/:documentType/:documentId', [CheckAccess, 'handle'])
