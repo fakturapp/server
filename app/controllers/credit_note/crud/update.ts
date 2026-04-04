@@ -4,6 +4,7 @@ import CreditNote from '#models/credit_note/credit_note'
 import CreditNoteLine from '#models/credit_note/credit_note_line'
 import { createCreditNoteValidator } from '#validators/credit_note_validator'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
 
 export default class Update {
   async handle(ctx: HttpContext) {
@@ -104,6 +105,8 @@ export default class Update {
         await CreditNoteLine.create(lineRecord, { client: trx })
       }
     })
+
+    broadcastDocumentSaved('credit_note', creditNote.id, user.id)
 
     return response.ok({
       message: 'Credit note updated',

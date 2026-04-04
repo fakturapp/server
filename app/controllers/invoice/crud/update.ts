@@ -4,6 +4,7 @@ import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
 import { createInvoiceValidator } from '#validators/invoice_validator'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
 
 export default class Update {
   async handle(ctx: HttpContext) {
@@ -107,6 +108,9 @@ export default class Update {
         await InvoiceLine.create(lineRecord, { client: trx })
       }
     })
+
+    // Notify collaborators that the document was saved
+    broadcastDocumentSaved('invoice', invoice.id, user.id)
 
     return response.ok({
       message: 'Invoice updated',

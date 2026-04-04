@@ -4,6 +4,7 @@ import Quote from '#models/quote/quote'
 import QuoteLine from '#models/quote/quote_line'
 import { createQuoteValidator } from '#validators/quote_validator'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
 
 export default class Update {
   async handle(ctx: HttpContext) {
@@ -103,6 +104,8 @@ export default class Update {
         await QuoteLine.create(lineRecord, { client: trx })
       }
     })
+
+    broadcastDocumentSaved('quote', quote.id, user.id)
 
     return response.ok({
       message: 'Quote updated',

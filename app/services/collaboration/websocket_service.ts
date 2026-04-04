@@ -310,6 +310,24 @@ function handleLeaveRoom(socket: Socket, userId: string) {
 }
 
 /**
+ * Broadcast that a document was saved, so other collaborators can refresh.
+ */
+export function broadcastDocumentSaved(
+  documentType: string,
+  documentId: string,
+  savedByUserId: string
+) {
+  if (!io) return
+
+  const roomKey = getRoomKey(documentType, documentId)
+  const collabNs = io.of('/collaboration')
+  collabNs.to(roomKey).emit('document-saved', {
+    savedByUserId,
+    timestamp: Date.now(),
+  })
+}
+
+/**
  * Forcefully disconnect a user from a document room.
  * Called when access is revoked.
  */
