@@ -30,6 +30,7 @@ export const updateInvoiceSettingsValidator = vine.compile(
     invoiceFilenamePattern: vine.string().trim().maxLength(255).optional(),
     footerMode: vine.enum(['company_info', 'vat_exempt', 'custom']).optional(),
     logoBorderRadius: vine.number().min(0).max(50).optional(),
+    collaborationEnabled: vine.boolean().optional(),
     aiEnabled: vine.boolean().optional(),
     aiProvider: vine.enum(['groq']).optional(),
     aiModel: vine.string().trim().maxLength(100).optional(),

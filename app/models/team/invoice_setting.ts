@@ -103,6 +103,9 @@ export default class InvoiceSetting extends BaseModel {
   declare nextQuoteNumber: string | null
 
   @column()
+  declare collaborationEnabled: boolean
+
+  @column()
   declare aiEnabled: boolean
 
   @column()

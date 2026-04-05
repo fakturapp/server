@@ -51,6 +51,7 @@ export default class InvoiceSettingsUpdate {
         invoiceFilenamePattern: payload.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: payload.footerMode || 'vat_exempt',
         logoBorderRadius: payload.logoBorderRadius ?? 0,
+        collaborationEnabled: payload.collaborationEnabled ?? false,
         aiEnabled: payload.aiEnabled ?? false,
         aiProvider: 'groq',
         aiModel: payload.aiModel || 'llama-3.3-70b-versatile',
@@ -97,6 +98,7 @@ export default class InvoiceSettingsUpdate {
       if (payload.footerMode !== undefined) settings.footerMode = payload.footerMode || 'vat_exempt'
       if (payload.logoBorderRadius !== undefined)
         settings.logoBorderRadius = payload.logoBorderRadius
+      if (payload.collaborationEnabled !== undefined) settings.collaborationEnabled = payload.collaborationEnabled
       if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
       settings.aiProvider = 'groq'
       if (payload.aiModel !== undefined)
@@ -133,6 +135,7 @@ export default class InvoiceSettingsUpdate {
         invoiceFilenamePattern: settings.invoiceFilenamePattern || 'FAC-{numero}',
         footerMode: settings.footerMode || 'vat_exempt',
         logoBorderRadius: settings.logoBorderRadius ?? 0,
+        collaborationEnabled: settings.collaborationEnabled ?? false,
         aiEnabled: settings.aiEnabled ?? false,
         aiProvider: 'groq',
         aiModel: settings.aiModel || 'llama-3.3-70b-versatile',
