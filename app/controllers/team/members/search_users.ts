@@ -50,9 +50,9 @@ export default class SearchUsers {
     return response.ok({
       users: filtered.map((u) => ({
         id: u.id,
-        email: u.email,
         fullName: u.fullName,
         avatarUrl: (u as any).avatarUrl ?? null,
+        emailHint: u.email.replace(/^(.{2})(.*)(@.*)$/, '$1***$3'),
       })),
     })
   }
