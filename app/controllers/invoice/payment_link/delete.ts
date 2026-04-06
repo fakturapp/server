@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import PaymentLink from '#models/invoice/payment_link'
+import r2StorageService from '#services/storage/r2_storage_service'
 
 export default class Delete {
   async handle({ auth, params, response }: HttpContext) {
@@ -18,6 +19,15 @@ export default class Delete {
 
     if (!paymentLink) {
       return response.notFound({ message: 'No active payment link found' })
+    }
+
+    // Delete PDF from R2 if stored
+    if (paymentLink.pdfStorageKey) {
+      try {
+        await r2StorageService.delete(paymentLink.pdfStorageKey)
+      } catch {
+        // Non-blocking
+      }
     }
 
     // Deactivate and wipe sensitive data

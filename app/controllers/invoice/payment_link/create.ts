@@ -6,7 +6,8 @@ import BankAccount from '#models/team/bank_account'
 import { createPaymentLinkValidator } from '#validators/payment_link_validator'
 import { encryptModelFields, decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import encryptionService from '#services/encryption/encryption_service'
-import { DocumentPdfService } from '#services/pdf/document_pdf_service'
+import { generateInvoicePdf } from '#services/pdf/document_pdf_service'
+import r2StorageService from '#services/storage/r2_storage_service'
 import env from '#start/env'
 
 export default class Create {
@@ -162,24 +163,28 @@ export default class Create {
       companyName: appEncryptedCompanyName,
     }
 
-    // Generate PDF snapshot for public download (needs DEK, do it now)
-    let pdfData: Buffer | null = null
-    try {
-      const pdfService = new DocumentPdfService()
-      const result = await pdfService.generateInvoicePdf(invoice.id, teamId, dek)
-      pdfData = result.buffer
-    } catch {
-      // PDF generation failure is non-blocking
-    }
-
-    if (pdfData) {
-      linkData.pdfData = pdfData
-    }
-
     // Encrypt DEK-based fields
     encryptModelFields(linkData, [...ENCRYPTED_FIELDS.paymentLink], dek)
 
     const paymentLink = await PaymentLink.create(linkData)
+
+    // Generate and upload PDF to R2 if includePdf is enabled (default: true)
+    const includePdf = payload.includePdf !== false
+    if (includePdf) {
+      try {
+        const { pdfBuffer, filename } = await generateInvoicePdf(invoice.id, teamId, dek)
+        const pdfUrl = await r2StorageService.upload(
+          'payment-links',
+          `${paymentLink.id}/${filename}`,
+          pdfBuffer,
+          'application/pdf'
+        )
+        paymentLink.pdfStorageKey = pdfUrl
+        await paymentLink.save()
+      } catch {
+        // PDF generation/upload failure is non-blocking
+      }
+    }
 
     // Build checkout URL
     const checkoutUrl = env.get('CHECKOUT_URL') || env.get('FRONTEND_URL') || 'http://localhost:3000'
@@ -194,6 +199,7 @@ export default class Create {
         expiresAt: expiresAt?.toISO() || null,
         isActive: true,
         isPasswordProtected: !!payload.password,
+        hasPdf: !!paymentLink.pdfStorageKey,
       },
     })
   }

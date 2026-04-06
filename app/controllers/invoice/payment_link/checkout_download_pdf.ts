@@ -26,7 +26,12 @@ export default class CheckoutDownloadPdf {
       return response.gone({ message: 'Payment link has expired' })
     }
 
-    // Try to serve stored PDF
+    // Redirect to R2 URL if available
+    if (paymentLink.pdfStorageKey) {
+      return response.redirect(paymentLink.pdfStorageKey)
+    }
+
+    // Fallback: serve from DB blob
     if (paymentLink.pdfData) {
       const filename = `${paymentLink.invoiceNumber}.pdf`
       response.header('Content-Type', 'application/pdf')
@@ -34,7 +39,6 @@ export default class CheckoutDownloadPdf {
       return response.send(paymentLink.pdfData)
     }
 
-    // If no stored PDF, we can't generate one without DEK
     return response.notFound({ message: 'PDF not available' })
   }
 }

@@ -69,6 +69,7 @@ export default class CheckoutShow {
       isPasswordProtected: !!paymentLink.passwordHash,
       showIban: paymentLink.showIban,
       companyName,
+      hasPdf: !!(paymentLink.pdfStorageKey || paymentLink.pdfData),
     })
   }
 }

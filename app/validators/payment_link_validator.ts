@@ -9,6 +9,7 @@ export const createPaymentLinkValidator = vine.compile(
     expirationType: vine.enum(['due_date', 'custom', 'days']).optional(),
     expiresAt: vine.string().trim().optional(),
     expirationDays: vine.number().min(1).max(365).optional(),
+    includePdf: vine.boolean().optional(),
   })
 )
 

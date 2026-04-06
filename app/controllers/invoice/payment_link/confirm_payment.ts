@@ -5,6 +5,7 @@ import PaymentLink from '#models/invoice/payment_link'
 import { confirmPaymentValidator } from '#validators/payment_link_validator'
 import { encryptModelFields } from '#services/crypto/field_encryption_helper'
 import encryptionService from '#services/encryption/encryption_service'
+import r2StorageService from '#services/storage/r2_storage_service'
 import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
 import { PaymentConfirmedNotification } from '#mails/payment_confirmed_notification'
 import mail from '@adonisjs/mail/services/main'
@@ -62,6 +63,15 @@ export default class ConfirmPayment {
     encryptModelFields(confirmData, ['confirmationDate', 'confirmationNotes'] as any, dek)
     paymentLink.confirmationDate = confirmData.confirmationDate
     paymentLink.confirmationNotes = confirmData.confirmationNotes
+
+    // Delete PDF from R2
+    if (paymentLink.pdfStorageKey) {
+      try {
+        await r2StorageService.delete(paymentLink.pdfStorageKey)
+      } catch {
+        // Non-blocking
+      }
+    }
 
     // Wipe IBAN data
     paymentLink.encryptedIban = null
