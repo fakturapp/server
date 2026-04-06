@@ -82,6 +82,15 @@ export default class ConfirmPayment {
 
     await paymentLink.save()
 
+    // Schedule auto-deletion of payment link in 5 minutes
+    const linkId = paymentLink.id
+    setTimeout(async () => {
+      try {
+        const link = await PaymentLink.find(linkId)
+        if (link) await link.delete()
+      } catch { /* */ }
+    }, 5 * 60 * 1000)
+
     // Notify client if requested
     if (payload.notifyClient && paymentLink.clientEmail) {
       // clientEmail is app-level encrypted, decrypt with EncryptionService

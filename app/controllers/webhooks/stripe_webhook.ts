@@ -101,6 +101,15 @@ export default class StripeWebhook {
 
     await paymentLink.save()
 
+    // Schedule auto-deletion of payment link in 5 minutes
+    const linkId = paymentLink.id
+    setTimeout(async () => {
+      try {
+        const link = await PaymentLink.find(linkId)
+        if (link) await link.delete()
+      } catch { /* */ }
+    }, 5 * 60 * 1000)
+
     // Set invoice to paid (auto-confirmed by Stripe)
     const invoice = await Invoice.find(paymentLink.invoiceId)
     if (invoice) {
