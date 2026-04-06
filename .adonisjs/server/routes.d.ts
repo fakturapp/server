@@ -222,6 +222,16 @@ export type ScannedRoutes = {
     'check_access': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
     'active_editors': { paramsTuple: [ParamValue]; params: {'documentType': ParamValue} }
     'validate_link': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'payment_link_show': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'payment_link_create': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'payment_link_delete': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'payment_link_confirm': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'payment_link_send_email': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'checkout_show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'checkout_verify_password': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'checkout_get_iban': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'checkout_mark_paid': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'my_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
@@ -311,6 +321,11 @@ export type ScannedRoutes = {
     'analytics_consent': { paramsTuple?: []; params?: {} }
     'share_create': { paramsTuple?: []; params?: {} }
     'link_create': { paramsTuple?: []; params?: {} }
+    'payment_link_create': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'payment_link_confirm': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'payment_link_send_email': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'checkout_verify_password': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'checkout_mark_paid': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
   }
@@ -397,6 +412,10 @@ export type ScannedRoutes = {
     'check_access': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
     'active_editors': { paramsTuple: [ParamValue]; params: {'documentType': ParamValue} }
     'validate_link': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'payment_link_show': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'checkout_show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'checkout_get_iban': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -482,6 +501,10 @@ export type ScannedRoutes = {
     'check_access': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
     'active_editors': { paramsTuple: [ParamValue]; params: {'documentType': ParamValue} }
     'validate_link': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'payment_link_show': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
+    'checkout_show': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'checkout_get_iban': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   PUT: {
@@ -526,6 +549,7 @@ export type ScannedRoutes = {
     'expense_category_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'share_revoke': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
     'link_destroy': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
+    'payment_link_delete': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
   }
   PATCH: {
     'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }

@@ -272,6 +272,18 @@ export const controllers = {
       UpdateComment: () => import('#controllers/invoice/operations/update_comment'),
       UpdateStatus: () => import('#controllers/invoice/operations/update_status'),
     },
+    paymentLink: {
+      CheckoutDownloadPdf: () => import('#controllers/invoice/payment_link/checkout_download_pdf'),
+      CheckoutGetIban: () => import('#controllers/invoice/payment_link/checkout_get_iban'),
+      CheckoutMarkPaid: () => import('#controllers/invoice/payment_link/checkout_mark_paid'),
+      CheckoutShow: () => import('#controllers/invoice/payment_link/checkout_show'),
+      CheckoutVerifyPassword: () => import('#controllers/invoice/payment_link/checkout_verify_password'),
+      ConfirmPayment: () => import('#controllers/invoice/payment_link/confirm_payment'),
+      Create: () => import('#controllers/invoice/payment_link/create'),
+      Delete: () => import('#controllers/invoice/payment_link/delete'),
+      SendLinkEmail: () => import('#controllers/invoice/payment_link/send_link_email'),
+      Show: () => import('#controllers/invoice/payment_link/show'),
+    },
     payments: {
       Destroy: () => import('#controllers/invoice/payments/destroy'),
       Index: () => import('#controllers/invoice/payments/index'),

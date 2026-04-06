@@ -7,6 +7,23 @@
 import { BaseModel, column } from '@adonisjs/lucid/orm'
 import { DateTime } from 'luxon'
 
+export class AiUsageLogSchema extends BaseModel {
+  static $columns = ['createdAt', 'endpoint', 'id', 'model', 'teamId', 'userId'] as const
+  $columns = AiUsageLogSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare endpoint: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare model: string
+  @column()
+  declare teamId: string
+  @column()
+  declare userId: string
+}
+
 export class AnalyticsErrorSchema extends BaseModel {
   static $columns = ['browser', 'createdAt', 'errorMessage', 'errorMessageFullEncrypted', 'errorType', 'fingerprint', 'id', 'isResolved', 'occurrenceCount', 'os', 'pagePath', 'sessionId', 'stackTraceEncrypted', 'timestamp', 'userId'] as const
   $columns = AnalyticsErrorSchema.$columns
@@ -528,6 +545,64 @@ export class CreditNoteSchema extends BaseModel {
   declare vatExemptReason: string
 }
 
+export class DocumentShareLinkSchema extends BaseModel {
+  static $columns = ['autoExpire', 'createdAt', 'createdByUserId', 'documentId', 'documentType', 'expiresAt', 'id', 'isActive', 'permission', 'teamId', 'token', 'updatedAt', 'visibility'] as const
+  $columns = DocumentShareLinkSchema.$columns
+  @column()
+  declare autoExpire: boolean
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare createdByUserId: string
+  @column()
+  declare documentId: string
+  @column()
+  declare documentType: any
+  @column.dateTime()
+  declare expiresAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare isActive: boolean
+  @column()
+  declare permission: any
+  @column()
+  declare teamId: string
+  @column()
+  declare token: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column()
+  declare visibility: any
+}
+
+export class DocumentShareSchema extends BaseModel {
+  static $columns = ['createdAt', 'documentId', 'documentType', 'id', 'permission', 'sharedByUserId', 'sharedWithEmail', 'sharedWithUserId', 'status', 'teamId', 'updatedAt'] as const
+  $columns = DocumentShareSchema.$columns
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare documentId: string
+  @column()
+  declare documentType: any
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare permission: any
+  @column()
+  declare sharedByUserId: string
+  @column()
+  declare sharedWithEmail: string | null
+  @column()
+  declare sharedWithUserId: string | null
+  @column()
+  declare status: any
+  @column()
+  declare teamId: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+}
+
 export class EmailAccountSchema extends BaseModel {
   static $columns = ['accessToken', 'createdAt', 'displayName', 'email', 'id', 'isActive', 'isDefault', 'provider', 'refreshToken', 'smtpHost', 'smtpPassword', 'smtpPort', 'smtpUsername', 'teamId', 'tokenExpiresAt', 'updatedAt'] as const
   $columns = EmailAccountSchema.$columns
@@ -741,7 +816,7 @@ export class InvoicePaymentSchema extends BaseModel {
 }
 
 export class InvoiceSettingSchema extends BaseModel {
-  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'billingType', 'createdAt', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'teamId', 'template', 'updatedAt'] as const
+  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'billingType', 'collaborationEnabled', 'createdAt', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'teamId', 'template', 'updatedAt'] as const
   $columns = InvoiceSettingSchema.$columns
   @column()
   declare accentColor: string
@@ -763,6 +838,8 @@ export class InvoiceSettingSchema extends BaseModel {
   declare aiProvider: string | null
   @column()
   declare billingType: string
+  @column()
+  declare collaborationEnabled: boolean
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
   @column()
@@ -931,6 +1008,117 @@ export class LoginHistorySchema extends BaseModel {
   declare userAgent: string | null
   @column()
   declare userId: string | null
+}
+
+export class PasskeyChallengeSchema extends BaseModel {
+  static $columns = ['challenge', 'createdAt', 'expiresAt', 'id', 'type', 'userId'] as const
+  $columns = PasskeyChallengeSchema.$columns
+  @column()
+  declare challenge: string
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column.dateTime()
+  declare expiresAt: DateTime
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare type: string
+  @column()
+  declare userId: string | null
+}
+
+export class PasskeyCredentialSchema extends BaseModel {
+  static $columns = ['backedUp', 'counter', 'createdAt', 'credentialId', 'encryptedKek', 'friendlyName', 'id', 'lastUsedAt', 'publicKey', 'transports', 'updatedAt', 'userId'] as const
+  $columns = PasskeyCredentialSchema.$columns
+  @column()
+  declare backedUp: boolean
+  @column()
+  declare counter: bigint | number
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare credentialId: string
+  @column()
+  declare encryptedKek: string | null
+  @column()
+  declare friendlyName: string
+  @column({ isPrimary: true })
+  declare id: string
+  @column.dateTime()
+  declare lastUsedAt: DateTime | null
+  @column()
+  declare publicKey: string
+  @column()
+  declare transports: string | null
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime
+  @column()
+  declare userId: string
+}
+
+export class PaymentLinkSchema extends BaseModel {
+  static $columns = ['amount', 'clientEmail', 'clientName', 'companyName', 'confirmationDate', 'confirmationNotes', 'confirmedAt', 'confirmedByUserId', 'createdAt', 'createdByUserId', 'currency', 'encryptedBankName', 'encryptedBic', 'encryptedIban', 'expirationType', 'expiresAt', 'id', 'invoiceId', 'invoiceNumber', 'isActive', 'paidAt', 'passwordHash', 'paymentMethod', 'paymentType', 'pdfData', 'pdfStorageKey', 'showIban', 'teamId', 'tokenHash', 'updatedAt'] as const
+  $columns = PaymentLinkSchema.$columns
+  @column()
+  declare amount: string
+  @column()
+  declare clientEmail: string | null
+  @column()
+  declare clientName: string | null
+  @column()
+  declare companyName: string | null
+  @column()
+  declare confirmationDate: string | null
+  @column()
+  declare confirmationNotes: string | null
+  @column.dateTime()
+  declare confirmedAt: DateTime | null
+  @column()
+  declare confirmedByUserId: string | null
+  @column.dateTime({ autoCreate: true })
+  declare createdAt: DateTime
+  @column()
+  declare createdByUserId: string
+  @column()
+  declare currency: string
+  @column()
+  declare encryptedBankName: string | null
+  @column()
+  declare encryptedBic: string | null
+  @column()
+  declare encryptedIban: string | null
+  @column()
+  declare expirationType: string | null
+  @column.dateTime()
+  declare expiresAt: DateTime | null
+  @column({ isPrimary: true })
+  declare id: string
+  @column()
+  declare invoiceId: string
+  @column()
+  declare invoiceNumber: string
+  @column()
+  declare isActive: boolean
+  @column.dateTime()
+  declare paidAt: DateTime | null
+  @column()
+  declare passwordHash: string | null
+  @column()
+  declare paymentMethod: string
+  @column()
+  declare paymentType: string
+  @column()
+  declare pdfData: Buffer | null
+  @column()
+  declare pdfStorageKey: string | null
+  @column()
+  declare showIban: boolean
+  @column()
+  declare teamId: string
+  @column()
+  declare tokenHash: string
+  @column.dateTime({ autoCreate: true, autoUpdate: true })
+  declare updatedAt: DateTime | null
 }
 
 export class PaymentReminderSettingSchema extends BaseModel {

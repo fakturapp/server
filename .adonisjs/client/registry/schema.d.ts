@@ -2623,6 +2623,126 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/access/validate_link').default['handle']>>>
     }
   }
+  'payment_link_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/invoices/:invoiceId/payment-link'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { invoiceId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/show').default['handle']>>>
+    }
+  }
+  'payment_link_create': {
+    methods: ["POST"]
+    pattern: '/api/v1/invoices/:invoiceId/payment-link'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/payment_link_validator').createPaymentLinkValidator)>>
+      paramsTuple: [ParamValue]
+      params: { invoiceId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/payment_link_validator').createPaymentLinkValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'payment_link_delete': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/invoices/:invoiceId/payment-link'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { invoiceId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/delete').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/delete').default['handle']>>>
+    }
+  }
+  'payment_link_confirm': {
+    methods: ["POST"]
+    pattern: '/api/v1/invoices/:invoiceId/payment-link/confirm'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/payment_link_validator').confirmPaymentValidator)>>
+      paramsTuple: [ParamValue]
+      params: { invoiceId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/payment_link_validator').confirmPaymentValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/confirm_payment').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/confirm_payment').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'payment_link_send_email': {
+    methods: ["POST"]
+    pattern: '/api/v1/invoices/:invoiceId/payment-link/send-email'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { invoiceId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/send_link_email').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/send_link_email').default['handle']>>>
+    }
+  }
+  'checkout_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/checkout/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_show').default['handle']>>>
+    }
+  }
+  'checkout_verify_password': {
+    methods: ["POST"]
+    pattern: '/api/v1/checkout/:token/verify-password'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_verify_password').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_verify_password').default['handle']>>>
+    }
+  }
+  'checkout_get_iban': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/checkout/:token/iban'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_get_iban').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_get_iban').default['handle']>>>
+    }
+  }
+  'checkout_mark_paid': {
+    methods: ["POST"]
+    pattern: '/api/v1/checkout/:token/mark-paid'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_mark_paid').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_mark_paid').default['handle']>>>
+    }
+  }
+  'checkout_download_pdf': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/checkout/:token/pdf'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_download_pdf').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_download_pdf').default['handle']>>>
+    }
+  }
   'create_feedback': {
     methods: ["POST"]
     pattern: '/api/v1/feedback'
