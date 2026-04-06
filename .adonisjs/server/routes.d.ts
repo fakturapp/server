@@ -9,6 +9,8 @@ export type ScannedRoutes = {
     'resend_verification': { paramsTuple?: []; params?: {} }
     'login': { paramsTuple?: []; params?: {} }
     'two_factor_verify': { paramsTuple?: []; params?: {} }
+    'passkey_login_options': { paramsTuple?: []; params?: {} }
+    'passkey_login_verify': { paramsTuple?: []; params?: {} }
     'password_reset_request': { paramsTuple?: []; params?: {} }
     'password_reset': { paramsTuple?: []; params?: {} }
     'google_auth_url': { paramsTuple?: []; params?: {} }
@@ -47,6 +49,10 @@ export type ScannedRoutes = {
     'list_providers': { paramsTuple?: []; params?: {} }
     'link_provider': { paramsTuple?: []; params?: {} }
     'unlink_provider': { paramsTuple?: []; params?: {} }
+    'passkey_register_options': { paramsTuple?: []; params?: {} }
+    'passkey_register_verify': { paramsTuple?: []; params?: {} }
+    'passkey_list': { paramsTuple?: []; params?: {} }
+    'passkey_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'create_team': { paramsTuple?: []; params?: {} }
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
@@ -72,6 +78,7 @@ export type ScannedRoutes = {
     'team_export': { paramsTuple?: []; params?: {} }
     'team_import': { paramsTuple?: []; params?: {} }
     'team_members': { paramsTuple?: []; params?: {} }
+    'search_users': { paramsTuple?: []; params?: {} }
     'team_invite': { paramsTuple?: []; params?: {} }
     'accept_invite': { paramsTuple?: []; params?: {} }
     'revoke_invite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -204,6 +211,17 @@ export type ScannedRoutes = {
     'analytics_errors.resolve': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'analytics_performance': { paramsTuple?: []; params?: {} }
     'analytics_users': { paramsTuple?: []; params?: {} }
+    'share_list': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
+    'share_create': { paramsTuple?: []; params?: {} }
+    'share_update': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
+    'share_revoke': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
+    'link_list': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
+    'link_create': { paramsTuple?: []; params?: {} }
+    'link_update': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
+    'link_destroy': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
+    'check_access': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
+    'active_editors': { paramsTuple: [ParamValue]; params: {'documentType': ParamValue} }
+    'validate_link': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'my_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
@@ -214,6 +232,8 @@ export type ScannedRoutes = {
     'resend_verification': { paramsTuple?: []; params?: {} }
     'login': { paramsTuple?: []; params?: {} }
     'two_factor_verify': { paramsTuple?: []; params?: {} }
+    'passkey_login_options': { paramsTuple?: []; params?: {} }
+    'passkey_login_verify': { paramsTuple?: []; params?: {} }
     'password_reset_request': { paramsTuple?: []; params?: {} }
     'password_reset': { paramsTuple?: []; params?: {} }
     'google_decode_profile': { paramsTuple?: []; params?: {} }
@@ -239,6 +259,8 @@ export type ScannedRoutes = {
     'email_confirm_change': { paramsTuple?: []; params?: {} }
     'link_provider': { paramsTuple?: []; params?: {} }
     'unlink_provider': { paramsTuple?: []; params?: {} }
+    'passkey_register_options': { paramsTuple?: []; params?: {} }
+    'passkey_register_verify': { paramsTuple?: []; params?: {} }
     'create_team': { paramsTuple?: []; params?: {} }
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
@@ -287,6 +309,8 @@ export type ScannedRoutes = {
     'chat_document': { paramsTuple?: []; params?: {} }
     'analytics_ingest': { paramsTuple?: []; params?: {} }
     'analytics_consent': { paramsTuple?: []; params?: {} }
+    'share_create': { paramsTuple?: []; params?: {} }
+    'link_create': { paramsTuple?: []; params?: {} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
   }
@@ -299,6 +323,7 @@ export type ScannedRoutes = {
     'sessions_list': { paramsTuple?: []; params?: {} }
     'deletion_teams': { paramsTuple?: []; params?: {} }
     'list_providers': { paramsTuple?: []; params?: {} }
+    'passkey_list': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
@@ -312,6 +337,7 @@ export type ScannedRoutes = {
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
     'team_members': { paramsTuple?: []; params?: {} }
+    'search_users': { paramsTuple?: []; params?: {} }
     'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'serve_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'company_show': { paramsTuple?: []; params?: {} }
@@ -366,6 +392,11 @@ export type ScannedRoutes = {
     'analytics_errors': { paramsTuple?: []; params?: {} }
     'analytics_performance': { paramsTuple?: []; params?: {} }
     'analytics_users': { paramsTuple?: []; params?: {} }
+    'share_list': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
+    'link_list': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
+    'check_access': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
+    'active_editors': { paramsTuple: [ParamValue]; params: {'documentType': ParamValue} }
+    'validate_link': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   HEAD: {
@@ -377,6 +408,7 @@ export type ScannedRoutes = {
     'sessions_list': { paramsTuple?: []; params?: {} }
     'deletion_teams': { paramsTuple?: []; params?: {} }
     'list_providers': { paramsTuple?: []; params?: {} }
+    'passkey_list': { paramsTuple?: []; params?: {} }
     'search_company': { paramsTuple?: []; params?: {} }
     'dashboard.index': { paramsTuple?: []; params?: {} }
     'dashboard.stats': { paramsTuple?: []; params?: {} }
@@ -390,6 +422,7 @@ export type ScannedRoutes = {
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
     'team_members': { paramsTuple?: []; params?: {} }
+    'search_users': { paramsTuple?: []; params?: {} }
     'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'serve_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'company_show': { paramsTuple?: []; params?: {} }
@@ -444,6 +477,11 @@ export type ScannedRoutes = {
     'analytics_errors': { paramsTuple?: []; params?: {} }
     'analytics_performance': { paramsTuple?: []; params?: {} }
     'analytics_users': { paramsTuple?: []; params?: {} }
+    'share_list': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
+    'link_list': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
+    'check_access': { paramsTuple: [ParamValue,ParamValue]; params: {'documentType': ParamValue,'documentId': ParamValue} }
+    'active_editors': { paramsTuple: [ParamValue]; params: {'documentType': ParamValue} }
+    'validate_link': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'my_feedback': { paramsTuple?: []; params?: {} }
   }
   PUT: {
@@ -470,6 +508,7 @@ export type ScannedRoutes = {
     'session_revoke': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'account_delete': { paramsTuple?: []; params?: {} }
     'deletion_confirm': { paramsTuple?: []; params?: {} }
+    'passkey_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'team_delete': { paramsTuple?: []; params?: {} }
     'revoke_invite': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'remove_member': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -485,6 +524,8 @@ export type ScannedRoutes = {
     'recurring_invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'expense_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'expense_category_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'share_revoke': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
+    'link_destroy': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
   }
   PATCH: {
     'quote_update_status': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
@@ -498,6 +539,8 @@ export type ScannedRoutes = {
     'recurring_invoice_toggle_active': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'admin_bug_reports.update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'analytics_errors.resolve': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
+    'share_update': { paramsTuple: [ParamValue]; params: {'shareId': ParamValue} }
+    'link_update': { paramsTuple: [ParamValue]; params: {'linkId': ParamValue} }
   }
 }
 declare module '@adonisjs/core/types/http' {

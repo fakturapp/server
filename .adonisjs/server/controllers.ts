@@ -20,6 +20,12 @@ export const controllers = {
       EmailConfirmChange: () => import('#controllers/account/email/email_confirm_change'),
       EmailRequestChange: () => import('#controllers/account/email/email_request_change'),
     },
+    passkeys: {
+      Delete: () => import('#controllers/account/passkeys/delete'),
+      List: () => import('#controllers/account/passkeys/list'),
+      RegisterOptions: () => import('#controllers/account/passkeys/register_options'),
+      RegisterVerify: () => import('#controllers/account/passkeys/register_verify'),
+    },
     profile: {
       Delete: () => import('#controllers/account/profile/delete'),
       ServeAvatar: () => import('#controllers/account/profile/serve_avatar'),
@@ -77,6 +83,10 @@ export const controllers = {
       GoogleDecodeProfile: () => import('#controllers/auth/oauth/google_decode_profile'),
       GoogleRegister: () => import('#controllers/auth/oauth/google_register'),
     },
+    passkey: {
+      LoginOptions: () => import('#controllers/auth/passkey/login_options'),
+      LoginVerify: () => import('#controllers/auth/passkey/login_verify'),
+    },
     registration: {
       Signup: () => import('#controllers/auth/registration/signup'),
     },
@@ -124,6 +134,25 @@ export const controllers = {
     },
     lookup: {
       SearchSiren: () => import('#controllers/client/lookup/search_siren'),
+    },
+  },
+  collaboration: {
+    access: {
+      ActiveEditors: () => import('#controllers/collaboration/access/active_editors'),
+      CheckAccess: () => import('#controllers/collaboration/access/check_access'),
+      ValidateLink: () => import('#controllers/collaboration/access/validate_link'),
+    },
+    links: {
+      Create: () => import('#controllers/collaboration/links/create'),
+      Destroy: () => import('#controllers/collaboration/links/destroy'),
+      List: () => import('#controllers/collaboration/links/list'),
+      Update: () => import('#controllers/collaboration/links/update'),
+    },
+    shares: {
+      Create: () => import('#controllers/collaboration/shares/create'),
+      List: () => import('#controllers/collaboration/shares/list'),
+      Revoke: () => import('#controllers/collaboration/shares/revoke'),
+      Update: () => import('#controllers/collaboration/shares/update'),
     },
   },
   company: {
@@ -350,6 +379,7 @@ export const controllers = {
     members: {
       Members: () => import('#controllers/team/members/members'),
       RemoveMember: () => import('#controllers/team/members/remove_member'),
+      SearchUsers: () => import('#controllers/team/members/search_users'),
       TransferOwnership: () => import('#controllers/team/members/transfer_ownership'),
       UpdateRole: () => import('#controllers/team/members/update_role'),
     },

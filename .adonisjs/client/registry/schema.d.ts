@@ -67,6 +67,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/security/two_factor/verify').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
     }
   }
+  'passkey_login_options': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/passkey/login-options'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth/passkey/login_options').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/passkey/login_options').default['handle']>>>
+    }
+  }
+  'passkey_login_verify': {
+    methods: ["POST"]
+    pattern: '/api/v1/auth/passkey/login-verify'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/auth/passkey/login_verify').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/auth/passkey/login_verify').default['handle']>>>
+    }
+  }
   'password_reset_request': {
     methods: ["POST"]
     pattern: '/api/v1/auth/password/forgot'
@@ -523,6 +547,54 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/providers/unlink').default['handle']>>>
     }
   }
+  'passkey_register_options': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/passkeys/register-options'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/passkeys/register_options').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/passkeys/register_options').default['handle']>>>
+    }
+  }
+  'passkey_register_verify': {
+    methods: ["POST"]
+    pattern: '/api/v1/account/passkeys/register-verify'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/passkeys/register_verify').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/passkeys/register_verify').default['handle']>>>
+    }
+  }
+  'passkey_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/account/passkeys'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/passkeys/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/passkeys/list').default['handle']>>>
+    }
+  }
+  'passkey_delete': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/account/passkeys/:id'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { id: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/account/passkeys/delete').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/account/passkeys/delete').default['handle']>>>
+    }
+  }
   'create_team': {
     methods: ["POST"]
     pattern: '/api/v1/onboarding/team'
@@ -821,6 +893,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/members/members').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/members/members').default['handle']>>>
+    }
+  }
+  'search_users': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/team/search-users'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/members/search_users').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/members/search_users').default['handle']>>>
     }
   }
   'team_invite': {
@@ -2405,6 +2489,138 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/admin/analytics/users').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/admin/analytics/users').default['handle']>>>
+    }
+  }
+  'share_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/collaboration/shares/:documentType/:documentId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { documentType: ParamValue; documentId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/collaboration/shares/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/shares/list').default['handle']>>>
+    }
+  }
+  'share_create': {
+    methods: ["POST"]
+    pattern: '/api/v1/collaboration/shares'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/collaboration_validator').createShareValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/collaboration_validator').createShareValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/collaboration/shares/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/shares/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'share_update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/collaboration/shares/:shareId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/collaboration_validator').updateShareValidator)>>
+      paramsTuple: [ParamValue]
+      params: { shareId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/collaboration_validator').updateShareValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/collaboration/shares/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/shares/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'share_revoke': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/collaboration/shares/:shareId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { shareId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/collaboration/shares/revoke').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/shares/revoke').default['handle']>>>
+    }
+  }
+  'link_list': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/collaboration/share-links/:documentType/:documentId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { documentType: ParamValue; documentId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/collaboration/links/list').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/links/list').default['handle']>>>
+    }
+  }
+  'link_create': {
+    methods: ["POST"]
+    pattern: '/api/v1/collaboration/share-links'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/collaboration_validator').createShareLinkValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/collaboration_validator').createShareLinkValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/collaboration/links/create').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/links/create').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'link_update': {
+    methods: ["PATCH"]
+    pattern: '/api/v1/collaboration/share-links/:linkId'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/collaboration_validator').updateShareLinkValidator)>>
+      paramsTuple: [ParamValue]
+      params: { linkId: ParamValue }
+      query: ExtractQuery<InferInput<(typeof import('#validators/collaboration_validator').updateShareLinkValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/collaboration/links/update').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/links/update').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'link_destroy': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/collaboration/share-links/:linkId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { linkId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/collaboration/links/destroy').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/links/destroy').default['handle']>>>
+    }
+  }
+  'check_access': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/collaboration/access/:documentType/:documentId'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue, ParamValue]
+      params: { documentType: ParamValue; documentId: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/collaboration/access/check_access').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/access/check_access').default['handle']>>>
+    }
+  }
+  'active_editors': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/collaboration/active-editors/:documentType'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { documentType: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/collaboration/access/active_editors').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/access/active_editors').default['handle']>>>
+    }
+  }
+  'validate_link': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/share/validate/:token'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/collaboration/access/validate_link').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/collaboration/access/validate_link').default['handle']>>>
     }
   }
   'create_feedback': {
