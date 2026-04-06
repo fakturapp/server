@@ -108,6 +108,40 @@ export const shareLinkValidationLimiter = limiter.define('share-link-validation'
     })
 })
 
+/** Checkout page: 30 requests per 15 minutes per IP */
+export const checkoutLimiter = limiter.define('checkout', (ctx) => {
+  return limiter
+    .allowRequests(30)
+    .every('15 minutes')
+    .usingKey(ctx.request.ip())
+    .limitExceeded((error) => {
+      error.setMessage('Trop de requêtes. Réessayez plus tard.')
+    })
+})
+
+/** Checkout password: 5 requests per 15 minutes per IP+token (anti-brute-force) */
+export const checkoutPasswordLimiter = limiter.define('checkout-password', (ctx) => {
+  return limiter
+    .allowRequests(5)
+    .every('15 minutes')
+    .usingKey(`${ctx.request.ip()}:${ctx.params.token}`)
+    .blockFor('30 minutes')
+    .limitExceeded((error) => {
+      error.setMessage('Trop de tentatives. Réessayez dans 30 minutes.')
+    })
+})
+
+/** Checkout mark-paid: 3 requests per hour per IP */
+export const checkoutMarkPaidLimiter = limiter.define('checkout-mark-paid', (ctx) => {
+  return limiter
+    .allowRequests(3)
+    .every('1 hour')
+    .usingKey(ctx.request.ip())
+    .limitExceeded((error) => {
+      error.setMessage('Trop de requêtes de paiement. Réessayez plus tard.')
+    })
+})
+
 /** Global API: 1000 requests per hour per IP */
 export const apiLimiter = limiter.define('api', (ctx) => {
   return limiter
