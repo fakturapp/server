@@ -1,5 +1,11 @@
 import vine from '@vinejs/vine'
 
+const bool = () => vine.boolean().optional().parse((v) => {
+  if (v === 1 || v === '1' || v === 'true') return true
+  if (v === 0 || v === '0' || v === 'false') return false
+  return v
+})
+
 export const updateInvoiceSettingsValidator = vine.compile(
   vine.object({
     billingType: vine.enum(['quick', 'detailed']).optional(),
@@ -12,27 +18,27 @@ export const updateInvoiceSettingsValidator = vine.compile(
     logoSource: vine.enum(['custom', 'company']).optional(),
     customPaymentMethod: vine.string().trim().maxLength(255).optional(),
     template: vine.string().trim().maxLength(30).optional(),
-    darkMode: vine.boolean().optional(),
+    darkMode: bool(),
     documentFont: vine.string().trim().maxLength(50).optional(),
-    eInvoicingEnabled: vine.boolean().optional(),
+    eInvoicingEnabled: bool(),
     pdpProvider: vine.string().trim().maxLength(50).optional().nullable(),
     pdpApiKey: vine.string().trim().maxLength(500).optional().nullable(),
-    pdpSandbox: vine.boolean().optional(),
+    pdpSandbox: bool(),
     defaultSubject: vine.string().trim().maxLength(500).optional().nullable(),
     defaultAcceptanceConditions: vine.string().trim().maxLength(2000).optional().nullable(),
-    defaultSignatureField: vine.boolean().optional(),
+    defaultSignatureField: bool(),
     defaultFreeField: vine.string().trim().maxLength(2000).optional().nullable(),
-    defaultShowNotes: vine.boolean().optional(),
-    defaultVatExempt: vine.boolean().optional(),
+    defaultShowNotes: bool(),
+    defaultVatExempt: bool(),
     defaultFooterText: vine.string().trim().maxLength(50).optional().nullable(),
-    defaultShowDeliveryAddress: vine.boolean().optional(),
+    defaultShowDeliveryAddress: bool(),
     defaultLanguage: vine.string().trim().maxLength(5).optional(),
     quoteFilenamePattern: vine.string().trim().maxLength(255).optional(),
     invoiceFilenamePattern: vine.string().trim().maxLength(255).optional(),
     footerMode: vine.enum(['company_info', 'vat_exempt', 'custom']).optional(),
     logoBorderRadius: vine.number().min(0).max(50).optional(),
-    collaborationEnabled: vine.boolean().optional(),
-    aiEnabled: vine.boolean().optional(),
+    collaborationEnabled: bool(),
+    aiEnabled: bool(),
     aiProvider: vine.enum(['groq']).optional(),
     aiModel: vine.string().trim().maxLength(100).optional(),
   })
