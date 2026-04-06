@@ -82,6 +82,9 @@ export default await Env.create(new URL('../', import.meta.url), {
   WEBAUTHN_RP_ID: Env.schema.string.optional(),
   WEBAUTHN_ORIGIN: Env.schema.string.optional(),
 
+  // Checkout URL (payment link public page, defaults to FRONTEND_URL)
+  CHECKOUT_URL: Env.schema.string.optional(),
+
   // Cloudflare R2 (S3-compatible object storage)
   R2_ACCOUNT_ID: Env.schema.string.optional(),
   R2_ACCESS_KEY_ID: Env.schema.string.optional(),
