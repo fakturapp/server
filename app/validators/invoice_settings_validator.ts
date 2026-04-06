@@ -2,7 +2,7 @@ import vine from '@vinejs/vine'
 
 export const updateInvoiceSettingsValidator = vine.compile(
   vine.object({
-te    billingType: vine.enum(['quick', 'detailed']).optional(),
+    billingType: vine.enum(['quick', 'detailed']).optional(),
     accentColor: vine
       .string()
       .trim()
