@@ -2,7 +2,7 @@ import vine from '@vinejs/vine'
 
 export const createPaymentLinkValidator = vine.compile(
   vine.object({
-    paymentMethod: vine.enum(['bank_transfer']),
+    paymentMethod: vine.enum(['bank_transfer', 'stripe']),
     paymentType: vine.enum(['full']),
     showIban: vine.boolean().optional(),
     password: vine.string().trim().minLength(4).maxLength(100).optional(),

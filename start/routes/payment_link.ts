@@ -22,6 +22,8 @@ const CheckoutGetIban = () => import('#controllers/invoice/payment_link/checkout
 const CheckoutMarkPaid = () => import('#controllers/invoice/payment_link/checkout_mark_paid')
 const CheckoutDownloadPdf = () =>
   import('#controllers/invoice/payment_link/checkout_download_pdf')
+const CheckoutCreateIntent = () =>
+  import('#controllers/invoice/payment_link/checkout_create_intent')
 
 // ── Authenticated routes (John manages payment links) ──────────────────
 
@@ -49,6 +51,9 @@ const checkoutGroup = router
     router.get('/:token/iban', [CheckoutGetIban, 'handle']).use(checkoutLimiter)
     router.post('/:token/mark-paid', [CheckoutMarkPaid, 'handle']).use(checkoutMarkPaidLimiter)
     router.get('/:token/pdf', [CheckoutDownloadPdf, 'handle']).use(checkoutLimiter)
+    router
+      .post('/:token/create-stripe-intent', [CheckoutCreateIntent, 'handle'])
+      .use(checkoutLimiter)
   })
   .prefix('/checkout')
 if (API_PREFIX) checkoutGroup.prefix(API_PREFIX)

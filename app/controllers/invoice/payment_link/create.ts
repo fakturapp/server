@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import Invoice from '#models/invoice/invoice'
 import PaymentLink from '#models/invoice/payment_link'
 import BankAccount from '#models/team/bank_account'
+import InvoiceSetting from '#models/team/invoice_setting'
 import { createPaymentLinkValidator } from '#validators/payment_link_validator'
 import { encryptModelFields, decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import encryptionService from '#services/encryption/encryption_service'
@@ -156,6 +157,22 @@ export default class Create {
       currency: 'EUR',
       invoiceNumber: invoice.invoiceNumber,
       companyName: appEncryptedCompanyName,
+    }
+
+    // If Stripe payment method, snapshot Stripe keys from InvoiceSetting
+    if (payload.paymentMethod === 'stripe') {
+      const invoiceSettings = await InvoiceSetting.query().where('team_id', teamId).first()
+      if (!invoiceSettings?.stripePublishableKey || !invoiceSettings?.stripeSecretKey) {
+        return response.badRequest({ message: 'Stripe is not configured. Set up your Stripe keys in settings.' })
+      }
+
+      // Decrypt Stripe keys with DEK
+      decryptModelFields(invoiceSettings, [...ENCRYPTED_FIELDS.invoiceSetting], dek)
+
+      // Re-encrypt with app-level encryption for public checkout access
+      linkData.encryptedStripePublishableKey = encryptionService.encrypt(invoiceSettings.stripePublishableKey!)
+      linkData.encryptedStripeSecretKey = encryptionService.encrypt(invoiceSettings.stripeSecretKey!)
+      linkData.showIban = false
     }
 
     // Encrypt DEK-based fields

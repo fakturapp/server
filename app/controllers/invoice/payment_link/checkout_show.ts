@@ -93,6 +93,7 @@ export default class CheckoutShow {
       companyName,
       maskedEmail,
       hasPdf: !!(paymentLink.pdfStorageKey || paymentLink.pdfData),
+      hasStripe: paymentLink.paymentMethod === 'stripe' && !!paymentLink.encryptedStripeSecretKey,
     })
   }
 }

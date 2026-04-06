@@ -88,6 +88,18 @@ export default class PaymentLink extends BaseModel {
   declare confirmationDate: string | null
 
   @column()
+  declare stripePaymentIntentId: string | null
+
+  @column()
+  declare stripeStatus: string | null
+
+  @column()
+  declare encryptedStripePublishableKey: string | null
+
+  @column()
+  declare encryptedStripeSecretKey: string | null
+
+  @column()
   declare confirmationNotes: string | null
 
   @column.dateTime({ autoCreate: true })

@@ -103,6 +103,18 @@ export default class InvoiceSetting extends BaseModel {
   declare nextQuoteNumber: string | null
 
   @column()
+  declare stripePublishableKey: string | null
+
+  @column()
+  declare stripeSecretKey: string | null
+
+  @column()
+  declare stripeWebhookSecret: string | null
+
+  @column()
+  declare stripeWebhookSecretApp: string | null
+
+  @column()
   declare collaborationEnabled: boolean
 
   @column()

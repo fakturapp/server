@@ -6,6 +6,9 @@ const InvoiceSettingsShow = () => import('#controllers/settings/invoice/invoice_
 const InvoiceSettingsUpdate = () => import('#controllers/settings/invoice/invoice_settings_update')
 const InvoiceLogoUpload = () => import('#controllers/settings/invoice/invoice_logo_upload')
 const ServeInvoiceLogo = () => import('#controllers/settings/invoice/serve_invoice_logo')
+const StripeSettingsShow = () => import('#controllers/settings/stripe/stripe_settings_show')
+const StripeSettingsSave = () => import('#controllers/settings/stripe/stripe_settings_save')
+const StripeSettingsDelete = () => import('#controllers/settings/stripe/stripe_settings_delete')
 
 // Public route - serve invoice logos
 router.get(API_PREFIX + '/invoice-logos/:filename', [ServeInvoiceLogo, 'handle'])
@@ -15,6 +18,11 @@ router
     router.get('/invoices', [InvoiceSettingsShow, 'handle'])
     router.put('/invoices', [InvoiceSettingsUpdate, 'handle'])
     router.post('/invoices/logo', [InvoiceLogoUpload, 'handle'])
+
+    // Stripe settings
+    router.get('/stripe', [StripeSettingsShow, 'handle'])
+    router.put('/stripe', [StripeSettingsSave, 'handle'])
+    router.delete('/stripe', [StripeSettingsDelete, 'handle'])
   })
   .prefix(API_PREFIX + '/settings')
   .use(middleware.auth())
