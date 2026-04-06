@@ -25,6 +25,7 @@ import '#start/routes/ai'
 import '#start/routes/admin'
 import '#start/routes/analytics'
 import '#start/routes/collaboration'
+import '#start/routes/payment_link'
 
 // Feedback & bug report routes (inline to avoid import issues)
 const CreateFeedback = () => import('#controllers/feedback/create')
@@ -43,7 +44,7 @@ if (API_PREFIX) feedbackGroup.prefix(API_PREFIX)
 router.get(API_PREFIX + '/', async () => {
   return {
     name: 'Faktur API',
-    version: '1.5.3',
+    version: '1.5.6',
     prefix: API_PREFIX || '/',
     status: 'healthy',
   }
