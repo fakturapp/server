@@ -1,10 +1,11 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
-import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
+import { BaseModel, column, belongsTo, hasMany, hasOne } from '@adonisjs/lucid/orm'
+import type { BelongsTo, HasMany, HasOne } from '@adonisjs/lucid/types/relations'
 import Team from '#models/team/team'
 import Client from '#models/client/client'
 import InvoiceLine from '#models/invoice/invoice_line'
 import InvoicePayment from '#models/invoice/invoice_payment'
+import PaymentLink from '#models/invoice/payment_link'
 import BankAccount from '#models/team/bank_account'
 
 export default class Invoice extends BaseModel {
@@ -21,7 +22,7 @@ export default class Invoice extends BaseModel {
   declare invoiceNumber: string
 
   @column()
-  declare status: 'draft' | 'sent' | 'paid' | 'partial' | 'overdue' | 'cancelled'
+  declare status: 'draft' | 'sent' | 'paid' | 'paid_unconfirmed' | 'partial' | 'overdue' | 'cancelled'
 
   @column()
   declare subject: string | null
@@ -133,4 +134,7 @@ export default class Invoice extends BaseModel {
 
   @belongsTo(() => BankAccount)
   declare bankAccount: BelongsTo<typeof BankAccount>
+
+  @hasOne(() => PaymentLink)
+  declare paymentLink: HasOne<typeof PaymentLink>
 }
