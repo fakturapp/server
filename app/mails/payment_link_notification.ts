@@ -1,7 +1,6 @@
 import { wrapHtml, ctaButton, infoBox, linkFallback } from '#mails/helpers/email_template'
 
 export class PaymentLinkNotification {
-  private email: string
   private paymentUrl: string
   private invoiceNumber: string
   private amount: number
@@ -9,14 +8,13 @@ export class PaymentLinkNotification {
   private clientName: string
 
   constructor(
-    email: string,
+    _email: string,
     paymentUrl: string,
     invoiceNumber: string,
     amount: number,
     currency: string,
     clientName: string
   ) {
-    this.email = email
     this.paymentUrl = paymentUrl
     this.invoiceNumber = invoiceNumber
     this.amount = amount

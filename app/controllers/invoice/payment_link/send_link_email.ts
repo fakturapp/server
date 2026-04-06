@@ -3,14 +3,13 @@ import Invoice from '#models/invoice/invoice'
 import PaymentLink from '#models/invoice/payment_link'
 import EmailAccount from '#models/email/email_account'
 import EmailLog from '#models/email/email_log'
-import { decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
-import encryptionService from '#services/encryption/encryption_service'
-import env from '#start/env'
-import { PaymentLinkNotification } from '#mails/payment_link_notification'
+import { decryptModelFields, encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import { generateInvoicePdf } from '#services/pdf/document_pdf_service'
 import GmailOAuthService from '#services/email/gmail_oauth_service'
 import ResendUserService from '#services/email/resend_user_service'
 import SmtpService from '#services/email/smtp_service'
-import { DocumentPdfService } from '#services/pdf/document_pdf_service'
+import { PaymentLinkNotification } from '#mails/payment_link_notification'
+import env from '#start/env'
 
 export default class SendLinkEmail {
   async handle(ctx: HttpContext) {
@@ -69,24 +68,18 @@ export default class SendLinkEmail {
 
     // Build checkout URL
     const checkoutUrl = env.get('CHECKOUT_URL') || env.get('FRONTEND_URL') || 'http://localhost:3000'
-    // We need the raw token -- but we only store the hash. We need to include the token in the URL.
-    // The token was returned at creation time. Since we can't recover it, we use the tokenHash as the URL identifier.
-    // Actually, the URL uses the raw token. Since we only have the hash, we need to store/pass the token differently.
-    // For now, the frontend should pass the token from when it was created.
     const token = request.input('token')
     if (!token) {
       return response.badRequest({ message: 'Token is required to build the payment link URL' })
     }
-
     const paymentUrl = `${checkoutUrl}/checkout/${token}/pay`
 
     // Generate PDF
     let pdfBuffer: Buffer | null = null
     let pdfFilename = `${invoice.invoiceNumber}.pdf`
     try {
-      const pdfService = new DocumentPdfService()
-      const result = await pdfService.generateInvoicePdf(invoice.id, teamId, dek)
-      pdfBuffer = result.buffer
+      const result = await generateInvoicePdf(invoice.id, teamId, dek)
+      pdfBuffer = result.pdfBuffer
       pdfFilename = result.filename || pdfFilename
     } catch {
       // PDF generation failure should not block email
@@ -103,45 +96,57 @@ export default class SendLinkEmail {
       clientName
     )
 
-    // Send email via the configured provider
-    let emailStatus: 'sent' | 'error' = 'sent'
-    let errorMessage: string | null = null
+    const emailSubject = notification.getSubject()
+    const emailBody = notification.getHtml()
+    const attachments = pdfBuffer
+      ? [{ filename: pdfFilename, content: pdfBuffer, mimeType: 'application/pdf' }]
+      : []
 
+    // Send email via the configured provider
+    let sendError: string | null = null
     try {
       if (emailAccount.provider === 'gmail') {
-        const gmailService = new GmailOAuthService()
-        await gmailService.sendMail(
-          emailAccount,
-          clientEmail,
-          notification.getSubject(),
-          notification.getHtml(),
-          notification.getText(),
-          pdfBuffer ? [{ filename: pdfFilename, content: pdfBuffer }] : []
-        )
+        const accessToken = await GmailOAuthService.getValidAccessToken(emailAccount)
+        if (emailAccount.$isDirty) await emailAccount.save()
+        await GmailOAuthService.sendEmail({
+          accessToken,
+          from: emailAccount.email,
+          fromName: emailAccount.displayName,
+          to: clientEmail,
+          subject: emailSubject,
+          body: emailBody,
+          attachments,
+        })
       } else if (emailAccount.provider === 'resend') {
-        const resendService = new ResendUserService()
-        await resendService.sendMail(
-          emailAccount,
-          clientEmail,
-          notification.getSubject(),
-          notification.getHtml(),
-          notification.getText(),
-          pdfBuffer ? [{ filename: pdfFilename, content: pdfBuffer }] : []
-        )
+        if (!emailAccount.accessToken) throw new Error('Resend API key missing')
+        await ResendUserService.sendEmail({
+          encryptedApiKey: emailAccount.accessToken,
+          from: emailAccount.email,
+          fromName: emailAccount.displayName,
+          to: clientEmail,
+          subject: emailSubject,
+          body: emailBody,
+          attachments,
+        })
       } else if (emailAccount.provider === 'smtp') {
-        const smtpService = new SmtpService()
-        await smtpService.sendMail(
-          emailAccount,
-          clientEmail,
-          notification.getSubject(),
-          notification.getHtml(),
-          notification.getText(),
-          pdfBuffer ? [{ filename: pdfFilename, content: pdfBuffer }] : []
-        )
+        if (!emailAccount.smtpHost || !emailAccount.smtpPort || !emailAccount.smtpUsername || !emailAccount.smtpPassword) {
+          throw new Error('SMTP config incomplete')
+        }
+        await SmtpService.sendEmail({
+          host: emailAccount.smtpHost,
+          port: emailAccount.smtpPort,
+          encryptedUsername: emailAccount.smtpUsername,
+          encryptedPassword: emailAccount.smtpPassword,
+          from: emailAccount.email,
+          fromName: emailAccount.displayName,
+          to: clientEmail,
+          subject: emailSubject,
+          body: emailBody,
+          attachments,
+        })
       }
     } catch (err: any) {
-      emailStatus = 'error'
-      errorMessage = err.message || 'Unknown error'
+      sendError = err.message || 'Unknown error'
     }
 
     // Log email
@@ -153,21 +158,17 @@ export default class SendLinkEmail {
       documentNumber: invoice.invoiceNumber,
       fromEmail: emailAccount.email,
       toEmail: clientEmail,
-      subject: notification.getSubject(),
-      body: notification.getHtml(),
-      status: emailStatus,
-      errorMessage,
+      subject: emailSubject,
+      body: emailBody,
+      status: sendError ? 'error' : 'sent',
+      errorMessage: sendError,
       emailType: 'payment_link',
     }
-
-    // Encrypt email log fields
-    const { encryptModelFields: encryptFields } = await import('#services/crypto/field_encryption_helper')
-    encryptFields(logData, [...ENCRYPTED_FIELDS.emailLog], dek)
-
+    encryptModelFields(logData, [...ENCRYPTED_FIELDS.emailLog], dek)
     await EmailLog.create(logData)
 
-    if (emailStatus === 'error') {
-      return response.internalServerError({ message: 'Failed to send email', error: errorMessage })
+    if (sendError) {
+      return response.internalServerError({ message: 'Failed to send email', error: sendError })
     }
 
     return response.ok({ message: 'Payment link email sent' })
