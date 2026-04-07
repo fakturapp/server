@@ -5,6 +5,7 @@ import { API_PREFIX } from '#start/routes/_prefix'
 const Authorize = () => import('#controllers/oauth/authorize')
 const Token = () => import('#controllers/oauth/token')
 const Revoke = () => import('#controllers/oauth/revoke')
+const ExchangeSession = () => import('#controllers/oauth/exchange_session')
 
 router
   .group(() => {
@@ -20,5 +21,10 @@ router
 
     // POST /api/v1/oauth/revoke — RFC 7009.
     router.post('/revoke', [Revoke, 'handle'])
+
+    // POST /api/v1/oauth/exchange-session — desktop-only helper that
+    // trades an OAuth access_token for a dashboard session token so
+    // the embedded browser window can boot without a re-login.
+    router.post('/exchange-session', [ExchangeSession, 'handle'])
   })
   .prefix(API_PREFIX + '/oauth')
