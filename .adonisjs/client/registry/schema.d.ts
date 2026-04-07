@@ -1279,6 +1279,42 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings/invoice/invoice_logo_upload').default['handle']>>>
     }
   }
+  'stripe_settings_show': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/settings/stripe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings/stripe/stripe_settings_show').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings/stripe/stripe_settings_show').default['handle']>>>
+    }
+  }
+  'stripe_settings_save': {
+    methods: ["PUT"]
+    pattern: '/api/v1/settings/stripe'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/stripe_settings_validator').saveStripeSettingsValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/stripe_settings_validator').saveStripeSettingsValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings/stripe/stripe_settings_save').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings/stripe/stripe_settings_save').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'stripe_settings_delete': {
+    methods: ["DELETE"]
+    pattern: '/api/v1/settings/stripe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/settings/stripe/stripe_settings_delete').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/settings/stripe/stripe_settings_delete').default['handle']>>>
+    }
+  }
   'quote_next_number': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/quotes/next-number'
@@ -2741,6 +2777,30 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_download_pdf').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_download_pdf').default['handle']>>>
+    }
+  }
+  'checkout_create_intent': {
+    methods: ["POST"]
+    pattern: '/api/v1/checkout/:token/create-stripe-intent'
+    types: {
+      body: {}
+      paramsTuple: [ParamValue]
+      params: { token: ParamValue }
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_create_intent').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/invoice/payment_link/checkout_create_intent').default['handle']>>>
+    }
+  }
+  'stripe_webhook': {
+    methods: ["POST"]
+    pattern: '/webhooks/stripe'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/webhooks/stripe_webhook').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/webhooks/stripe_webhook').default['handle']>>>
     }
   }
   'create_feedback': {

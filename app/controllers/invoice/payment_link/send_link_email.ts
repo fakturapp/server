@@ -9,7 +9,7 @@ import GmailOAuthService from '#services/email/gmail_oauth_service'
 import ResendUserService from '#services/email/resend_user_service'
 import SmtpService from '#services/email/smtp_service'
 import { PaymentLinkNotification } from '#mails/payment_link_notification'
-import env from '#start/env'
+import { buildCheckoutUrl } from '#services/checkout/checkout_url_builder'
 
 export default class SendLinkEmail {
   async handle(ctx: HttpContext) {
@@ -67,12 +67,11 @@ export default class SendLinkEmail {
     decryptModelFields(emailAccount, ['accessToken', 'refreshToken', 'smtpHost', 'smtpUsername', 'smtpPassword'] as any, dek)
 
     // Build checkout URL
-    const checkoutUrl = env.get('CHECKOUT_URL') || env.get('FRONTEND_URL') || 'http://localhost:3000'
     const token = request.input('token')
     if (!token) {
       return response.badRequest({ message: 'Token is required to build the payment link URL' })
     }
-    const paymentUrl = `${checkoutUrl}/checkout/${token}/pay`
+    const paymentUrl = buildCheckoutUrl(token)
 
     // Generate PDF
     let pdfBuffer: Buffer | null = null

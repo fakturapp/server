@@ -110,6 +110,9 @@ export type ScannedRoutes = {
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
     'invoice_settings_update': { paramsTuple?: []; params?: {} }
     'invoice_logo_upload': { paramsTuple?: []; params?: {} }
+    'stripe_settings_show': { paramsTuple?: []; params?: {} }
+    'stripe_settings_save': { paramsTuple?: []; params?: {} }
+    'stripe_settings_delete': { paramsTuple?: []; params?: {} }
     'quote_next_number': { paramsTuple?: []; params?: {} }
     'quote_document_count': { paramsTuple?: []; params?: {} }
     'quote_set_next_number': { paramsTuple?: []; params?: {} }
@@ -232,6 +235,8 @@ export type ScannedRoutes = {
     'checkout_get_iban': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_mark_paid': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_download_pdf': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'checkout_create_intent': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'stripe_webhook': { paramsTuple?: []; params?: {} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'my_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
@@ -326,6 +331,8 @@ export type ScannedRoutes = {
     'payment_link_send_email': { paramsTuple: [ParamValue]; params: {'invoiceId': ParamValue} }
     'checkout_verify_password': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
     'checkout_mark_paid': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'checkout_create_intent': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
+    'stripe_webhook': { paramsTuple?: []; params?: {} }
     'create_feedback': { paramsTuple?: []; params?: {} }
     'create_bug_report': { paramsTuple?: []; params?: {} }
   }
@@ -364,6 +371,7 @@ export type ScannedRoutes = {
     'client_contact_index': { paramsTuple: [ParamValue]; params: {'clientId': ParamValue} }
     'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
+    'stripe_settings_show': { paramsTuple?: []; params?: {} }
     'quote_next_number': { paramsTuple?: []; params?: {} }
     'quote_document_count': { paramsTuple?: []; params?: {} }
     'quote_list': { paramsTuple?: []; params?: {} }
@@ -453,6 +461,7 @@ export type ScannedRoutes = {
     'client_contact_index': { paramsTuple: [ParamValue]; params: {'clientId': ParamValue} }
     'serve_invoice_logo': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'invoice_settings_show': { paramsTuple?: []; params?: {} }
+    'stripe_settings_show': { paramsTuple?: []; params?: {} }
     'quote_next_number': { paramsTuple?: []; params?: {} }
     'quote_document_count': { paramsTuple?: []; params?: {} }
     'quote_list': { paramsTuple?: []; params?: {} }
@@ -518,6 +527,7 @@ export type ScannedRoutes = {
     'client_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_contact_update': { paramsTuple: [ParamValue,ParamValue]; params: {'clientId': ParamValue,'id': ParamValue} }
     'invoice_settings_update': { paramsTuple?: []; params?: {} }
+    'stripe_settings_save': { paramsTuple?: []; params?: {} }
     'quote_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_update': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'email_template_update': { paramsTuple?: []; params?: {} }
@@ -538,6 +548,7 @@ export type ScannedRoutes = {
     'bank_accounts.destroy': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'client_contact_destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'clientId': ParamValue,'id': ParamValue} }
+    'stripe_settings_delete': { paramsTuple?: []; params?: {} }
     'quote_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_delete': { paramsTuple: [ParamValue]; params: {'id': ParamValue} }
     'invoice_payment_destroy': { paramsTuple: [ParamValue,ParamValue]; params: {'invoiceId': ParamValue,'id': ParamValue} }

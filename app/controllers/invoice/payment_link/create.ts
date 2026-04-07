@@ -9,7 +9,7 @@ import { encryptModelFields, decryptModelFields, ENCRYPTED_FIELDS } from '#servi
 import encryptionService from '#services/encryption/encryption_service'
 import { generateInvoicePdf } from '#services/pdf/document_pdf_service'
 import r2StorageService from '#services/storage/r2_storage_service'
-import env from '#start/env'
+import { buildCheckoutUrl } from '#services/checkout/checkout_url_builder'
 
 export default class Create {
   async handle(ctx: HttpContext) {
@@ -202,8 +202,7 @@ export default class Create {
     }
 
     // Build checkout URL
-    const checkoutUrl = env.get('CHECKOUT_URL') || env.get('FRONTEND_URL') || 'http://localhost:3000'
-    const fullUrl = `${checkoutUrl}/checkout/${rawToken}/pay`
+    const fullUrl = buildCheckoutUrl(rawToken)
 
     return response.created({
       message: 'Payment link created',

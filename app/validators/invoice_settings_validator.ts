@@ -15,7 +15,7 @@ export const updateInvoiceSettingsValidator = vine.compile(
       .trim()
       .regex(/^#[0-9a-fA-F]{6}$/)
       .optional(),
-    paymentMethods: vine.array(vine.enum(['bank_transfer', 'cash', 'custom'])).optional(),
+    paymentMethods: vine.array(vine.enum(['bank_transfer', 'cash', 'custom', 'stripe'])).optional(),
     logoSource: vine.enum(['custom', 'company']).optional(),
     customPaymentMethod: vine.string().trim().maxLength(255).optional(),
     template: vine.string().trim().maxLength(30).optional(),

@@ -642,6 +642,24 @@ const routes = {
     tokens: [{"old":"/api/v1/settings/invoices/logo","type":0,"val":"api","end":""},{"old":"/api/v1/settings/invoices/logo","type":0,"val":"v1","end":""},{"old":"/api/v1/settings/invoices/logo","type":0,"val":"settings","end":""},{"old":"/api/v1/settings/invoices/logo","type":0,"val":"invoices","end":""},{"old":"/api/v1/settings/invoices/logo","type":0,"val":"logo","end":""}],
     types: placeholder as Registry['invoice_logo_upload']['types'],
   },
+  'stripe_settings_show': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/settings/stripe',
+    tokens: [{"old":"/api/v1/settings/stripe","type":0,"val":"api","end":""},{"old":"/api/v1/settings/stripe","type":0,"val":"v1","end":""},{"old":"/api/v1/settings/stripe","type":0,"val":"settings","end":""},{"old":"/api/v1/settings/stripe","type":0,"val":"stripe","end":""}],
+    types: placeholder as Registry['stripe_settings_show']['types'],
+  },
+  'stripe_settings_save': {
+    methods: ["PUT"],
+    pattern: '/api/v1/settings/stripe',
+    tokens: [{"old":"/api/v1/settings/stripe","type":0,"val":"api","end":""},{"old":"/api/v1/settings/stripe","type":0,"val":"v1","end":""},{"old":"/api/v1/settings/stripe","type":0,"val":"settings","end":""},{"old":"/api/v1/settings/stripe","type":0,"val":"stripe","end":""}],
+    types: placeholder as Registry['stripe_settings_save']['types'],
+  },
+  'stripe_settings_delete': {
+    methods: ["DELETE"],
+    pattern: '/api/v1/settings/stripe',
+    tokens: [{"old":"/api/v1/settings/stripe","type":0,"val":"api","end":""},{"old":"/api/v1/settings/stripe","type":0,"val":"v1","end":""},{"old":"/api/v1/settings/stripe","type":0,"val":"settings","end":""},{"old":"/api/v1/settings/stripe","type":0,"val":"stripe","end":""}],
+    types: placeholder as Registry['stripe_settings_delete']['types'],
+  },
   'quote_next_number': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/quotes/next-number',
@@ -1373,6 +1391,18 @@ const routes = {
     pattern: '/api/v1/checkout/:token/pdf',
     tokens: [{"old":"/api/v1/checkout/:token/pdf","type":0,"val":"api","end":""},{"old":"/api/v1/checkout/:token/pdf","type":0,"val":"v1","end":""},{"old":"/api/v1/checkout/:token/pdf","type":0,"val":"checkout","end":""},{"old":"/api/v1/checkout/:token/pdf","type":1,"val":"token","end":""},{"old":"/api/v1/checkout/:token/pdf","type":0,"val":"pdf","end":""}],
     types: placeholder as Registry['checkout_download_pdf']['types'],
+  },
+  'checkout_create_intent': {
+    methods: ["POST"],
+    pattern: '/api/v1/checkout/:token/create-stripe-intent',
+    tokens: [{"old":"/api/v1/checkout/:token/create-stripe-intent","type":0,"val":"api","end":""},{"old":"/api/v1/checkout/:token/create-stripe-intent","type":0,"val":"v1","end":""},{"old":"/api/v1/checkout/:token/create-stripe-intent","type":0,"val":"checkout","end":""},{"old":"/api/v1/checkout/:token/create-stripe-intent","type":1,"val":"token","end":""},{"old":"/api/v1/checkout/:token/create-stripe-intent","type":0,"val":"create-stripe-intent","end":""}],
+    types: placeholder as Registry['checkout_create_intent']['types'],
+  },
+  'stripe_webhook': {
+    methods: ["POST"],
+    pattern: '/webhooks/stripe',
+    tokens: [{"old":"/webhooks/stripe","type":0,"val":"webhooks","end":""},{"old":"/webhooks/stripe","type":0,"val":"stripe","end":""}],
+    types: placeholder as Registry['stripe_webhook']['types'],
   },
   'create_feedback': {
     methods: ["POST"],

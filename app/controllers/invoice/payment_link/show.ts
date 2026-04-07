@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import PaymentLink from '#models/invoice/payment_link'
-import env from '#start/env'
+import { buildCheckoutUrl } from '#services/checkout/checkout_url_builder'
 
 export default class Show {
   async handle(ctx: HttpContext) {
@@ -22,8 +22,6 @@ export default class Show {
       return response.ok({ paymentLink: null })
     }
 
-    const checkoutUrl = env.get('CHECKOUT_URL') || env.get('FRONTEND_URL') || 'http://localhost:3000'
-
     return response.ok({
       paymentLink: {
         id: paymentLink.id,
@@ -40,7 +38,7 @@ export default class Show {
         amount: paymentLink.amount,
         currency: paymentLink.currency,
         invoiceNumber: paymentLink.invoiceNumber,
-        url: paymentLink.isActive ? `${checkoutUrl}/checkout/${paymentLink.tokenHash}/pay` : null,
+        url: paymentLink.isActive ? buildCheckoutUrl(paymentLink.tokenHash) : null,
         createdAt: paymentLink.createdAt.toISO(),
       },
     })

@@ -816,7 +816,7 @@ export class InvoicePaymentSchema extends BaseModel {
 }
 
 export class InvoiceSettingSchema extends BaseModel {
-  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'billingType', 'collaborationEnabled', 'createdAt', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'teamId', 'template', 'updatedAt'] as const
+  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'billingType', 'collaborationEnabled', 'createdAt', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'stripePublishableKey', 'stripeSecretKey', 'stripeWebhookSecret', 'stripeWebhookSecretApp', 'teamId', 'template', 'updatedAt'] as const
   $columns = InvoiceSettingSchema.$columns
   @column()
   declare accentColor: string
@@ -896,6 +896,14 @@ export class InvoiceSettingSchema extends BaseModel {
   declare pdpSandbox: boolean | null
   @column()
   declare quoteFilenamePattern: string | null
+  @column()
+  declare stripePublishableKey: string | null
+  @column()
+  declare stripeSecretKey: string | null
+  @column()
+  declare stripeWebhookSecret: string | null
+  @column()
+  declare stripeWebhookSecretApp: string | null
   @column()
   declare teamId: string
   @column()
@@ -1057,7 +1065,7 @@ export class PasskeyCredentialSchema extends BaseModel {
 }
 
 export class PaymentLinkSchema extends BaseModel {
-  static $columns = ['amount', 'clientEmail', 'clientName', 'companyName', 'confirmationDate', 'confirmationNotes', 'confirmedAt', 'confirmedByUserId', 'createdAt', 'createdByUserId', 'currency', 'encryptedBankName', 'encryptedBic', 'encryptedIban', 'expirationType', 'expiresAt', 'id', 'invoiceId', 'invoiceNumber', 'isActive', 'paidAt', 'passwordHash', 'paymentMethod', 'paymentType', 'pdfData', 'pdfStorageKey', 'showIban', 'teamId', 'tokenHash', 'updatedAt'] as const
+  static $columns = ['amount', 'clientEmail', 'clientName', 'companyName', 'confirmationDate', 'confirmationNotes', 'confirmedAt', 'confirmedByUserId', 'createdAt', 'createdByUserId', 'currency', 'encryptedBankName', 'encryptedBic', 'encryptedIban', 'encryptedStripePublishableKey', 'encryptedStripeSecretKey', 'expirationType', 'expiresAt', 'id', 'invoiceId', 'invoiceNumber', 'isActive', 'paidAt', 'passwordHash', 'paymentMethod', 'paymentType', 'pdfData', 'pdfStorageKey', 'showIban', 'stripePaymentIntentId', 'stripeStatus', 'teamId', 'tokenHash', 'updatedAt'] as const
   $columns = PaymentLinkSchema.$columns
   @column()
   declare amount: string
@@ -1088,6 +1096,10 @@ export class PaymentLinkSchema extends BaseModel {
   @column()
   declare encryptedIban: string | null
   @column()
+  declare encryptedStripePublishableKey: string | null
+  @column()
+  declare encryptedStripeSecretKey: string | null
+  @column()
   declare expirationType: string | null
   @column.dateTime()
   declare expiresAt: DateTime | null
@@ -1113,6 +1125,10 @@ export class PaymentLinkSchema extends BaseModel {
   declare pdfStorageKey: string | null
   @column()
   declare showIban: boolean
+  @column()
+  declare stripePaymentIntentId: string | null
+  @column()
+  declare stripeStatus: string | null
   @column()
   declare teamId: string
   @column()

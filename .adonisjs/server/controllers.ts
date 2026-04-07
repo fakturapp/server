@@ -273,6 +273,7 @@ export const controllers = {
       UpdateStatus: () => import('#controllers/invoice/operations/update_status'),
     },
     paymentLink: {
+      CheckoutCreateIntent: () => import('#controllers/invoice/payment_link/checkout_create_intent'),
       CheckoutDownloadPdf: () => import('#controllers/invoice/payment_link/checkout_download_pdf'),
       CheckoutGetIban: () => import('#controllers/invoice/payment_link/checkout_get_iban'),
       CheckoutMarkPaid: () => import('#controllers/invoice/payment_link/checkout_mark_paid'),
@@ -362,6 +363,11 @@ export const controllers = {
       InvoiceSettingsUpdate: () => import('#controllers/settings/invoice/invoice_settings_update'),
       ServeInvoiceLogo: () => import('#controllers/settings/invoice/serve_invoice_logo'),
     },
+    stripe: {
+      StripeSettingsDelete: () => import('#controllers/settings/stripe/stripe_settings_delete'),
+      StripeSettingsSave: () => import('#controllers/settings/stripe/stripe_settings_save'),
+      StripeSettingsShow: () => import('#controllers/settings/stripe/stripe_settings_show'),
+    },
   },
   tax: {
     VatReport: () => import('#controllers/tax/vat_report'),
@@ -395,5 +401,8 @@ export const controllers = {
       TransferOwnership: () => import('#controllers/team/members/transfer_ownership'),
       UpdateRole: () => import('#controllers/team/members/update_role'),
     },
+  },
+  webhooks: {
+    StripeWebhook: () => import('#controllers/webhooks/stripe_webhook'),
   },
 }
