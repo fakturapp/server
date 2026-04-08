@@ -7,22 +7,27 @@ const looseBool = vine.any().optional().transform((v) => {
   return !!v
 })
 
+// ---------- Strict enums for typed fields ----------
+const BILLING_TYPES = ['quick', 'detailed'] as const
+const LOGO_SOURCES = ['custom', 'company'] as const
+const FOOTER_MODES = ['custom', 'company_info', 'vat_exempt'] as const
+const PDP_PROVIDERS = ['b2brouter', 'sandbox'] as const
+
 export const updateInvoiceSettingsValidator = vine.compile(
   vine.object({
-    billingType: vine.string().trim().maxLength(30).optional(),
+    billingType: vine.enum(BILLING_TYPES),
     accentColor: vine
       .string()
       .trim()
-      .regex(/^#[0-9a-fA-F]{6}$/)
-      .optional(),
-    paymentMethods: vine.array(vine.string().trim().maxLength(50)).optional(),
-    logoSource: vine.string().trim().maxLength(30).optional(),
+      .regex(/^#[0-9a-fA-F]{6}$/),
+    paymentMethods: vine.array(vine.string().trim().maxLength(50)),
+    logoSource: vine.enum(LOGO_SOURCES).optional(),
     customPaymentMethod: vine.string().trim().maxLength(255).optional(),
     template: vine.string().trim().maxLength(30).optional(),
     darkMode: looseBool.clone(),
     documentFont: vine.string().trim().maxLength(50).optional(),
     eInvoicingEnabled: looseBool.clone(),
-    pdpProvider: vine.string().trim().maxLength(50).optional().nullable(),
+    pdpProvider: vine.enum(PDP_PROVIDERS).optional().nullable(),
     pdpApiKey: vine.string().trim().maxLength(500).optional().nullable(),
     pdpSandbox: looseBool.clone(),
     defaultSubject: vine.string().trim().maxLength(500).optional().nullable(),
@@ -36,7 +41,7 @@ export const updateInvoiceSettingsValidator = vine.compile(
     defaultLanguage: vine.string().trim().maxLength(5).optional(),
     quoteFilenamePattern: vine.string().trim().maxLength(255).optional(),
     invoiceFilenamePattern: vine.string().trim().maxLength(255).optional(),
-    footerMode: vine.string().trim().maxLength(50).optional(),
+    footerMode: vine.enum(FOOTER_MODES).optional(),
     logoBorderRadius: vine.number().min(0).max(50).optional(),
     collaborationEnabled: looseBool.clone(),
     aiEnabled: looseBool.clone(),

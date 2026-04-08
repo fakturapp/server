@@ -1,34 +1,39 @@
 import vine from '@vinejs/vine'
 
+// ---------- Document share validators ----------
+const DOCUMENT_TYPES = ['invoice', 'quote', 'credit_note'] as const
+const SHARE_PERMISSIONS = ['viewer', 'editor'] as const
+const SHARE_VISIBILITIES = ['team', 'anyone'] as const
+
 export const createShareValidator = vine.compile(
   vine.object({
-    documentType: vine.string().trim().maxLength(30),
+    documentType: vine.enum(DOCUMENT_TYPES),
     documentId: vine.string().trim().uuid(),
     email: vine.string().trim().email(),
-    permission: vine.string().trim().maxLength(20),
+    permission: vine.enum(SHARE_PERMISSIONS),
   })
 )
 
 export const updateShareValidator = vine.compile(
   vine.object({
-    permission: vine.string().trim().maxLength(20),
+    permission: vine.enum(SHARE_PERMISSIONS),
   })
 )
 
 export const createShareLinkValidator = vine.compile(
   vine.object({
-    documentType: vine.string().trim().maxLength(30),
+    documentType: vine.enum(DOCUMENT_TYPES),
     documentId: vine.string().trim().uuid(),
-    permission: vine.string().trim().maxLength(20),
-    visibility: vine.string().trim().maxLength(20).optional(),
+    permission: vine.enum(SHARE_PERMISSIONS),
+    visibility: vine.enum(SHARE_VISIBILITIES).optional(),
     autoExpire: vine.boolean().optional(),
   })
 )
 
 export const updateShareLinkValidator = vine.compile(
   vine.object({
-    permission: vine.string().trim().maxLength(20).optional(),
-    visibility: vine.string().trim().maxLength(20).optional(),
+    permission: vine.enum(SHARE_PERMISSIONS).optional(),
+    visibility: vine.enum(SHARE_VISIBILITIES).optional(),
     isActive: vine.boolean().optional(),
   })
 )
