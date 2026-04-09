@@ -214,36 +214,8 @@ export default class Authorize {
     return response.ok({ redirect })
   }
 
-  /**
-   * Loopback-aware redirect_uri matcher. Desktop clients use
-   * http://127.0.0.1:<ephemeral>/callback — the port changes every time
-   * the app is opened, so we compare scheme + host + path and allow the
-   * port to float.
-   */
   private isRedirectUriAllowed(app: OauthApp, presented: string): boolean {
-    if (app.isRedirectUriAllowed(presented)) return true
-
-    try {
-      const p = new URL(presented)
-      const isLoopback = p.hostname === '127.0.0.1' || p.hostname === 'localhost'
-      if (!isLoopback) return false
-      if (p.protocol !== 'http:') return false
-
-      return app.redirectUris.some((raw) => {
-        try {
-          const allowed = new URL(raw)
-          if (allowed.protocol !== 'http:') return false
-          const allowedIsLoopback =
-            allowed.hostname === '127.0.0.1' || allowed.hostname === 'localhost'
-          if (!allowedIsLoopback) return false
-          return allowed.pathname === p.pathname
-        } catch {
-          return false
-        }
-      })
-    } catch {
-      return false
-    }
+    return app.isRedirectUriAllowed(presented)
   }
 
   private parseScopes(raw: string | undefined | null): string[] {
