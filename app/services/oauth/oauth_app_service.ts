@@ -3,16 +3,20 @@ import oauthCrypto from '#services/oauth/oauth_crypto_service'
 import encryptionService from '#services/encryption/encryption_service'
 import { DateTime } from 'luxon'
 
+export type OauthAppKind = 'desktop' | 'web' | 'cli' | 'mobile'
+
 export interface CreateOauthAppInput {
   name: string
   description?: string | null
   iconUrl?: string | null
   websiteUrl?: string | null
   redirectUris: string[]
+  allowedOrigins?: string[]
+  allowAllOrigins?: boolean
   scopes: string[]
   webhookUrl?: string | null
   webhookEvents?: string[] | null
-  kind?: 'desktop' | 'web' | 'cli'
+  kind?: OauthAppKind
   createdByUserId: string
   isFirstParty?: boolean
 }
@@ -23,7 +27,7 @@ export interface CreatedOauthApp {
   webhookSecret: string | null
 }
 
-const PUBLIC_CLIENT_KINDS = new Set(['desktop', 'cli'])
+const PUBLIC_CLIENT_KINDS = new Set<OauthAppKind>(['desktop', 'cli', 'mobile'])
 
 class OauthAppService {
   async create(input: CreateOauthAppInput): Promise<CreatedOauthApp> {
@@ -46,6 +50,8 @@ class OauthAppService {
       clientId,
       clientSecretHash,
       redirectUris: input.redirectUris,
+      allowedOrigins: input.allowedOrigins ?? [],
+      allowAllOrigins: input.allowAllOrigins ?? false,
       scopes: input.scopes,
       webhookUrl: input.webhookUrl ?? null,
       encryptedWebhookSecret,

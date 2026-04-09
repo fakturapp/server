@@ -2,6 +2,7 @@ import { DateTime } from 'luxon'
 import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import User from '#models/account/user'
+import { isRedirectUriAllowed } from '#services/oauth/redirect_uri_matcher'
 
 export default class OauthApp extends BaseModel {
   public static table = 'oauth_apps'
@@ -31,6 +32,12 @@ export default class OauthApp extends BaseModel {
   declare redirectUris: string[]
 
   @column()
+  declare allowedOrigins: string[]
+
+  @column()
+  declare allowAllOrigins: boolean
+
+  @column()
   declare scopes: string[]
 
   @column()
@@ -43,7 +50,7 @@ export default class OauthApp extends BaseModel {
   declare webhookEvents: string[] | null
 
   @column()
-  declare kind: 'desktop' | 'web' | 'cli'
+  declare kind: 'desktop' | 'web' | 'cli' | 'mobile'
 
   @column()
   declare createdByUserId: string
@@ -64,7 +71,11 @@ export default class OauthApp extends BaseModel {
   declare createdBy: BelongsTo<typeof User>
 
   isRedirectUriAllowed(raw: string): boolean {
-    return this.redirectUris.includes(raw)
+    return isRedirectUriAllowed(raw, {
+      redirectUris: this.redirectUris ?? [],
+      allowedOrigins: this.allowedOrigins ?? [],
+      allowAllOrigins: this.allowAllOrigins === true,
+    })
   }
 
   subscribesTo(eventType: string): boolean {
