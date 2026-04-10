@@ -58,7 +58,7 @@ export default class InvoiceSettingsUpdate {
         collaborationEnabled: payload.collaborationEnabled ?? false,
         aiEnabled: payload.aiEnabled ?? false,
         aiProvider: 'gemini',
-        aiModel: payload.aiModel || 'gemini-2.5-flash',
+        aiModel: payload.aiModel || 'nvidia/nemotron-3-super-120b-a12b:free',
       })
     } else {
       settings.billingType = payload.billingType
@@ -106,7 +106,7 @@ export default class InvoiceSettingsUpdate {
       if (payload.aiEnabled !== undefined) settings.aiEnabled = payload.aiEnabled
       settings.aiProvider = 'gemini'
       if (payload.aiModel !== undefined)
-        settings.aiModel = payload.aiModel || 'gemini-2.5-flash'
+        settings.aiModel = payload.aiModel || 'nvidia/nemotron-3-super-120b-a12b:free'
       await settings.save()
     }
 
@@ -142,7 +142,7 @@ export default class InvoiceSettingsUpdate {
         collaborationEnabled: settings.collaborationEnabled ?? false,
         aiEnabled: settings.aiEnabled ?? false,
         aiProvider: 'gemini',
-        aiModel: settings.aiModel || 'gemini-2.5-flash',
+        aiModel: settings.aiModel || 'nvidia/nemotron-3-super-120b-a12b:free',
       },
     })
   }

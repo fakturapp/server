@@ -48,7 +48,7 @@ export default class InvoiceSettingsShow {
           collaborationEnabled: false,
           aiEnabled: false,
           aiProvider: 'gemini',
-          aiModel: 'llama-3.3-70b-versatile',
+          aiModel: 'nvidia/nemotron-3-super-120b-a12b:free',
         },
       })
     }
@@ -85,7 +85,7 @@ export default class InvoiceSettingsShow {
         collaborationEnabled: settings.collaborationEnabled ?? false,
         aiEnabled: settings.aiEnabled ?? false,
         aiProvider: 'gemini',
-        aiModel: settings.aiModel || 'llama-3.3-70b-versatile',
+        aiModel: settings.aiModel || 'nvidia/nemotron-3-super-120b-a12b:free',
       },
     })
   }
