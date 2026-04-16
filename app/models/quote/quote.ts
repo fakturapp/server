@@ -4,6 +4,7 @@ import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Team from '#models/team/team'
 import Client from '#models/client/client'
 import QuoteLine from '#models/quote/quote_line'
+import Invoice from '#models/invoice/invoice'
 
 export default class Quote extends BaseModel {
   @column({ isPrimary: true })
@@ -107,4 +108,7 @@ export default class Quote extends BaseModel {
 
   @hasMany(() => QuoteLine)
   declare lines: HasMany<typeof QuoteLine>
+
+  @hasMany(() => Invoice, { foreignKey: 'sourceQuoteId' })
+  declare invoices: HasMany<typeof Invoice>
 }

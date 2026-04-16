@@ -3,6 +3,8 @@ import db from '@adonisjs/lucid/services/db'
 import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
 import InvoiceSetting from '#models/team/invoice_setting'
+import { ApiError } from '#exceptions/api_error'
+import { generateNextNumber } from '#services/documents/number_generator'
 
 export default class Duplicate {
   async handle({ auth, params, response }: HttpContext) {
@@ -10,7 +12,7 @@ export default class Duplicate {
     const teamId = user.currentTeamId
 
     if (!teamId) {
-      return response.badRequest({ message: 'No team selected' })
+      throw new ApiError('team_not_selected')
     }
 
     const source = await Invoice.query()
@@ -20,7 +22,7 @@ export default class Duplicate {
       .first()
 
     if (!source) {
-      return response.notFound({ message: 'Invoice not found' })
+      throw new ApiError('invoice_not_found')
     }
 
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
@@ -31,19 +33,12 @@ export default class Duplicate {
       settings.nextInvoiceNumber = null
       await settings.save()
     } else {
-      const lastInvoice = await Invoice.query()
-        .where('team_id', teamId)
-        .orderBy('created_at', 'desc')
-        .first()
-
-      invoiceNumber = 'FAC-001'
-      if (lastInvoice) {
-        const match = lastInvoice.invoiceNumber.match(/^FAC-(\d+)$/)
-        if (match) {
-          const num = Number.parseInt(match[1], 10) + 1
-          invoiceNumber = `FAC-${num.toString().padStart(3, '0')}`
-        }
-      }
+      invoiceNumber = await generateNextNumber({
+        teamId,
+        table: 'invoices',
+        numberColumn: 'invoice_number',
+        pattern: settings?.invoiceFilenamePattern || 'FAK-{annee}-{numero}',
+      })
     }
 
     const today = new Date().toISOString().slice(0, 10)
@@ -76,6 +71,9 @@ export default class Duplicate {
           taxAmount: source.taxAmount,
           total: source.total,
           paymentTerms: source.paymentTerms,
+          clientSnapshot: source.clientSnapshot,
+          companySnapshot: source.companySnapshot,
+          vatExemptReason: source.vatExemptReason,
         },
         { client: trx }
       )

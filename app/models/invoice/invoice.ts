@@ -7,6 +7,7 @@ import InvoiceLine from '#models/invoice/invoice_line'
 import InvoicePayment from '#models/invoice/invoice_payment'
 import PaymentLink from '#models/invoice/payment_link'
 import BankAccount from '#models/team/bank_account'
+import CreditNote from '#models/credit_note/credit_note'
 
 export default class Invoice extends BaseModel {
   @column({ isPrimary: true })
@@ -137,4 +138,7 @@ export default class Invoice extends BaseModel {
 
   @hasOne(() => PaymentLink)
   declare paymentLink: HasOne<typeof PaymentLink>
+
+  @hasMany(() => CreditNote, { foreignKey: 'sourceInvoiceId' })
+  declare creditNotes: HasMany<typeof CreditNote>
 }

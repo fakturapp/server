@@ -5,16 +5,18 @@ import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { encryptModelFields } from '#services/crypto/field_encryption_helper'
+import { ApiError } from '#exceptions/api_error'
+import { generateNextNumber } from '#services/documents/number_generator'
 
 export default class ConvertQuote {
   async handle(ctx: HttpContext) {
-    const { auth, params, response } = ctx
+    const { auth, params } = ctx
     const dek: Buffer = (ctx as any).dek
     const user = auth.user!
     const teamId = user.currentTeamId
 
     if (!teamId) {
-      return response.badRequest({ message: 'No team selected' })
+      throw new ApiError('team_not_selected')
     }
 
     const quote = await Quote.query()
@@ -25,7 +27,18 @@ export default class ConvertQuote {
       .first()
 
     if (!quote) {
-      return response.notFound({ message: 'Quote not found' })
+      throw new ApiError('quote_not_found')
+    }
+
+    const existing = await Invoice.query()
+      .where('team_id', teamId)
+      .where('source_quote_id', quote.id)
+      .first()
+
+    if (existing) {
+      throw new ApiError('quote_already_converted', {
+        details: { invoiceId: existing.id, invoiceNumber: existing.invoiceNumber },
+      })
     }
 
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
@@ -36,30 +49,20 @@ export default class ConvertQuote {
       settings.nextInvoiceNumber = null
       await settings.save()
     } else {
-      const lastInvoice = await Invoice.query()
-        .where('team_id', teamId)
-        .orderBy('created_at', 'desc')
-        .first()
-
-      invoiceNumber = 'FAC-001'
-      if (lastInvoice) {
-        const match = lastInvoice.invoiceNumber.match(/^FAC-(\d+)$/)
-        if (match) {
-          const num = Number.parseInt(match[1], 10) + 1
-          invoiceNumber = `FAC-${num.toString().padStart(3, '0')}`
-        }
-      }
+      invoiceNumber = await generateNextNumber({
+        teamId,
+        table: 'invoices',
+        numberColumn: 'invoice_number',
+        pattern: settings?.invoiceFilenamePattern || 'FAK-{annee}-{numero}',
+      })
     }
 
-    // Calculate due date: issue date + 30 days
     const today = new Date()
     const dueDate = new Date(today)
     dueDate.setDate(dueDate.getDate() + 30)
     const dueDateStr = dueDate.toISOString().slice(0, 10)
     const issueDateStr = today.toISOString().slice(0, 10)
 
-    // Build invoice data — encrypted fields from quote are already encrypted,
-    // but hardcoded plaintext fields (documentTitle, paymentTerms) need encryption.
     const invoiceData: Record<string, any> = {
       teamId,
       clientId: quote.clientId,
@@ -87,15 +90,16 @@ export default class ConvertQuote {
       total: quote.total,
       sourceQuoteId: quote.id,
       paymentTerms: '30 jours net',
+      clientSnapshot: quote.clientSnapshot,
+      companySnapshot: quote.companySnapshot,
+      vatExemptReason: quote.vatExemptReason,
     }
 
-    // Only encrypt the hardcoded plaintext fields — the rest are already encrypted from quote
     encryptModelFields(invoiceData, ['documentTitle', 'paymentTerms'], dek)
 
     const invoice = await db.transaction(async (trx) => {
       const inv = await Invoice.create(invoiceData, { client: trx })
 
-      // Lines are already encrypted in the DB, copy as-is
       for (const line of quote.lines) {
         await InvoiceLine.create(
           {
@@ -113,10 +117,16 @@ export default class ConvertQuote {
         )
       }
 
+      if (quote.status === 'draft' || quote.status === 'sent') {
+        quote.status = 'accepted'
+        quote.useTransaction(trx)
+        await quote.save()
+      }
+
       return inv
     })
 
-    return response.created({
+    return ctx.response.created({
       message: 'Invoice created from quote',
       invoice: {
         id: invoice.id,
