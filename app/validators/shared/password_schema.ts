@@ -1,7 +1,11 @@
 import vine from '@vinejs/vine'
 import securityConfig from '#config/security'
 
-const { password } = securityConfig
+type PasswordConfig = typeof securityConfig.password & {
+  maxLength?: number
+}
+
+const password: PasswordConfig = securityConfig.password
 
 const parts: string[] = []
 if (password.requireLowercase) parts.push('(?=.*[a-z])')
@@ -12,7 +16,10 @@ if (password.requireSymbols) parts.push('(?=.*[^A-Za-z0-9])')
 const COMPLEXITY_REGEX = parts.length > 0 ? new RegExp(`^${parts.join('')}.*$`) : null
 
 export function passwordField() {
-  let schema = vine.string().minLength(password.minLength).maxLength(password.maxLength)
+  let schema = vine.string().minLength(password.minLength)
+  if (typeof password.maxLength === 'number') {
+    schema = schema.maxLength(password.maxLength)
+  }
   if (COMPLEXITY_REGEX) {
     schema = schema.regex(COMPLEXITY_REGEX)
   }

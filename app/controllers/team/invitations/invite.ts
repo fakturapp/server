@@ -15,7 +15,7 @@ const INVITATION_TTL_DAYS = 7
 
 export default class Invite {
   async handle(ctx: HttpContext) {
-    const { auth, request } = ctx
+    const { auth, request, response } = ctx
     const user = auth.user!
 
     if (!user.currentTeamId) {
