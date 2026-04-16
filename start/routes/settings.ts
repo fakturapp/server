@@ -15,13 +15,19 @@ router.get(API_PREFIX + '/invoice-logos/:filename', [ServeInvoiceLogo, 'handle']
 router
   .group(() => {
     router.get('/invoices', [InvoiceSettingsShow, 'handle'])
-    router.put('/invoices', [InvoiceSettingsUpdate, 'handle'])
-    router.post('/invoices/logo', [InvoiceLogoUpload, 'handle'])
 
-    router.get('/stripe', [StripeSettingsShow, 'handle'])
-    router.put('/stripe', [StripeSettingsSave, 'handle'])
-    router.delete('/stripe', [StripeSettingsDelete, 'handle'])
+    router
+      .group(() => {
+        router.put('/invoices', [InvoiceSettingsUpdate, 'handle'])
+        router.post('/invoices/logo', [InvoiceLogoUpload, 'handle'])
+
+        router.get('/stripe', [StripeSettingsShow, 'handle'])
+        router.put('/stripe', [StripeSettingsSave, 'handle'])
+        router.delete('/stripe', [StripeSettingsDelete, 'handle'])
+      })
+      .use(middleware.teamRole({ min: 'admin' }))
   })
   .prefix(API_PREFIX + '/settings')
   .use(middleware.auth())
   .use(middleware.vault())
+  .use(middleware.emailVerified())
