@@ -30,6 +30,9 @@ export default class TeamMember extends BaseModel {
   declare invitedAt: DateTime | null
 
   @column.dateTime()
+  declare invitationExpiresAt: DateTime | null
+
+  @column.dateTime()
   declare joinedAt: DateTime | null
 
   @column({ serializeAs: null })

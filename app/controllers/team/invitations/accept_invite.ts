@@ -5,6 +5,7 @@ import TeamMember from '#models/team/team_member'
 import Team from '#models/team/team'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
+import { ApiError } from '#exceptions/api_error'
 
 const acceptInviteValidator = vine.compile(
   vine.object({
@@ -23,11 +24,17 @@ export default class AcceptInvite {
       .first()
 
     if (!invitation) {
-      return response.notFound({ message: 'Invalid or expired invitation' })
+      throw new ApiError('invalid_token', { message: 'Invalid or expired invitation' })
+    }
+
+    if (invitation.invitationExpiresAt && invitation.invitationExpiresAt < DateTime.now()) {
+      invitation.invitationToken = null
+      await invitation.save()
+      throw new ApiError('invalid_token', { message: 'Invitation has expired' })
     }
 
     if (invitation.invitedEmail && invitation.invitedEmail !== user.email) {
-      return response.forbidden({
+      throw new ApiError('permission_denied', {
         message: 'This invitation was sent to a different email address',
       })
     }

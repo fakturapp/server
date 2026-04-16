@@ -8,6 +8,9 @@ import env from '#start/env'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 import { inviteValidator } from '#validators/team_validator'
+import { ApiError } from '#exceptions/api_error'
+
+const INVITATION_TTL_DAYS = 7
 
 export default class Invite {
   async handle(ctx: HttpContext) {
@@ -15,7 +18,7 @@ export default class Invite {
     const user = auth.user!
 
     if (!user.currentTeamId) {
-      return response.notFound({ message: 'No team found' })
+      throw new ApiError('team_not_selected')
     }
 
     const currentMember = await TeamMember.query()
@@ -24,7 +27,9 @@ export default class Invite {
       .first()
 
     if (!currentMember || !['super_admin', 'admin'].includes(currentMember.role)) {
-      return response.forbidden({ message: 'Only admins can invite members' })
+      throw new ApiError('permission_team_role_required', {
+        message: 'Only admins can invite members',
+      })
     }
 
     const payload = await request.validateUsing(inviteValidator)
@@ -60,6 +65,7 @@ export default class Invite {
       encryptedInviteDek = zeroAccessCryptoService.encryptDEK(teamDek, inviteKey)
     }
 
+    const now = DateTime.now()
     const member = await TeamMember.create({
       teamId: user.currentTeamId,
       userId: existingUser?.id ?? (null as any),
@@ -67,7 +73,8 @@ export default class Invite {
       status: 'pending',
       invitationToken: token,
       invitedEmail: payload.email,
-      invitedAt: DateTime.now(),
+      invitedAt: now,
+      invitationExpiresAt: now.plus({ days: INVITATION_TTL_DAYS }),
       encryptedInviteDek,
     })
 

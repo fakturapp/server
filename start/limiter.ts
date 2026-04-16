@@ -145,3 +145,27 @@ export const apiLimiter = limiter.define('api', (ctx) => {
       error.setMessage('Limite de requêtes API dépassée. Réessayez plus tard.')
     })
 })
+
+export const teamInviteLimiter = limiter.define('team-invite', (ctx) => {
+  const userId = ctx.auth.user?.id ?? ctx.request.ip()
+  return limiter
+    .allowRequests(30)
+    .every('1 hour')
+    .usingKey(String(userId))
+    .limitExceeded((error) => {
+      error.setMessage("Trop d'invitations envoyées. Réessayez plus tard.")
+    })
+})
+
+export const inviteLookupLimiter = limiter.define('invite-lookup', (ctx) => {
+  const token = ctx.params?.token ?? ''
+  const prefix = String(token).slice(0, 8)
+  return limiter
+    .allowRequests(10)
+    .every('1 hour')
+    .usingKey(`${ctx.request.ip()}:${prefix}`)
+    .blockFor('1 hour')
+    .limitExceeded((error) => {
+      error.setMessage('Trop de requêtes. Réessayez plus tard.')
+    })
+})
