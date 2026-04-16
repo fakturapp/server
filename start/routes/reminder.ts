@@ -18,3 +18,4 @@ router
   .prefix(API_PREFIX + '/reminders')
   .use(middleware.auth())
   .use(middleware.vault())
+  .use(middleware.emailVerified())

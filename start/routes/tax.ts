@@ -11,3 +11,4 @@ router
   .prefix(API_PREFIX + '/tax')
   .use(middleware.auth())
   .use(middleware.vault())
+  .use(middleware.emailVerified())

@@ -27,3 +27,4 @@ router
   .prefix(API_PREFIX + '/company')
   .use(middleware.auth())
   .use(middleware.vault())
+  .use(middleware.emailVerified())

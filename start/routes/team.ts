@@ -1,6 +1,7 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import { API_PREFIX } from '#start/routes/_prefix'
+import { teamInviteLimiter, inviteLookupLimiter } from '#start/limiter'
 
 const TeamList = () => import('#controllers/team/core/list')
 const TeamCreate = () => import('#controllers/team/core/create')
@@ -39,7 +40,7 @@ router
     router.post('/import', [TeamImport, 'handle'])
     router.get('/members', [TeamMembers, 'handle'])
     router.get('/search-users', [SearchUsers, 'handle'])
-    router.post('/invite', [TeamInvite, 'handle'])
+    router.post('/invite', [TeamInvite, 'handle']).use(teamInviteLimiter)
     router.post('/invite/accept', [AcceptInvite, 'handle'])
     router.delete('/invite/:id', [RevokeInvite, 'handle'])
     router.put('/members/:id/role', [UpdateRole, 'handle'])
@@ -49,5 +50,6 @@ router
   .prefix(API_PREFIX + '/team')
   .use(middleware.auth())
   .use(middleware.vault())
+  .use(middleware.emailVerified())
 
-router.get(API_PREFIX + '/invite/:token', [InviteInfo, 'handle'])
+router.get(API_PREFIX + '/invite/:token', [InviteInfo, 'handle']).use(inviteLookupLimiter)
