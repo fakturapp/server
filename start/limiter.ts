@@ -2,10 +2,11 @@ import limiter from '@adonisjs/limiter/services/main'
 
 
 export const loginLimiter = limiter.define('login', (ctx) => {
+  const email = String(ctx.request.input('email', '')).toLowerCase().trim()
   return limiter
     .allowRequests(5)
     .every('15 minutes')
-    .usingKey(ctx.request.ip())
+    .usingKey(`${ctx.request.ip()}:${email}`)
     .blockFor('30 minutes')
     .limitExceeded((error) => {
       error.setMessage('Trop de tentatives de connexion. Réessayez dans 30 minutes.')
@@ -33,10 +34,11 @@ export const registerLimiter = limiter.define('register', (ctx) => {
 })
 
 export const passwordResetLimiter = limiter.define('password-reset', (ctx) => {
+  const email = String(ctx.request.input('email', '')).toLowerCase().trim()
   return limiter
     .allowRequests(3)
     .every('1 hour')
-    .usingKey(ctx.request.ip())
+    .usingKey(`${ctx.request.ip()}:${email}`)
     .limitExceeded((error) => {
       error.setMessage('Trop de demandes de réinitialisation. Réessayez plus tard.')
     })
@@ -53,10 +55,12 @@ export const emailVerificationLimiter = limiter.define('email-verification', (ct
 })
 
 export const twoFactorLimiter = limiter.define('2fa', (ctx) => {
+  const userKey =
+    ctx.auth?.user?.id ?? String(ctx.request.input('email', '')).toLowerCase().trim()
   return limiter
     .allowRequests(5)
     .every('15 minutes')
-    .usingKey(ctx.request.ip())
+    .usingKey(`${ctx.request.ip()}:${userKey}`)
     .blockFor('30 minutes')
     .limitExceeded((error) => {
       error.setMessage('Trop de tentatives 2FA. Réessayez dans 30 minutes.')
@@ -74,10 +78,11 @@ export const analyticsLimiter = limiter.define('analytics', (ctx) => {
 })
 
 export const passkeyLimiter = limiter.define('passkey', (ctx) => {
+  const email = String(ctx.request.input('email', '')).toLowerCase().trim()
   return limiter
     .allowRequests(10)
     .every('15 minutes')
-    .usingKey(ctx.request.ip())
+    .usingKey(`${ctx.request.ip()}:${email}`)
     .limitExceeded((error) => {
       error.setMessage('Trop de tentatives passkey. Réessayez plus tard.')
     })
