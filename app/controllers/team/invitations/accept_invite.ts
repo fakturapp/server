@@ -6,6 +6,7 @@ import Team from '#models/team/team'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 import { ApiError } from '#exceptions/api_error'
+import { logTeamAction } from '#services/audit/team_audit_log'
 
 const acceptInviteValidator = vine.compile(
   vine.object({
@@ -14,7 +15,8 @@ const acceptInviteValidator = vine.compile(
 )
 
 export default class AcceptInvite {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
     const payload = await request.validateUsing(acceptInviteValidator)
 
@@ -73,6 +75,12 @@ export default class AcceptInvite {
     await user.save()
 
     const team = await Team.findOrFail(invitation.teamId)
+
+    await logTeamAction(ctx, 'team.invite_accepted', {
+      teamId: invitation.teamId,
+      severity: 'info',
+      metadata: { memberId: invitation.id, role: invitation.role },
+    })
 
     return response.ok({
       message: 'Invitation accepted',

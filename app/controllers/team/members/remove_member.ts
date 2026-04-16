@@ -1,8 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import TeamMember from '#models/team/team_member'
+import { logTeamAction } from '#services/audit/team_audit_log'
 
 export default class RemoveMember {
-  async handle({ auth, params, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, response } = ctx
     const user = auth.user!
 
     if (!user.currentTeamId) {
@@ -36,6 +38,16 @@ export default class RemoveMember {
     }
 
     await targetMember.delete()
+
+    await logTeamAction(ctx, 'team.member_removed', {
+      teamId: user.currentTeamId,
+      severity: 'critical',
+      metadata: {
+        targetUserId: targetMember.userId,
+        targetMemberId: targetMember.id,
+        role: targetMember.role,
+      },
+    })
 
     return response.ok({ message: 'Member removed' })
   }

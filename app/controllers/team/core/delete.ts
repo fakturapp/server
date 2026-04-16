@@ -4,6 +4,7 @@ import hash from '@adonisjs/core/services/hash'
 import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import { deleteTeamCascade } from '#services/team/delete_team_service'
+import { logTeamAction } from '#services/audit/team_audit_log'
 
 const deleteTeamValidator = vine.compile(
   vine.object({
@@ -13,7 +14,8 @@ const deleteTeamValidator = vine.compile(
 )
 
 export default class Delete {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
 
@@ -46,6 +48,12 @@ export default class Delete {
     if (!isValid) {
       return response.unauthorized({ message: 'Mot de passe incorrect' })
     }
+
+    await logTeamAction(ctx, 'team.deleted', {
+      teamId,
+      severity: 'critical',
+      metadata: { teamName: team.name },
+    })
 
     await deleteTeamCascade(teamId)
 

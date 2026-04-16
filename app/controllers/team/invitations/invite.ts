@@ -9,12 +9,13 @@ import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service
 import keyStore from '#services/crypto/key_store'
 import { inviteValidator } from '#validators/team_validator'
 import { ApiError } from '#exceptions/api_error'
+import { logTeamAction } from '#services/audit/team_audit_log'
 
 const INVITATION_TTL_DAYS = 7
 
 export default class Invite {
   async handle(ctx: HttpContext) {
-    const { auth, request, response } = ctx
+    const { auth, request } = ctx
     const user = auth.user!
 
     if (!user.currentTeamId) {
@@ -81,10 +82,19 @@ export default class Invite {
     const frontendUrl = env.get('FRONTEND_URL') || 'http://localhost:3000'
     const inviteUrl = `${frontendUrl}/invite/${token}`
 
-    // Send invitation email
     TeamMemberInvited.dispatch(payload.email, user.fullName || user.email, inviteUrl)
 
-    return response.created({
+    await logTeamAction(ctx, 'team.invite_sent', {
+      teamId: user.currentTeamId,
+      severity: 'info',
+      metadata: {
+        invitedEmail: payload.email,
+        role: payload.role,
+        memberId: member.id,
+      },
+    })
+
+    return ctx.response.created({
       message: 'Invitation sent',
       invitation: {
         id: member.id,

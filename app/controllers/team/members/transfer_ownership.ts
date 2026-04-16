@@ -3,6 +3,7 @@ import vine from '@vinejs/vine'
 import hash from '@adonisjs/core/services/hash'
 import TeamMember from '#models/team/team_member'
 import Team from '#models/team/team'
+import { logTeamAction } from '#services/audit/team_audit_log'
 
 const transferValidator = vine.compile(
   vine.object({
@@ -12,7 +13,8 @@ const transferValidator = vine.compile(
 )
 
 export default class TransferOwnership {
-  async handle({ auth, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, request, response } = ctx
     const user = auth.user!
 
     if (!user.currentTeamId) {
@@ -56,8 +58,18 @@ export default class TransferOwnership {
     await currentMember.save()
 
     const team = await Team.findOrFail(user.currentTeamId)
+    const previousOwnerId = team.ownerId
     team.ownerId = targetMember.userId
     await team.save()
+
+    await logTeamAction(ctx, 'team.ownership_transferred', {
+      teamId: user.currentTeamId,
+      severity: 'critical',
+      metadata: {
+        previousOwnerId,
+        newOwnerId: targetMember.userId,
+      },
+    })
 
     return response.ok({
       message: 'Ownership transferred successfully',
