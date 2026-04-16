@@ -5,6 +5,7 @@ import TeamMember from '#models/team/team_member'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
+import { ApiError } from '#exceptions/api_error'
 
 export default class VaultMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
@@ -26,10 +27,7 @@ export default class VaultMiddleware {
     }
 
     if (!dek) {
-      return ctx.response.status(423).send({
-        code: 'VAULT_LOCKED',
-        message: 'Vault is locked. Please provide your password to unlock.',
-      })
+      throw new ApiError('vault_locked')
     }
 
     ;(ctx as any).dek = dek
@@ -51,6 +49,7 @@ export default class VaultMiddleware {
       const tokenRow = await db
         .from('auth_access_tokens')
         .where('id', String(tokenIdentifier))
+        .where('tokenable_id', userId)
         .select('encrypted_kek')
         .first()
 
