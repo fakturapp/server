@@ -2,9 +2,10 @@ import type { HttpContext } from '@adonisjs/core/http'
 import PaymentLink from '#models/invoice/payment_link'
 import encryptionService from '#services/encryption/encryption_service'
 import stripeService from '#services/stripe/stripe_service'
+import paymentLinkCheckoutSessionService from '#services/invoice/payment_link_checkout_session_service'
 
 export default class CheckoutCreateIntent {
-  async handle({ params, response }: HttpContext) {
+  async handle({ params, request, response }: HttpContext) {
     response.header('X-Robots-Tag', 'noindex, nofollow')
     response.header('Cache-Control', 'no-store, no-cache, must-revalidate')
 
@@ -21,6 +22,16 @@ export default class CheckoutCreateIntent {
 
     if (paymentLink.paidAt) {
       return response.conflict({ message: 'Payment already completed' })
+    }
+
+    if (paymentLink.passwordHash) {
+      const verification = paymentLinkCheckoutSessionService.verify(
+        request.header('X-Checkout-Session'),
+        tokenHash
+      )
+      if (!verification.ok) {
+        return response.unauthorized({ message: verification.message })
+      }
     }
 
     if (paymentLink.paymentMethod !== 'stripe') {
