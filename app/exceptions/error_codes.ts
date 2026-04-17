@@ -1,24 +1,7 @@
-export type ErrorType =
-  | 'authentication_error'
-  | 'permission_error'
-  | 'not_found_error'
-  | 'invalid_request_error'
-  | 'validation_error'
-  | 'conflict_error'
-  | 'rate_limit_error'
-  | 'vault_locked_error'
-  | 'two_factor_required_error'
-  | 'email_verification_required_error'
-  | 'onboarding_required_error'
-  | 'payment_required_error'
-  | 'unprocessable_error'
-  | 'api_error'
-  | 'service_unavailable_error'
-
 export type ErrorVisibility = 'user_facing' | 'internal'
 
 export interface ErrorDefinition {
-  type: ErrorType
+  type: string
   status: number
   visibility: ErrorVisibility
   defaultMessage: string
@@ -73,7 +56,6 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'Account is temporarily locked',
   },
-
   vault_locked: {
     type: 'vault_locked_error',
     status: 423,
@@ -86,7 +68,6 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'Invalid vault key',
   },
-
   permission_denied: {
     type: 'permission_error',
     status: 403,
@@ -111,7 +92,6 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'You are not a member of this team',
   },
-
   team_not_selected: {
     type: 'invalid_request_error',
     status: 400,
@@ -124,7 +104,6 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'Team not found',
   },
-
   validation_failed: {
     type: 'validation_error',
     status: 422,
@@ -155,7 +134,6 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'Invalid filename',
   },
-
   resource_not_found: {
     type: 'not_found_error',
     status: 404,
@@ -168,14 +146,12 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'Resource already exists or is in a conflicting state',
   },
-
   client_not_found: {
     type: 'not_found_error',
     status: 404,
     visibility: 'user_facing',
     defaultMessage: 'Client not found',
   },
-
   invoice_not_found: {
     type: 'not_found_error',
     status: 404,
@@ -200,7 +176,6 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'Selected payment method is not configured for this team',
   },
-
   quote_not_found: {
     type: 'not_found_error',
     status: 404,
@@ -213,14 +188,12 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'Quote has already been converted to an invoice',
   },
-
   credit_note_not_found: {
     type: 'not_found_error',
     status: 404,
     visibility: 'user_facing',
     defaultMessage: 'Credit note not found',
   },
-
   payment_link_not_found: {
     type: 'not_found_error',
     status: 404,
@@ -239,7 +212,6 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'Invalid password',
   },
-
   einvoicing_not_configured: {
     type: 'invalid_request_error',
     status: 400,
@@ -258,14 +230,12 @@ export const ERROR_CODES = {
     visibility: 'internal',
     defaultMessage: 'Invalid webhook signature',
   },
-
   rate_limit_exceeded: {
     type: 'rate_limit_error',
     status: 429,
     visibility: 'user_facing',
     defaultMessage: 'Too many requests, please slow down',
   },
-
   internal_error: {
     type: 'api_error',
     status: 500,
@@ -281,6 +251,10 @@ export const ERROR_CODES = {
 } as const satisfies Record<string, ErrorDefinition>
 
 export type ErrorCode = keyof typeof ERROR_CODES
+
+export function isErrorCode(value: string): value is ErrorCode {
+  return value in ERROR_CODES
+}
 
 export function getErrorDefinition(code: ErrorCode): ErrorDefinition {
   return ERROR_CODES[code]

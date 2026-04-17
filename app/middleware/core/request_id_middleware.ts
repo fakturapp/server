@@ -12,13 +12,20 @@ export default class RequestIdMiddleware {
         ? incoming
         : `req_${randomBytes(12).toString('hex')}`
 
-    ;(ctx as any).requestId = requestId
+    ctx.requestId = requestId
     ctx.response.header('X-Request-Id', requestId)
 
     return next()
   }
 }
 
-export function getRequestId(ctx: HttpContext): string | undefined {
-  return (ctx as any).requestId
+export function getRequestId(ctx: HttpContext) {
+  return ctx.requestId
+}
+
+declare module '@adonisjs/core/http' {
+  export interface HttpContext {
+    requestId?: string
+    apiErrorLogged?: boolean
+  }
 }

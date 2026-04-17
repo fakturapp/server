@@ -23,6 +23,10 @@ export const createQuoteValidator = vine.compile(
     deliveryAddress: vine.string().trim().maxLength(500).optional(),
     clientSiren: vine.string().trim().maxLength(20).optional(),
     clientVatNumber: vine.string().trim().maxLength(30).optional(),
+    showQuantityColumn: vine.boolean().optional(),
+    showUnitColumn: vine.boolean().optional(),
+    showUnitPriceColumn: vine.boolean().optional(),
+    showVatColumn: vine.boolean().optional(),
     clientSnapshot: vine
       .object({
         type: vine.string().trim().maxLength(20).optional(),

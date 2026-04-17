@@ -76,6 +76,18 @@ export default class Invoice extends BaseModel {
   declare clientVatNumber: string | null
 
   @column()
+  declare showQuantityColumn: boolean
+
+  @column()
+  declare showUnitColumn: boolean
+
+  @column()
+  declare showUnitPriceColumn: boolean
+
+  @column()
+  declare showVatColumn: boolean
+
+  @column()
   declare subtotal: number
 
   @column()

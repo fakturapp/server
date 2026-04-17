@@ -2,6 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import AiService from '#services/ai/ai_service'
 import AiQuotaService from '#services/ai/ai_quota_service'
+import { buildStructuredErrorResponse } from '#services/http/error_response_service'
+import { logRequestError } from '#services/http/request_error_log_service'
 
 const chatDocumentValidator = vine.compile(
   vine.object({
@@ -230,7 +232,17 @@ export default class ChatDocument {
     }
 
     if (!dek) {
-      return response.status(423).send({ message: 'Vault is locked. Please re-authenticate.' })
+      await logRequestError(ctx, {
+        status: 423,
+        errorCode: 'vault_locked',
+        errorType: 'vault_locked_error',
+      })
+      return response.status(423).send(
+        buildStructuredErrorResponse(ctx, {
+          errorCode: 'vault_locked',
+          message: 'Vault is locked. Please re-authenticate.',
+        })
+      )
     }
 
     if (!(await AiService.isEnabled(teamId))) {

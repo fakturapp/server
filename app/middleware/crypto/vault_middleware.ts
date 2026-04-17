@@ -5,7 +5,8 @@ import TeamMember from '#models/team/team_member'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
-import { getRequestId } from '#middleware/core/request_id_middleware'
+import { buildStructuredErrorResponse } from '#services/http/error_response_service'
+import { logRequestError } from '#services/http/request_error_log_service'
 
 export default class VaultMiddleware {
   async handle(ctx: HttpContext, next: NextFn) {
@@ -27,18 +28,17 @@ export default class VaultMiddleware {
     }
 
     if (!dek) {
-      return ctx.response.status(423).send({
-        type: 'error',
-        error: {
-          type: 'vault_locked_error',
-          message: 'Vault is locked. Please provide your password to unlock.',
-          details: {
-            error_visibility: 'user_facing',
-            error_code: 'vault_locked',
-          },
-        },
-        request_id: getRequestId(ctx) ?? null,
+      await logRequestError(ctx, {
+        status: 423,
+        errorCode: 'vault_locked',
+        errorType: 'vault_locked_error',
       })
+      return ctx.response.status(423).send(
+        buildStructuredErrorResponse(ctx, {
+          errorCode: 'vault_locked',
+          message: 'Vault is locked. Please provide your password to unlock.',
+        })
+      )
     }
 
     ;(ctx as any).dek = dek

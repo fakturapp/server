@@ -12,7 +12,7 @@ import {
 const suggestValidator = vine.compile(
   vine.object({
     clientId: vine.string().trim(),
-    description: vine.string().trim().maxLength(500).optional(),
+    description: vine.string().trim().optional(),
   })
 )
 

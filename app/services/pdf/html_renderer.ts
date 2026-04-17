@@ -19,6 +19,10 @@ interface QuoteData {
   deliveryAddress: string | null
   clientSiren: string | null
   clientVatNumber: string | null
+  showQuantityColumn?: boolean
+  showUnitColumn?: boolean
+  showUnitPriceColumn?: boolean
+  showVatColumn?: boolean
   subtotal: number
   taxAmount: number
   total: number
@@ -922,30 +926,37 @@ function renderTable(
   i: I18n
 ): string {
   const isDetailed = quote.billingType === 'detailed'
+  const showQuantityColumn = quote.showQuantityColumn !== false
+  const showUnitColumn = quote.showUnitColumn !== false
+  const showUnitPriceColumn = quote.showUnitPriceColumn !== false
+  const showVatColumn = quote.showVatColumn !== false
+  const detailedColumnCount =
+    2 +
+    [showQuantityColumn, showUnitColumn, showUnitPriceColumn, showVatColumn].filter(Boolean).length
 
   let headerCols = `<th>${i.description}</th>`
   if (isDetailed) {
-    headerCols += `<th class="center">${i.qty}</th>`
-    headerCols += `<th class="center">${i.unit}</th>`
-    headerCols += `<th class="right">${i.unitPrice}</th>`
-    headerCols += `<th class="center">${i.vat}</th>`
+    if (showQuantityColumn) headerCols += `<th class="center">${i.qty}</th>`
+    if (showUnitColumn) headerCols += `<th class="center">${i.unit}</th>`
+    if (showUnitPriceColumn) headerCols += `<th class="right">${i.unitPrice}</th>`
+    if (showVatColumn) headerCols += `<th class="center">${i.vat}</th>`
   }
   headerCols += `<th class="right">${i.amount}</th>`
 
   let rows = ''
   lines.forEach((line, idx) => {
     if (line.saleType === 'section') {
-      rows += `<tr class="section-row"><td colspan="${isDetailed ? 6 : 2}">${formatText(line.description)}</td></tr>`
+      rows += `<tr class="section-row"><td colspan="${isDetailed ? detailedColumnCount : 2}">${formatText(line.description)}</td></tr>`
       return
     }
     const cls = idx % 2 === 0 ? 'even' : 'odd'
     const lineTotal = isDetailed ? line.quantity * line.unitPrice : line.unitPrice
     rows += `<tr class="${cls}"><td>${formatText(line.description)}</td>`
     if (isDetailed) {
-      rows += `<td class="center">${line.quantity}</td>`
-      rows += `<td class="unit-col">${esc(line.unit || '')}</td>`
-      rows += `<td class="right">${fmtC(line.unitPrice, lang)}</td>`
-      rows += `<td class="vat-col">${line.vatRate}%</td>`
+      if (showQuantityColumn) rows += `<td class="center">${line.quantity}</td>`
+      if (showUnitColumn) rows += `<td class="unit-col">${esc(line.unit || '')}</td>`
+      if (showUnitPriceColumn) rows += `<td class="right">${fmtC(line.unitPrice, lang)}</td>`
+      if (showVatColumn) rows += `<td class="vat-col">${line.vatRate}%</td>`
     }
     rows += `<td class="amount">${fmtC(lineTotal, lang)}</td></tr>`
   })
