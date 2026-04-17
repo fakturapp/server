@@ -35,7 +35,8 @@ export function verifyDesktopProof(proof: DesktopProof | null): boolean {
 
   if (usedNonces.has(nonce)) return false
 
-  const key = env.get('FAKTUR_DESKTOP_PROOF_KEY', 'faktur-desktop-v1-proof-key-change-in-prod')
+  const key = env.get('FAKTUR_DESKTOP_PROOF_KEY')
+  if (!key) return false
   const material = `${nonce}:${ts}:${clientId}`
   const expected = crypto.createHmac('sha256', key).update(material).digest('base64url')
 
