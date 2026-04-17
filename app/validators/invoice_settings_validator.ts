@@ -7,7 +7,7 @@ const looseBool = vine.any().optional().transform((v) => {
   return !!v
 })
 
-const BILLING_TYPES = ['quick', 'detailed'] as const
+const BILLING_TYPES = ['quick', 'detailed', 'qty-only', 'vat-only'] as const
 const LOGO_SOURCES = ['custom', 'company'] as const
 const FOOTER_MODES = ['custom', 'company_info', 'vat_exempt'] as const
 const PDP_PROVIDERS = ['b2brouter', 'sandbox'] as const
