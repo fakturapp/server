@@ -3,7 +3,6 @@ import vine from '@vinejs/vine'
 import Invoice from '#models/invoice/invoice'
 import InvoicePayment from '#models/invoice/invoice_payment'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
-import { ApiError } from '#exceptions/api_error'
 
 const storePaymentValidator = vine.compile(
   vine.object({
@@ -22,7 +21,7 @@ export default class Store {
     const teamId = user.currentTeamId
 
     if (!teamId) {
-      throw new ApiError('team_not_selected')
+      return response.badRequest({ message: 'No team selected' })
     }
 
     const invoice = await Invoice.query()
@@ -31,7 +30,7 @@ export default class Store {
       .first()
 
     if (!invoice) {
-      throw new ApiError('invoice_not_found')
+      return response.notFound({ message: 'Invoice not found' })
     }
 
     const payload = await request.validateUsing(storePaymentValidator)
@@ -61,9 +60,6 @@ export default class Store {
       invoice.paidDate = payload.paymentDate
     } else if (amountPaid > 0) {
       invoice.status = 'partial'
-      if (!invoice.paidDate) {
-        invoice.paidDate = payload.paymentDate
-      }
     }
 
     await invoice.save()

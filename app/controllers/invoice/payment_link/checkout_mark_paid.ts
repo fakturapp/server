@@ -8,10 +8,9 @@ import { broadcastDocumentSaved } from '#services/collaboration/websocket_servic
 import { PaymentMarkedToCreator } from '#mails/payment_marked_to_creator'
 import { PaymentMarkedToClient } from '#mails/payment_marked_to_client'
 import mail from '@adonisjs/mail/services/main'
-import paymentLinkCheckoutSessionService from '#services/invoice/payment_link_checkout_session_service'
 
 export default class CheckoutMarkPaid {
-  async handle({ params, request, response }: HttpContext) {
+  async handle({ params, response }: HttpContext) {
     response.header('X-Robots-Tag', 'noindex, nofollow')
     response.header('Cache-Control', 'no-store, no-cache, must-revalidate')
 
@@ -28,16 +27,6 @@ export default class CheckoutMarkPaid {
 
     if (paymentLink.paidAt) {
       return response.conflict({ message: 'Payment already marked as sent' })
-    }
-
-    if (paymentLink.passwordHash) {
-      const verification = paymentLinkCheckoutSessionService.verify(
-        request.header('X-Checkout-Session'),
-        tokenHash
-      )
-      if (!verification.ok) {
-        return response.unauthorized({ message: verification.message })
-      }
     }
 
     paymentLink.paidAt = DateTime.now()

@@ -1,10 +1,10 @@
 const securityConfig = {
   password: {
-    minLength: 12,
-    requireUppercase: true,
-    requireLowercase: true,
-    requireNumbers: true,
-    requireSymbols: true,
+    minLength: 8,
+    requireUppercase: false,
+    requireLowercase: false,
+    requireNumbers: false,
+    requireSymbols: false,
   },
 
   twoFactor: {

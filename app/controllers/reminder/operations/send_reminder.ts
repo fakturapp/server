@@ -15,7 +15,6 @@ import {
   decryptModelFields,
   ENCRYPTED_FIELDS,
 } from '#services/crypto/field_encryption_helper'
-import { applyTemplate } from '#services/email/template_helpers'
 
 const sendReminderValidator = vine.compile(
   vine.object({
@@ -25,6 +24,14 @@ const sendReminderValidator = vine.compile(
     body: vine.string().trim().optional(),
   })
 )
+
+function applyTemplate(template: string, vars: Record<string, string>): string {
+  let result = template
+  for (const [key, value] of Object.entries(vars)) {
+    result = result.replaceAll(`{${key}}`, value)
+  }
+  return result
+}
 
 export default class SendReminder {
   async handle(ctx: HttpContext) {
@@ -97,12 +104,12 @@ export default class SendReminder {
     const emailSubject =
       payload.subject ||
       (settings?.emailSubjectTemplate
-        ? applyTemplate(settings.emailSubjectTemplate, templateVars, { escape: false })
+        ? applyTemplate(settings.emailSubjectTemplate, templateVars)
         : defaultSubject)
     const emailBody =
       payload.body ||
       (settings?.emailBodyTemplate
-        ? applyTemplate(settings.emailBodyTemplate, templateVars, { escape: true })
+        ? applyTemplate(settings.emailBodyTemplate, templateVars)
         : defaultBody)
 
     let pdfBuffer: Buffer

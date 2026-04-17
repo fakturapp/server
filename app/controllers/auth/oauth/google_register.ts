@@ -9,14 +9,13 @@ import AuditLog from '#models/shared/audit_log'
 import GoogleAuthService from '#services/auth/google_auth_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
+import securityConfig from '#config/security'
 import UserTransformer from '#transformers/user_transformer'
-import { confirmedPasswordField } from '#validators/shared/password_schema'
-import { setAuthSessionCookies } from '#services/auth/auth_cookie_service'
 
 const googleRegisterValidator = vine.compile(
   vine.object({
     googleData: vine.string(),
-    password: confirmedPasswordField().maxLength(128),
+    password: vine.string().minLength(securityConfig.password.minLength).maxLength(128).confirmed(),
     acceptTerms: vine.accepted(),
     acceptPrivacy: vine.accepted(),
   })
@@ -107,16 +106,10 @@ export default class GoogleRegister {
     const kek = await zeroAccessCryptoService.deriveKEK(data.password, salt)
     keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
 
-    const releasedToken = token.value!.release()
-    setAuthSessionCookies(response, {
-      authToken: releasedToken,
-      authTtlSeconds: 7 * 24 * 60 * 60,
-    })
-
     return response.created({
       message: 'Registration successful',
       user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
-      token: releasedToken,
+      token: token.value!.release(),
     })
   }
 }

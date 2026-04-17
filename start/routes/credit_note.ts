@@ -31,4 +31,3 @@ router
   .prefix(API_PREFIX + '/credit-notes')
   .use(middleware.auth())
   .use(middleware.vault())
-  .use(middleware.emailVerified())

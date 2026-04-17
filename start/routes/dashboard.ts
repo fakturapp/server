@@ -23,4 +23,3 @@ router
   .prefix(API_PREFIX + '/dashboard')
   .use(middleware.auth())
   .use(middleware.vault())
-  .use(middleware.emailVerified())

@@ -2,11 +2,6 @@ import type { HttpContext } from '@adonisjs/core/http'
 import InvoiceSetting from '#models/team/invoice_setting'
 import Company from '#models/team/company'
 
-function maskApiKey(key: string): string {
-  if (key.length <= 4) return '••••••••'
-  return key.slice(0, 4) + '••••••••'
-}
-
 export default class InvoiceSettingsShow {
   async handle({ auth, response }: HttpContext) {
     const user = auth.user!
@@ -37,12 +32,6 @@ export default class InvoiceSettingsShow {
           pdpProvider: null,
           pdpApiKey: null,
           pdpSandbox: true,
-          b2bAccountId: null,
-          b2bEnterpriseSize: null,
-          b2bNafCode: null,
-          b2bTypeOperation: null,
-          b2bEreportingEnabled: false,
-          defaultOperationCategory: 'service',
           defaultSubject: null,
           defaultAcceptanceConditions: null,
           defaultSignatureField: false,
@@ -78,14 +67,8 @@ export default class InvoiceSettingsShow {
         documentFont: settings.documentFont || 'Lexend',
         eInvoicingEnabled: settings.eInvoicingEnabled || false,
         pdpProvider: settings.pdpProvider || null,
-        pdpApiKey: settings.pdpApiKey ? maskApiKey(settings.pdpApiKey) : null,
+        pdpApiKey: settings.pdpApiKey ? '••••••••' : null,
         pdpSandbox: settings.pdpSandbox ?? true,
-        b2bAccountId: settings.b2bAccountId || null,
-        b2bEnterpriseSize: settings.b2bEnterpriseSize || null,
-        b2bNafCode: settings.b2bNafCode || null,
-        b2bTypeOperation: settings.b2bTypeOperation || null,
-        b2bEreportingEnabled: settings.b2bEreportingEnabled ?? false,
-        defaultOperationCategory: settings.defaultOperationCategory || 'service',
         defaultSubject: settings.defaultSubject || null,
         defaultAcceptanceConditions: settings.defaultAcceptanceConditions || null,
         defaultSignatureField: settings.defaultSignatureField || false,

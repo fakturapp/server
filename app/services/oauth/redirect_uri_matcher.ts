@@ -90,8 +90,14 @@ export function isRedirectUriAllowed(
   presented: string,
   options: {
     readonly redirectUris: readonly string[]
+    readonly allowedOrigins: readonly string[]
+    readonly allowAllOrigins: boolean
   }
 ): boolean {
+  if (options.allowAllOrigins) {
+    return true
+  }
+
   if (!presented || typeof presented !== 'string') {
     return false
   }
@@ -103,6 +109,12 @@ export function isRedirectUriAllowed(
   }
 
   for (const pattern of options.redirectUris) {
+    if (matchRedirectUri(pattern, presented)) {
+      return true
+    }
+  }
+
+  for (const pattern of options.allowedOrigins) {
     if (matchRedirectUri(pattern, presented)) {
       return true
     }

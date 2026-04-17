@@ -5,8 +5,6 @@ import TeamMember from '#models/team/team_member'
 import Team from '#models/team/team'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
-import { ApiError } from '#exceptions/api_error'
-import { logTeamAction } from '#services/audit/team_audit_log'
 
 const acceptInviteValidator = vine.compile(
   vine.object({
@@ -15,8 +13,7 @@ const acceptInviteValidator = vine.compile(
 )
 
 export default class AcceptInvite {
-  async handle(ctx: HttpContext) {
-    const { auth, request, response } = ctx
+  async handle({ auth, request, response }: HttpContext) {
     const user = auth.user!
     const payload = await request.validateUsing(acceptInviteValidator)
 
@@ -26,17 +23,11 @@ export default class AcceptInvite {
       .first()
 
     if (!invitation) {
-      throw new ApiError('invalid_token', { message: 'Invalid or expired invitation' })
-    }
-
-    if (invitation.invitationExpiresAt && invitation.invitationExpiresAt < DateTime.now()) {
-      invitation.invitationToken = null
-      await invitation.save()
-      throw new ApiError('invalid_token', { message: 'Invitation has expired' })
+      return response.notFound({ message: 'Invalid or expired invitation' })
     }
 
     if (invitation.invitedEmail && invitation.invitedEmail !== user.email) {
-      throw new ApiError('permission_denied', {
+      return response.forbidden({
         message: 'This invitation was sent to a different email address',
       })
     }
@@ -75,12 +66,6 @@ export default class AcceptInvite {
     await user.save()
 
     const team = await Team.findOrFail(invitation.teamId)
-
-    await logTeamAction(ctx, 'team.invite_accepted', {
-      teamId: invitation.teamId,
-      severity: 'info',
-      metadata: { memberId: invitation.id, role: invitation.role },
-    })
 
     return response.ok({
       message: 'Invitation accepted',

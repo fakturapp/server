@@ -7,11 +7,6 @@ import oauthTokenService from '#services/oauth/oauth_token_service'
 import keyStore from '#services/crypto/key_store'
 import encryptionService from '#services/encryption/encryption_service'
 import UserTransformer from '#transformers/user_transformer'
-import OauthApp from '#models/oauth/oauth_app'
-import {
-  extractProofFromHeaders,
-  verifyDesktopProof,
-} from '#services/security/desktop_proof_service'
 
 export default class ExchangeSession {
   async handle({ request, response }: HttpContext) {
@@ -37,26 +32,6 @@ export default class ExchangeSession {
       return response.forbidden({
         error: 'insufficient_scope',
         error_description: "The 'profile' scope is required to exchange for a session",
-      })
-    }
-
-    const oauthApp = await OauthApp.query()
-      .where('id', oauthToken.oauthAppId)
-      .where('is_active', true)
-      .first()
-
-    if (!oauthApp || oauthApp.kind !== 'desktop' || oauthApp.isFirstParty !== true) {
-      return response.forbidden({
-        error: 'access_denied',
-        error_description: 'Session exchange is reserved to the trusted desktop application',
-      })
-    }
-
-    const proof = extractProofFromHeaders(request.headers())
-    if (!proof || proof.clientId !== oauthApp.clientId || !verifyDesktopProof(proof)) {
-      return response.forbidden({
-        error: 'access_denied',
-        error_description: 'Desktop proof verification failed',
       })
     }
 

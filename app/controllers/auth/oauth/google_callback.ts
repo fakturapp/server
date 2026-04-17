@@ -8,18 +8,6 @@ import AuditLog from '#models/shared/audit_log'
 import GoogleAuthService from '#services/auth/google_auth_service'
 import EncryptionService from '#services/encryption/encryption_service'
 import env from '#start/env'
-import { setAuthSessionCookies } from '#services/auth/auth_cookie_service'
-
-function buildFrontendRedirect(frontendUrl: string, path: string): string {
-  return new URL(path.startsWith('/') ? path : `/${path}`, frontendUrl).toString()
-}
-
-function sanitizeReturnTo(value: string | undefined | null): string {
-  if (!value || typeof value !== 'string' || !value.startsWith('/')) {
-    return '/dashboard'
-  }
-  return value
-}
 
 export default class GoogleCallback {
   async handle({ request, response }: HttpContext) {
@@ -51,17 +39,13 @@ export default class GoogleCallback {
       return response.redirect(errorRedirect)
     }
 
+    // Handle "link" intent — link Google to existing account
     if (state.intent === 'link' && state.userId) {
       return this.handleLink(request, response, frontendUrl, state.userId, profile)
     }
 
-    return this.handleLogin(
-      request,
-      response,
-      frontendUrl,
-      sanitizeReturnTo(state.returnTo),
-      profile
-    )
+    // Handle "login" intent — login or register
+    return this.handleLogin(request, response, frontendUrl, profile)
   }
 
   private async handleLink(
@@ -76,6 +60,7 @@ export default class GoogleCallback {
       return response.redirect(`${frontendUrl}/oauth/callback?error=user_not_found`)
     }
 
+    // Check if this Google account is already linked to another user
     const existingProvider = await AuthProvider.query()
       .where('provider', 'google')
       .where('providerUserId', profile.sub)
@@ -88,6 +73,7 @@ export default class GoogleCallback {
       return response.redirect(`${frontendUrl}/oauth/callback?error=already_linked`)
     }
 
+    // Check if user already has a Google provider
     const userProvider = await AuthProvider.query()
       .where('userId', userId)
       .where('provider', 'google')
@@ -123,15 +109,16 @@ export default class GoogleCallback {
     request: HttpContext['request'],
     response: HttpContext['response'],
     frontendUrl: string,
-    returnTo: string,
     profile: { sub: string; email: string; name: string | null; picture: string | null }
   ) {
+    // Check if this Google account is already linked
     const existingProvider = await AuthProvider.query()
       .where('provider', 'google')
       .where('providerUserId', profile.sub)
       .first()
 
     if (existingProvider) {
+      // User has Google linked — log them in
       const user = await User.find(existingProvider.userId)
       if (!user || user.status !== 'active') {
         return response.redirect(`${frontendUrl}/login?error=account_inactive`)
@@ -172,30 +159,19 @@ export default class GoogleCallback {
       })
 
       const tokenValue = token.value!.release()
-      setAuthSessionCookies(response, {
-        authToken: tokenValue,
-        authTtlSeconds: 15 * 24 * 60 * 60,
-      })
-
-      return response.redirect(buildFrontendRedirect(frontendUrl, returnTo))
+      return response.redirect(`${frontendUrl}/login?token=${encodeURIComponent(tokenValue)}`)
     }
 
+    // Check if a user exists with this email but without Google linked
     const existingUser = await User.findBy('email', profile.email)
     if (existingUser) {
-      return response.redirect(
-        buildFrontendRedirect(
-          frontendUrl,
-          `/login?error=email_exists&redirect=${encodeURIComponent(returnTo)}`
-        )
-      )
+      return response.redirect(`${frontendUrl}/login?error=email_exists`)
     }
 
+    // New user — redirect to register with encrypted profile
     const encryptedProfile = GoogleAuthService.encryptProfileData(profile)
     return response.redirect(
-      buildFrontendRedirect(
-        frontendUrl,
-        `/register?google_data=${encodeURIComponent(encryptedProfile)}&redirect=${encodeURIComponent(returnTo)}`
-      )
+      `${frontendUrl}/register?google_data=${encodeURIComponent(encryptedProfile)}`
     )
   }
 }

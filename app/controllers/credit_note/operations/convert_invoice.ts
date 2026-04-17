@@ -3,10 +3,7 @@ import db from '@adonisjs/lucid/services/db'
 import Invoice from '#models/invoice/invoice'
 import CreditNote from '#models/credit_note/credit_note'
 import CreditNoteLine from '#models/credit_note/credit_note_line'
-import InvoiceSetting from '#models/team/invoice_setting'
 import { encryptModelFields } from '#services/crypto/field_encryption_helper'
-import { ApiError } from '#exceptions/api_error'
-import { generateNextNumber } from '#services/documents/number_generator'
 
 export default class ConvertInvoice {
   async handle(ctx: HttpContext) {
@@ -16,7 +13,7 @@ export default class ConvertInvoice {
     const teamId = user.currentTeamId
 
     if (!teamId) {
-      throw new ApiError('team_not_selected')
+      return response.badRequest({ message: 'No team selected' })
     }
 
     const invoice = await Invoice.query()
@@ -26,25 +23,26 @@ export default class ConvertInvoice {
       .first()
 
     if (!invoice) {
-      throw new ApiError('invoice_not_found')
+      return response.notFound({ message: 'Invoice not found' })
     }
 
-    const settings = await InvoiceSetting.query().where('team_id', teamId).first()
-    let creditNoteNumber: string
+    const currentYear = new Date().getFullYear().toString()
+    const prefix = `AV-${currentYear}-`
 
-    if (settings?.nextCreditNoteNumber) {
-      creditNoteNumber = settings.nextCreditNoteNumber
-      settings.nextCreditNoteNumber = null
-      await settings.save()
-    } else {
-      creditNoteNumber = await generateNextNumber({
-        teamId,
-        table: 'credit_notes',
-        numberColumn: 'credit_note_number',
-        pattern: settings?.creditNoteFilenamePattern || 'AV-{annee}-{numero}',
-      })
+    const lastCreditNote = await CreditNote.query()
+      .where('team_id', teamId)
+      .where('credit_note_number', 'like', `${prefix}%`)
+      .orderBy('created_at', 'desc')
+      .first()
+
+    let nextNum = 1
+    if (lastCreditNote) {
+      const numStr = lastCreditNote.creditNoteNumber.slice(prefix.length)
+      const parsed = Number.parseInt(numStr, 10)
+      if (!Number.isNaN(parsed)) nextNum = parsed + 1
     }
 
+    const creditNoteNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`
     const today = new Date().toISOString().slice(0, 10)
 
     // Build credit note data — encrypted fields from invoice are already encrypted,
@@ -76,8 +74,6 @@ export default class ConvertInvoice {
       taxAmount: invoice.taxAmount,
       total: invoice.total,
       vatExemptReason: invoice.vatExemptReason,
-      clientSnapshot: invoice.clientSnapshot,
-      companySnapshot: invoice.companySnapshot,
     }
 
     // Only encrypt the hardcoded plaintext fields — the rest are already encrypted from invoice

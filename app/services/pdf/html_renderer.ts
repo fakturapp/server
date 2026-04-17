@@ -73,8 +73,6 @@ interface CompanyData {
   iban: string | null
   bic: string | null
   bankName: string | null
-  currency?: string | null
-  paymentConditions?: string | null
 }
 
 interface SettingsData {
@@ -153,14 +151,11 @@ function formatIban(iban: string): string {
   return clean.match(/.{1,4}/g)?.join(' ') || clean
 }
 
-function fmtC(n: number, lang: string, currency = 'EUR'): string {
+function fmtC(n: number, lang: string): string {
   const locale = lang === 'en' ? 'en-GB' : 'fr-FR'
-  return new Intl.NumberFormat(locale, {
-    style: 'currency',
-    currency,
-    minimumFractionDigits: 2,
-    maximumFractionDigits: 2,
-  }).format(n)
+  return (
+    n.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20ac'
+  )
 }
 
 function fmtD(dateStr: string | Date, lang: string): string {
@@ -351,7 +346,6 @@ export function renderQuoteHtml(
   const T = getTemplate(settings.template, settings.darkMode)
   const ac = quote.accentColor || '#6366f1'
   const lang = quote.language || 'fr'
-  const currency = company?.currency || 'EUR'
   const i = getI18n(lang)
   const docTitle = quote.documentTitle || i.quote
   const tva = buildTvaBreakdown(lines, quote.billingType)
@@ -658,8 +652,7 @@ ${
         tva,
         discountAmount,
         lang,
-        i,
-        currency
+        i
       )
     : renderStandardPage(
         quote,
@@ -674,8 +667,7 @@ ${
         discountAmount,
         lang,
         i,
-        isClassique,
-        currency
+        isClassique
       )
 }
 </div>
@@ -700,8 +692,7 @@ function renderStandardPage(
   discountAmount: number,
   lang: string,
   i: I18n,
-  isClassique: boolean,
-  currency: string
+  isClassique: boolean
 ): string {
   let html = '<div class="top-section">'
 
@@ -797,7 +788,7 @@ function renderStandardPage(
   html += renderDateBar(quote, docTitle, T, ac, lang, i, isClassique)
 
   // Lines table
-  html += renderTable(lines, quote, T, ac, lang, i, currency)
+  html += renderTable(lines, quote, T, ac, lang, i)
 
   html += '</div>' // end top-section
 
@@ -805,7 +796,7 @@ function renderStandardPage(
   html += '<div class="bottom-section">'
 
   // Totals
-  html += renderTotals(quote, tva, discountAmount, lang, i, isClassique, currency)
+  html += renderTotals(quote, tva, discountAmount, lang, i, isClassique)
 
   // VAT exempt
   const vatText = getVatExemptText(quote.vatExemptReason, i)
@@ -928,8 +919,7 @@ function renderTable(
   _T: TemplateConfig,
   _ac: string,
   lang: string,
-  i: I18n,
-  currency: string
+  i: I18n
 ): string {
   const isDetailed = quote.billingType === 'detailed'
 
@@ -954,10 +944,10 @@ function renderTable(
     if (isDetailed) {
       rows += `<td class="center">${line.quantity}</td>`
       rows += `<td class="unit-col">${esc(line.unit || '')}</td>`
-      rows += `<td class="right">${fmtC(line.unitPrice, lang, currency)}</td>`
+      rows += `<td class="right">${fmtC(line.unitPrice, lang)}</td>`
       rows += `<td class="vat-col">${line.vatRate}%</td>`
     }
-    rows += `<td class="amount">${fmtC(lineTotal, lang, currency)}</td></tr>`
+    rows += `<td class="amount">${fmtC(lineTotal, lang)}</td></tr>`
   })
 
   return `<table class="lines-table"><thead><tr>${headerCols}</tr></thead><tbody>${rows}</tbody></table>`
@@ -973,8 +963,7 @@ function renderTotals(
   discountAmount: number,
   lang: string,
   i: I18n,
-  isClassique: boolean,
-  currency: string
+  isClassique: boolean
 ): string {
   const isDetailed = quote.billingType === 'detailed'
   const totalTax = tva.reduce((s, tv) => s + tv.amount, 0)
@@ -983,26 +972,26 @@ function renderTotals(
 
   if (isClassique) {
     html += '<div class="totals-rows">'
-    html += `<div class="total-row"><span class="label">${i.totalHT}</span><span class="value">${fmtC(quote.subtotal, lang, currency)}</span></div>`
+    html += `<div class="total-row"><span class="label">${i.totalHT}</span><span class="value">${fmtC(quote.subtotal, lang)}</span></div>`
     for (const tv of tva) {
-      html += `<div class="total-row sub"><span class="label">${i.vat} ${tv.rate}%</span><span class="value">${fmtC(tv.amount, lang, currency)}</span></div>`
+      html += `<div class="total-row sub"><span class="label">${i.vat} ${tv.rate}%</span><span class="value">${fmtC(tv.amount, lang)}</span></div>`
     }
     if (totalTax > 0) {
-      html += `<div class="total-row" style="border-top:1px solid ${isClassique ? 'currentColor' : 'inherit'};opacity:0.3;padding-top:4px"><span class="label" style="font-weight:600">${i.totalTVA}</span><span class="value">${fmtC(totalTax, lang, currency)}</span></div>`
+      html += `<div class="total-row" style="border-top:1px solid ${isClassique ? 'currentColor' : 'inherit'};opacity:0.3;padding-top:4px"><span class="label" style="font-weight:600">${i.totalTVA}</span><span class="value">${fmtC(totalTax, lang)}</span></div>`
     }
     if (discountAmount > 0) {
-      html += `<div class="total-row discount"><span class="label">${i.discount}</span><span class="value">-${fmtC(discountAmount, lang, currency)}</span></div>`
+      html += `<div class="total-row discount"><span class="label">${i.discount}</span><span class="value">-${fmtC(discountAmount, lang)}</span></div>`
     }
     html += '</div>'
-    html += `<div class="total-final"><span class="label">${isDetailed ? i.totalTTC : i.totalHT}</span><span class="value">${fmtC(quote.total, lang, currency)}</span></div>`
+    html += `<div class="total-final"><span class="label">${isDetailed ? i.totalTTC : i.totalHT}</span><span class="value">${fmtC(quote.total, lang)}</span></div>`
   } else {
     if (isDetailed) {
-      html += `<div class="total-row"><span class="label">${i.totalHT}</span><span class="value">${fmtC(quote.subtotal, lang, currency)}</span></div>`
+      html += `<div class="total-row"><span class="label">${i.totalHT}</span><span class="value">${fmtC(quote.subtotal, lang)}</span></div>`
       for (const tv of tva) {
-        html += `<div class="total-row sub"><span class="label">${i.vat} ${tv.rate}% (${fmtC(tv.base, lang, currency)})</span><span class="value">${fmtC(tv.amount, lang, currency)}</span></div>`
+        html += `<div class="total-row sub"><span class="label">${i.vat} ${tv.rate}% (${fmtC(tv.base, lang)})</span><span class="value">${fmtC(tv.amount, lang)}</span></div>`
       }
       if (totalTax > 0) {
-        html += `<div class="total-row"><span class="label" style="font-weight:600">${i.totalTVA}</span><span class="value" style="font-weight:600">${fmtC(totalTax, lang, currency)}</span></div>`
+        html += `<div class="total-row"><span class="label" style="font-weight:600">${i.totalTVA}</span><span class="value" style="font-weight:600">${fmtC(totalTax, lang)}</span></div>`
       }
     }
     if (discountAmount > 0) {
@@ -1010,9 +999,9 @@ function renderTotals(
         quote.globalDiscountType === 'percentage'
           ? `${i.discount} (${quote.globalDiscountValue}%)`
           : i.discount
-      html += `<div class="total-row discount"><span class="label">${label}</span><span class="value">-${fmtC(discountAmount, lang, currency)}</span></div>`
+      html += `<div class="total-row discount"><span class="label">${label}</span><span class="value">-${fmtC(discountAmount, lang)}</span></div>`
     }
-    html += `<div class="total-final"><span class="label">${isDetailed ? i.totalTTC : i.totalHT}</span><span class="value">${fmtC(quote.total, lang, currency)}</span></div>`
+    html += `<div class="total-final"><span class="label">${isDetailed ? i.totalTTC : i.totalHT}</span><span class="value">${fmtC(quote.total, lang)}</span></div>`
   }
 
   html += '</div></div>'
@@ -1116,8 +1105,7 @@ function renderLateral(
   tva: { rate: number; base: number; amount: number }[],
   discountAmount: number,
   lang: string,
-  i: I18n,
-  currency: string
+  i: I18n
 ): string {
   // Sidebar with company info
   let sidebar = '<div class="sidebar">'
@@ -1181,11 +1169,11 @@ function renderLateral(
     main += `<div class="date-item"><strong>${i.validity} :</strong> ${fmtD(quote.validityDate, lang)}</div>`
   main += '</div>'
 
-  main += renderTable(lines, quote, T, ac, lang, i, currency)
+  main += renderTable(lines, quote, T, ac, lang, i)
   main += '</div>' // end top-section
 
   main += '<div class="bottom-section">'
-  main += renderTotals(quote, tva, discountAmount, lang, i, false, currency)
+  main += renderTotals(quote, tva, discountAmount, lang, i, false)
 
   const lateralVatText = getVatExemptText(quote.vatExemptReason, i)
   if (lateralVatText) main += `<div class="vat-exempt">${lateralVatText}</div>`

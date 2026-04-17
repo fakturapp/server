@@ -9,7 +9,6 @@ import {
   decryptModelFieldsArray,
   ENCRYPTED_FIELDS,
 } from '#services/crypto/field_encryption_helper'
-import { ApiError } from '#exceptions/api_error'
 
 export default class Show {
   async handle(ctx: HttpContext) {
@@ -19,7 +18,7 @@ export default class Show {
     const dek: Buffer = (ctx as any).dek
 
     if (!teamId) {
-      throw new ApiError('team_not_selected')
+      return response.badRequest({ message: 'No team selected' })
     }
 
     const invoice = await Invoice.query()
@@ -27,12 +26,10 @@ export default class Show {
       .where('team_id', teamId)
       .preload('client')
       .preload('lines', (q) => q.orderBy('position', 'asc'))
-      .preload('payments', (q) => q.orderBy('payment_date', 'desc'))
-      .preload('creditNotes', (q) => q.orderBy('created_at', 'desc'))
       .first()
 
     if (!invoice) {
-      throw new ApiError('invoice_not_found')
+      return response.notFound({ message: 'Invoice not found' })
     }
 
     if (invoice.status === 'sent' && invoice.dueDate) {
@@ -46,7 +43,6 @@ export default class Show {
     decryptModelFields(invoice, [...ENCRYPTED_FIELDS.invoice], dek)
 
     decryptModelFieldsArray(invoice.lines, [...ENCRYPTED_FIELDS.invoiceLine], dek)
-    decryptModelFieldsArray(invoice.payments, [...ENCRYPTED_FIELDS.invoicePayment], dek)
 
     if (invoice.client) {
       decryptModelFields(invoice.client, [...ENCRYPTED_FIELDS.client], dek)
@@ -66,28 +62,10 @@ export default class Show {
       }
     }
 
-    const payments = invoice.payments.map((p) => ({
-      id: p.id,
-      amount: Number(p.amount),
-      paymentDate: p.paymentDate,
-      paymentMethod: p.paymentMethod,
-      notes: p.notes,
-    }))
-
-    const creditNotes = invoice.creditNotes.map((cn) => ({
-      id: cn.id,
-      creditNoteNumber: cn.creditNoteNumber,
-      status: cn.status,
-      total: Number(cn.total),
-      issueDate: cn.issueDate,
-    }))
-
     return response.ok({
       invoice: {
         ...(await ctx.serialize.withoutWrapping(InvoiceTransformer.transform(invoice))),
         sourceQuote,
-        payments,
-        creditNotes,
         paymentLink: paymentLink
           ? {
               id: paymentLink.id,

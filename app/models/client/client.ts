@@ -3,8 +3,6 @@ import { BaseModel, column, belongsTo, hasMany } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany } from '@adonisjs/lucid/types/relations'
 import Team from '#models/team/team'
 import ClientContact from '#models/client/client_contact'
-import Invoice from '#models/invoice/invoice'
-import Quote from '#models/quote/quote'
 
 export default class Client extends BaseModel {
   @column({ isPrimary: true })
@@ -61,9 +59,6 @@ export default class Client extends BaseModel {
   @column()
   declare notes: string | null
 
-  @column()
-  declare b2bContactId: number | null
-
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
@@ -75,12 +70,6 @@ export default class Client extends BaseModel {
 
   @hasMany(() => ClientContact)
   declare contacts: HasMany<typeof ClientContact>
-
-  @hasMany(() => Invoice)
-  declare invoices: HasMany<typeof Invoice>
-
-  @hasMany(() => Quote)
-  declare quotes: HasMany<typeof Quote>
 
   get displayName(): string {
     if (this.type === 'company') {

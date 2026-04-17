@@ -73,6 +73,8 @@ export default class OauthApp extends BaseModel {
   isRedirectUriAllowed(raw: string): boolean {
     return isRedirectUriAllowed(raw, {
       redirectUris: this.redirectUris ?? [],
+      allowedOrigins: this.allowedOrigins ?? [],
+      allowAllOrigins: this.allowAllOrigins === true,
     })
   }
 

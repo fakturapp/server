@@ -13,7 +13,6 @@ import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service
 import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
 import UserTransformer from '#transformers/user_transformer'
-import { setAuthSessionCookies } from '#services/auth/auth_cookie_service'
 
 export default class Login {
   async handle(ctx: HttpContext) {
@@ -184,29 +183,18 @@ export default class Login {
         .where('id', String(token.identifier))
         .update({ encrypted_kek: layer2 })
 
-      const releasedToken = token.value!.release()
-      const vaultKey = sessionKey.toString('hex')
-
-      setAuthSessionCookies(response, {
-        authToken: releasedToken,
-        vaultKey,
-      })
-
       return response.ok({
         message: 'Login successful',
         user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
-        token: releasedToken,
-        vaultKey,
+        token: token.value!.release(),
+        vaultKey: sessionKey.toString('hex'),
       })
     }
-
-    const releasedToken = token.value!.release()
-    setAuthSessionCookies(response, { authToken: releasedToken })
 
     return response.ok({
       message: 'Login successful',
       user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
-      token: releasedToken,
+      token: token.value!.release(),
     })
   }
 
@@ -217,6 +205,27 @@ export default class Login {
     failureReason: string | null,
     tokenIdentifier?: string
   ) {
+    let country: string | null = null
+    let city: string | null = null
+
+    if (status === 'success') {
+      try {
+        const ip = request.ip()
+        if (ip && ip !== '::1' && ip !== '127.0.0.1') {
+          const res = await fetch(`http://ip-api.com/json/${ip}`)
+          if (res.ok) {
+            const data = (await res.json()) as any
+            if (data.status === 'success') {
+              country = data.country
+              city = data.city
+            }
+          }
+        }
+      } catch {
+        // Silently fail if location service is unreachable
+      }
+    }
+
     await LoginHistory.create({
       userId: userId ?? undefined,
       tokenIdentifier: tokenIdentifier ?? undefined,
@@ -225,6 +234,8 @@ export default class Login {
       status,
       failureReason: failureReason ?? undefined,
       isSuspicious: false,
+      country: country ?? undefined,
+      city: city ?? undefined,
     })
   }
 }

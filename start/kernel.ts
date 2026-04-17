@@ -7,6 +7,7 @@ server.errorHandler(() => import('#exceptions/handler'))
 server.use([
   () => import('#middleware/core/container_bindings_middleware'),
   () => import('#middleware/core/request_id_middleware'),
+  () => import('#middleware/core/request_log_middleware'),
   () => import('#middleware/core/force_json_response_middleware'),
   () => import('#middleware/security/helmet_middleware'),
   () => import('@adonisjs/cors/cors_middleware'),
@@ -14,7 +15,6 @@ server.use([
 
 router.use([
   () => import('@adonisjs/core/bodyparser_middleware'),
-  () => import('#middleware/auth/auth_cookie_bridge_middleware'),
   () => import('@adonisjs/auth/initialize_auth_middleware'),
   () => import('@adonisjs/shield/shield_middleware'),
 ])

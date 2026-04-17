@@ -6,8 +6,6 @@ import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { encryptModelFields } from '#services/crypto/field_encryption_helper'
-import { ApiError } from '#exceptions/api_error'
-import { generateNextNumber } from '#services/documents/number_generator'
 
 function computeNextDate(current: string, frequency: string, customDays: number | null): string {
   const d = new Date(current)
@@ -39,7 +37,7 @@ export default class Generate {
     const teamId = user.currentTeamId
 
     if (!teamId) {
-      throw new ApiError('team_not_selected')
+      return response.badRequest({ message: 'No team selected' })
     }
 
     const recurring = await RecurringInvoice.query()
@@ -49,7 +47,7 @@ export default class Generate {
       .first()
 
     if (!recurring) {
-      throw new ApiError('resource_not_found', { message: 'Recurring invoice not found' })
+      return response.notFound({ message: 'Recurring invoice not found' })
     }
 
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
@@ -60,12 +58,24 @@ export default class Generate {
       settings.nextInvoiceNumber = null
       await settings.save()
     } else {
-      invoiceNumber = await generateNextNumber({
-        teamId,
-        table: 'invoices',
-        numberColumn: 'invoice_number',
-        pattern: settings?.invoiceFilenamePattern || 'FAK-{annee}-{numero}',
-      })
+      const pattern = settings?.invoiceFilenamePattern || 'FAC-{annee}-{numero}'
+      const currentYear = new Date().getFullYear().toString()
+      const prefix = pattern.replace('{annee}', currentYear).replace('{numero}', '')
+
+      const lastInvoice = await Invoice.query()
+        .where('team_id', teamId)
+        .where('invoice_number', 'like', `${prefix}%`)
+        .orderBy('created_at', 'desc')
+        .first()
+
+      let nextNum = 1
+      if (lastInvoice) {
+        const numStr = lastInvoice.invoiceNumber.slice(prefix.length)
+        const parsed = Number.parseInt(numStr, 10)
+        if (!Number.isNaN(parsed)) nextNum = parsed + 1
+      }
+
+      invoiceNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`
     }
 
     const today = new Date().toISOString().slice(0, 10)
@@ -121,8 +131,6 @@ export default class Generate {
       paymentMethod: recurring.paymentMethod,
       bankAccountId: recurring.bankAccountId,
       vatExemptReason: recurring.vatExemptReason,
-      clientSnapshot: recurring.clientSnapshot,
-      companySnapshot: recurring.companySnapshot,
     }
 
     // documentTitle might not be encrypted if it was null in recurring — encrypt the fallback

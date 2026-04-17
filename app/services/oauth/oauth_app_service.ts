@@ -11,6 +11,8 @@ export interface CreateOauthAppInput {
   iconUrl?: string | null
   websiteUrl?: string | null
   redirectUris: string[]
+  allowedOrigins?: string[]
+  allowAllOrigins?: boolean
   scopes: string[]
   webhookUrl?: string | null
   webhookEvents?: string[] | null
@@ -48,8 +50,8 @@ class OauthAppService {
       clientId,
       clientSecretHash,
       redirectUris: input.redirectUris,
-      allowedOrigins: [],
-      allowAllOrigins: false,
+      allowedOrigins: input.allowedOrigins ?? [],
+      allowAllOrigins: input.allowAllOrigins ?? false,
       scopes: input.scopes,
       webhookUrl: input.webhookUrl ?? null,
       encryptedWebhookSecret,

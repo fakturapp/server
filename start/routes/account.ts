@@ -19,7 +19,6 @@ const ServeAvatar = () => import('#controllers/account/profile/serve_avatar')
 const PasswordChange = () => import('#controllers/account/security/password')
 const SecurityVerify = () => import('#controllers/account/security/security_verify')
 const SessionRevoke = () => import('#controllers/account/security/revoke_session')
-const SessionRevokeAll = () => import('#controllers/account/security/revoke_all_sessions')
 const SessionsList = () => import('#controllers/account/security/sessions')
 
 const TwoFactorSetup = () => import('#controllers/account/two_factor/setup')
@@ -51,7 +50,6 @@ router
     router.put('/password', [PasswordChange, 'handle'])
     router.post('/avatar', [UploadAvatar, 'handle'])
     router.get('/sessions', [SessionsList, 'handle'])
-    router.delete('/sessions', [SessionRevokeAll, 'handle'])
     router.delete('/sessions/:id', [SessionRevoke, 'handle'])
     router.delete('/', [AccountDelete, 'handle'])
 

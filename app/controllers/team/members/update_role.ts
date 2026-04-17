@@ -1,7 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import TeamMember from '#models/team/team_member'
-import { logTeamAction } from '#services/audit/team_audit_log'
 
 const updateRoleValidator = vine.compile(
   vine.object({
@@ -10,8 +9,7 @@ const updateRoleValidator = vine.compile(
 )
 
 export default class UpdateRole {
-  async handle(ctx: HttpContext) {
-    const { auth, params, request, response } = ctx
+  async handle({ auth, params, request, response }: HttpContext) {
     const user = auth.user!
 
     if (!user.currentTeamId) {
@@ -48,20 +46,8 @@ export default class UpdateRole {
       return response.forbidden({ message: 'Only the Super Admin can promote to Admin' })
     }
 
-    const previousRole = targetMember.role
     targetMember.role = payload.role
     await targetMember.save()
-
-    await logTeamAction(ctx, 'team.role_updated', {
-      teamId: user.currentTeamId,
-      severity: 'warning',
-      metadata: {
-        targetUserId: targetMember.userId,
-        targetMemberId: targetMember.id,
-        previousRole,
-        newRole: targetMember.role,
-      },
-    })
 
     return response.ok({
       message: 'Role updated',

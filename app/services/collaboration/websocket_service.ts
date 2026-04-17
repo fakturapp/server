@@ -4,7 +4,6 @@ import { Secret } from '@adonisjs/core/helpers'
 import env from '#start/env'
 import User from '#models/account/user'
 import type { SharePermission } from '#models/collaboration/document_share'
-import { AUTH_COOKIE_NAME, readCookieValue } from '#services/auth/auth_cookie_service'
 
 
 export interface CollaboratorInfo {
@@ -106,12 +105,7 @@ export function initWebSocket(httpServer: HttpServer) {
 
   collabNs.use(async (socket, next) => {
     try {
-      const cookieHeader = Array.isArray(socket.handshake.headers.cookie)
-        ? socket.handshake.headers.cookie.join('; ')
-        : socket.handshake.headers.cookie
-      const token =
-        (socket.handshake.auth?.token as string | undefined) ||
-        readCookieValue(cookieHeader, AUTH_COOKIE_NAME)
+      const token = socket.handshake.auth?.token as string
       if (!token) {
         return next(new Error('Authentication required'))
       }

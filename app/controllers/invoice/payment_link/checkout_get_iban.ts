@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import crypto from 'node:crypto'
 import PaymentLink from '#models/invoice/payment_link'
 import encryptionService from '#services/encryption/encryption_service'
-import paymentLinkCheckoutSessionService from '#services/invoice/payment_link_checkout_session_service'
 
 export default class CheckoutGetIban {
   async handle({ params, request, response }: HttpContext) {
@@ -28,12 +28,36 @@ export default class CheckoutGetIban {
     }
 
     if (paymentLink.passwordHash) {
-      const verification = paymentLinkCheckoutSessionService.verify(
-        request.header('X-Checkout-Session'),
-        tokenHash
-      )
-      if (!verification.ok) {
-        return response.unauthorized({ message: verification.message })
+      const sessionToken = request.header('X-Checkout-Session')
+
+      if (!sessionToken) {
+        return response.unauthorized({ message: 'Session token required' })
+      }
+
+      const [payload, hmac] = sessionToken.split('.')
+      if (!payload || !hmac) {
+        return response.unauthorized({ message: 'Invalid session token' })
+      }
+
+      const expectedHmac = crypto
+        .createHmac('sha256', encryptionService.hash('session-key'))
+        .update(payload)
+        .digest('base64url')
+
+      if (!encryptionService.timingSafeEqual(hmac, expectedHmac)) {
+        return response.unauthorized({ message: 'Invalid session token' })
+      }
+
+      try {
+        const data = JSON.parse(Buffer.from(payload, 'base64url').toString())
+        if (data.exp < Date.now()) {
+          return response.unauthorized({ message: 'Session expired' })
+        }
+        if (data.tokenHash !== tokenHash) {
+          return response.unauthorized({ message: 'Session mismatch' })
+        }
+      } catch {
+        return response.unauthorized({ message: 'Invalid session token' })
       }
     }
 

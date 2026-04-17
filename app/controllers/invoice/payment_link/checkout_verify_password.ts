@@ -1,7 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import crypto from 'node:crypto'
 import PaymentLink from '#models/invoice/payment_link'
 import encryptionService from '#services/encryption/encryption_service'
-import paymentLinkCheckoutSessionService from '#services/invoice/payment_link_checkout_session_service'
 
 export default class CheckoutVerifyPassword {
   async handle({ params, request, response }: HttpContext) {
@@ -42,7 +42,17 @@ export default class CheckoutVerifyPassword {
       return response.unauthorized({ message: 'Incorrect password' })
     }
 
-    const sessionToken = paymentLinkCheckoutSessionService.issue(tokenHash)
+    const sessionData = {
+      tokenHash,
+      exp: Date.now() + 30 * 60 * 1000,
+    }
+    const sessionPayload = Buffer.from(JSON.stringify(sessionData)).toString('base64url')
+    const hmac = crypto
+      .createHmac('sha256', encryptionService.hash('session-key'))
+      .update(sessionPayload)
+      .digest('base64url')
+
+    const sessionToken = `${sessionPayload}.${hmac}`
 
     return response.ok({
       message: 'Password verified',

@@ -108,12 +108,6 @@ export default class RecurringInvoice extends BaseModel {
   @column()
   declare dueDays: number
 
-  @column()
-  declare clientSnapshot: string | null
-
-  @column()
-  declare companySnapshot: string | null
-
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

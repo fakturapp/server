@@ -35,7 +35,6 @@ const paymentLinkGroup = router
   .prefix('/invoices')
   .use(middleware.auth())
   .use(middleware.vault())
-  .use(middleware.emailVerified())
 if (API_PREFIX) paymentLinkGroup.prefix(API_PREFIX)
 
 

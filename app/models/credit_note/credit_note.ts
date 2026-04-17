@@ -96,12 +96,6 @@ export default class CreditNote extends BaseModel {
   @column()
   declare operationCategory: 'service' | 'goods' | 'mixed' | null
 
-  @column()
-  declare clientSnapshot: string | null
-
-  @column()
-  declare companySnapshot: string | null
-
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

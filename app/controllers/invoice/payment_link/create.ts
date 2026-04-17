@@ -4,7 +4,6 @@ import Invoice from '#models/invoice/invoice'
 import PaymentLink from '#models/invoice/payment_link'
 import BankAccount from '#models/team/bank_account'
 import InvoiceSetting from '#models/team/invoice_setting'
-import Company from '#models/team/company'
 import { createPaymentLinkValidator } from '#validators/payment_link_validator'
 import { encryptModelFields, decryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import encryptionService from '#services/encryption/encryption_service'
@@ -96,7 +95,6 @@ export default class Create {
     let clientEmail: string | null = null
     let clientName: string | null = null
     let companyName: string | null = null
-    let currency = 'EUR'
 
     if (invoice.client) {
       decryptModelFields(invoice.client, [...ENCRYPTED_FIELDS.client], dek)
@@ -109,17 +107,7 @@ export default class Create {
       try {
         const snap = JSON.parse(invoice.companySnapshot!)
         companyName = snap.legalName || snap.companyName || null
-        currency = snap.currency || currency
       } catch {
-      }
-    }
-
-    if (!companyName || currency === 'EUR') {
-      const company = await Company.query().where('team_id', teamId).first()
-      if (company) {
-        decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
-        companyName ||= company.legalName || company.tradeName || null
-        currency = company.currency || currency
       }
     }
 
@@ -155,7 +143,7 @@ export default class Create {
       clientEmail: appEncryptedClientEmail,
       clientName: appEncryptedClientName,
       amount: Number(invoice.total),
-      currency,
+      currency: 'EUR',
       invoiceNumber: invoice.invoiceNumber,
       companyName: appEncryptedCompanyName,
     }

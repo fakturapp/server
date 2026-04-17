@@ -1,5 +1,5 @@
 import vine from '@vinejs/vine'
-import { confirmedPasswordField } from '#validators/shared/password_schema'
+import securityConfig from '#config/security'
 
 export const registerValidator = vine.compile(
   vine.object({
@@ -13,7 +13,7 @@ export const registerValidator = vine.compile(
         const user = await db.from('users').where('email', value).first()
         return !user
       }),
-    password: confirmedPasswordField().maxLength(128),
+    password: vine.string().minLength(securityConfig.password.minLength).maxLength(128).confirmed(),
     turnstileToken: vine.string().optional(),
   })
 )
@@ -41,7 +41,7 @@ export const passwordResetRequestValidator = vine.compile(
 export const passwordResetValidator = vine.compile(
   vine.object({
     token: vine.string(),
-    password: confirmedPasswordField().maxLength(128),
+    password: vine.string().minLength(securityConfig.password.minLength).maxLength(128).confirmed(),
   })
 )
 

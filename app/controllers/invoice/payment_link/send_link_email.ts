@@ -165,11 +165,6 @@ export default class SendLinkEmail {
       return response.internalServerError({ message: 'Failed to send email', error: sendError })
     }
 
-    if (invoice.status === 'draft') {
-      invoice.status = 'sent'
-      await invoice.save()
-    }
-
-    return response.ok({ message: 'Payment link email sent', invoiceStatus: invoice.status })
+    return response.ok({ message: 'Payment link email sent' })
   }
 }

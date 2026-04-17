@@ -1,10 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import PaymentLink from '#models/invoice/payment_link'
 import encryptionService from '#services/encryption/encryption_service'
-import paymentLinkCheckoutSessionService from '#services/invoice/payment_link_checkout_session_service'
 
 export default class CheckoutDownloadPdf {
-  async handle({ params, request, response }: HttpContext) {
+  async handle({ params, response }: HttpContext) {
     response.header('X-Robots-Tag', 'noindex, nofollow')
     response.header('Cache-Control', 'no-store, no-cache, must-revalidate')
 
@@ -24,16 +23,6 @@ export default class CheckoutDownloadPdf {
 
     if (paymentLink.isExpired && !paymentLink.paidAt) {
       return response.gone({ message: 'Payment link has expired' })
-    }
-
-    if (paymentLink.passwordHash) {
-      const verification = paymentLinkCheckoutSessionService.verify(
-        request.header('X-Checkout-Session'),
-        tokenHash
-      )
-      if (!verification.ok) {
-        return response.unauthorized({ message: verification.message })
-      }
     }
 
     const filename = `${paymentLink.invoiceNumber}.pdf`

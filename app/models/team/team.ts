@@ -20,9 +20,6 @@ export default class Team extends BaseModel {
   @column()
   declare ownerId: string
 
-  @column()
-  declare b2bAccountId: string | null
-
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
