@@ -5,6 +5,7 @@ import { errors as vineErrors } from '@vinejs/vine'
 import { ApiError } from './api_error.js'
 import { ERROR_CODES, type ErrorCode, type ErrorType, type ErrorVisibility } from './error_codes.js'
 import { getRequestId } from '#middleware/core/request_id_middleware'
+import { clearAuthSessionCookies } from '#services/auth/auth_cookie_service'
 
 interface SerializedError {
   type: ErrorType
@@ -174,6 +175,13 @@ export default class HttpExceptionHandler extends ExceptionHandler {
 
   async handle(error: unknown, ctx: HttpContext) {
     const { status, body } = serialize(error, ctx)
+    if (
+      error instanceof authErrors.E_UNAUTHORIZED_ACCESS ||
+      (error instanceof ApiError &&
+        (error.errorCode === 'account_session_invalid' || error.errorCode === 'account_session_expired'))
+    ) {
+      clearAuthSessionCookies(ctx.response)
+    }
     ctx.response.status(status).send(body)
   }
 

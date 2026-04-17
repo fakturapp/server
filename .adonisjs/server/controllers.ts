@@ -121,6 +121,7 @@ export const controllers = {
       },
     },
     session: {
+      Bootstrap: () => import('#controllers/auth/session/bootstrap'),
       CheckEmail: () => import('#controllers/auth/session/check_email'),
       Login: () => import('#controllers/auth/session/login'),
       Logout: () => import('#controllers/auth/session/logout'),

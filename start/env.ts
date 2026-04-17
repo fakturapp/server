@@ -53,8 +53,10 @@ export default await Env.create(new URL('../', import.meta.url), {
 
   WEBAUTHN_RP_ID: Env.schema.string.optional(),
   WEBAUTHN_ORIGIN: Env.schema.string.optional(),
+  FAKTUR_DESKTOP_PROOF_KEY: Env.schema.string.optional(),
 
   CHECKOUT_URL: Env.schema.string.optional(),
+  CHECKOUT_SESSION_KEY: Env.schema.string.optional(),
 
   R2_ACCOUNT_ID: Env.schema.string.optional(),
   R2_ACCESS_KEY_ID: Env.schema.string.optional(),
