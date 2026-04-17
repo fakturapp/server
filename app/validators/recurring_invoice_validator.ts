@@ -34,7 +34,7 @@ export const createRecurringInvoiceValidator = vine.compile(
     vatExemptReason: vine.string().trim().maxLength(50).optional(),
     lines: vine.array(
       vine.object({
-        description: vine.string().trim().maxLength(500),
+        description: vine.string().trim(),
         saleType: vine.string().trim().maxLength(50).optional(),
         quantity: vine.number().min(0),
         unit: vine.string().trim().maxLength(20).optional(),
