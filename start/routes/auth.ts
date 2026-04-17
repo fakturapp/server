@@ -15,6 +15,7 @@ const Login = () => import('#controllers/auth/session/login')
 const Logout = () => import('#controllers/auth/session/logout')
 const Me = () => import('#controllers/auth/session/me')
 const CheckEmail = () => import('#controllers/auth/session/check_email')
+const Bootstrap = () => import('#controllers/auth/session/bootstrap')
 const Signup = () => import('#controllers/auth/registration/signup')
 
 const PasswordResetRequest = () => import('#controllers/auth/security/password_reset/request')
@@ -46,6 +47,7 @@ router
     router.post('/login', [Login, 'handle']).use(loginLimiter)
     router.post('/login/2fa', [TwoFactorVerify, 'handle']).use(twoFactorLimiter)
     router.post('/check-email', [CheckEmail, 'handle']).use(checkEmailLimiter)
+    router.post('/session/bootstrap', [Bootstrap, 'handle'])
 
     router.post('/passkey/login-options', [PasskeyLoginOptions, 'handle']).use(passkeyLimiter)
     router.post('/passkey/login-verify', [PasskeyLoginVerify, 'handle']).use(passkeyLimiter)
