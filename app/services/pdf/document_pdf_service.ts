@@ -8,6 +8,7 @@ import Company from '#models/team/company'
 import InvoiceSetting from '#models/team/invoice_setting'
 import BankAccount from '#models/team/bank_account'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import documentNumberingService from '#services/documents/document_numbering_service'
 import {
   decryptModelFields,
   decryptModelFieldsArray,
@@ -56,11 +57,8 @@ function resolveFilenamePattern(
   pattern: string,
   vars: { numero: string; date: string; client: string; entreprise: string }
 ): string {
-  return pattern
-    .replace(/\{numero\}/gi, vars.numero)
-    .replace(/\{date\}/gi, vars.date)
-    .replace(/\{client\}/gi, vars.client)
-    .replace(/\{entreprise\}/gi, vars.entreprise)
+  return documentNumberingService
+    .resolvePattern(pattern, 'FAC-{numero}', vars)
     .replace(/[^a-zA-Z0-9àâäéèêëïîôùûüçÀÂÄÉÈÊËÏÎÔÙÛÜÇ\-_.\s]/g, '')
     .replace(/\s+/g, '_')
 }
