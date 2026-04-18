@@ -4,13 +4,14 @@ export default class extends BaseSchema {
   protected tableName = 'invoice_settings'
 
   async up() {
-    this.schema.alterTable(this.tableName, (table) => {
-      table.float('default_vat_rate').notNullable().defaultTo(20)
-      table.boolean('default_show_quantity_column').notNullable().defaultTo(true)
-      table.boolean('default_show_unit_column').notNullable().defaultTo(true)
-      table.boolean('default_show_unit_price_column').notNullable().defaultTo(true)
-      table.boolean('default_show_vat_column').notNullable().defaultTo(true)
-    })
+    this.schema.raw(
+      `alter table ${this.tableName}
+         add column if not exists default_vat_rate real not null default 20,
+         add column if not exists default_show_quantity_column boolean not null default true,
+         add column if not exists default_show_unit_column boolean not null default true,
+         add column if not exists default_show_unit_price_column boolean not null default true,
+         add column if not exists default_show_vat_column boolean not null default true`
+    )
   }
 
   async down() {
