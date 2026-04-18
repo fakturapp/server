@@ -2,59 +2,12 @@ import type { HttpContext } from '@adonisjs/core/http'
 import Company from '#models/team/company'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { updateCompanyValidator } from '#validators/auth/onboarding_validators'
+import { buildDefaultInvoiceSettings } from '#services/settings/default_invoice_settings'
 import {
   encryptModelFields,
   decryptModelFields,
   ENCRYPTED_FIELDS,
 } from '#services/crypto/field_encryption_helper'
-
-function buildDefaultInvoiceSettings(teamId: string) {
-  return {
-    teamId,
-    billingType: 'quick' as const,
-    accentColor: '#6366f1',
-    logoUrl: null,
-    logoSource: 'custom' as const,
-    paymentMethods: ['bank_transfer'],
-    customPaymentMethod: null,
-    template: 'classique',
-    darkMode: false,
-    documentFont: 'Lexend',
-    eInvoicingEnabled: false,
-    pdpProvider: null,
-    pdpApiKey: null,
-    pdpSandbox: true,
-    defaultOperationCategory: 'service' as const,
-    defaultSubject: null,
-    defaultAcceptanceConditions: null,
-    defaultSignatureField: false,
-    defaultFreeField: null,
-    defaultShowNotes: true,
-    defaultVatExempt: false,
-    defaultVatRate: 20,
-    defaultShowQuantityColumn: true,
-    defaultShowUnitColumn: true,
-    defaultShowUnitPriceColumn: true,
-    defaultShowVatColumn: true,
-    defaultFooterText: null,
-    defaultShowDeliveryAddress: false,
-    defaultLanguage: 'fr',
-    quoteFilenamePattern: 'DEV-{numero}',
-    invoiceFilenamePattern: 'FAC-{numero}',
-    footerMode: 'company_info' as const,
-    logoBorderRadius: 0,
-    nextInvoiceNumber: null,
-    nextQuoteNumber: null,
-    stripePublishableKey: null,
-    stripeSecretKey: null,
-    stripeWebhookSecret: null,
-    stripeWebhookSecretApp: null,
-    collaborationEnabled: false,
-    aiEnabled: false,
-    aiProvider: 'gemini',
-    aiModel: 'nvidia/nemotron-3-super-120b-a12b:free',
-  }
-}
 
 export default class Update {
   async handle(ctx: HttpContext) {

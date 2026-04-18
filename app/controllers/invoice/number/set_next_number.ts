@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Invoice from '#models/invoice/invoice'
 import InvoiceSetting from '#models/team/invoice_setting'
+import { buildDefaultInvoiceSettings } from '#services/settings/default_invoice_settings'
 
 export default class SetNextNumber {
   async handle({ auth, request, response }: HttpContext) {
@@ -23,14 +24,25 @@ export default class SetNextNumber {
       return response.badRequest({ message: 'nextNumber is required' })
     }
 
-    const settings = await InvoiceSetting.query().where('team_id', teamId).first()
-    if (!settings) {
-      return response.notFound({ message: 'Invoice settings not found' })
+    const normalizedNextNumber = nextNumber.trim()
+    if (!normalizedNextNumber) {
+      return response.badRequest({ message: 'nextNumber is required' })
     }
 
-    settings.nextInvoiceNumber = nextNumber
+    if (/[{}]/.test(normalizedNextNumber)) {
+      return response.badRequest({
+        message: 'Use a concrete invoice number, not a placeholder pattern',
+      })
+    }
+
+    let settings = await InvoiceSetting.query().where('team_id', teamId).first()
+    if (!settings) {
+      settings = await InvoiceSetting.create(buildDefaultInvoiceSettings(teamId))
+    }
+
+    settings.nextInvoiceNumber = normalizedNextNumber
     await settings.save()
 
-    return response.ok({ message: 'Next number set', nextNumber })
+    return response.ok({ message: 'Next number set', nextNumber: normalizedNextNumber })
   }
 }
