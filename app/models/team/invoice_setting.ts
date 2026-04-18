@@ -106,7 +106,7 @@ export default class InvoiceSetting extends BaseModel {
   declare invoiceFilenamePattern: string
 
   @column()
-  declare footerMode: 'company_info' | 'custom' | 'vat_exempt'
+  declare footerMode: 'company_info' | 'custom'
 
   @column()
   declare logoBorderRadius: number
