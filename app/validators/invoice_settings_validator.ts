@@ -11,6 +11,7 @@ const BILLING_TYPES = ['quick', 'detailed'] as const
 const LOGO_SOURCES = ['custom', 'company'] as const
 const FOOTER_MODES = ['custom', 'company_info', 'vat_exempt'] as const
 const PDP_PROVIDERS = ['b2brouter', 'sandbox'] as const
+const OPERATION_CATEGORIES = ['service', 'goods', 'mixed'] as const
 
 export const updateInvoiceSettingsValidator = vine.compile(
   vine.object({
@@ -29,6 +30,7 @@ export const updateInvoiceSettingsValidator = vine.compile(
     pdpProvider: vine.enum(PDP_PROVIDERS).optional().nullable(),
     pdpApiKey: vine.string().trim().maxLength(500).optional().nullable(),
     pdpSandbox: looseBool.clone(),
+    defaultOperationCategory: vine.enum(OPERATION_CATEGORIES).optional().nullable(),
     defaultSubject: vine.string().trim().maxLength(500).optional().nullable(),
     defaultAcceptanceConditions: vine.string().trim().maxLength(2000).optional().nullable(),
     defaultSignatureField: looseBool.clone(),

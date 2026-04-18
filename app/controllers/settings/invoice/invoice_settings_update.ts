@@ -44,6 +44,7 @@ export default class InvoiceSettingsUpdate {
         pdpProvider: payload.pdpProvider ?? defaultSettings.pdpProvider,
         pdpApiKey: pdpApiKeyToStore,
         pdpSandbox: payload.pdpSandbox ?? defaultSettings.pdpSandbox,
+        defaultOperationCategory: payload.defaultOperationCategory ?? defaultSettings.defaultOperationCategory,
         defaultSubject: payload.defaultSubject || null,
         defaultAcceptanceConditions: payload.defaultAcceptanceConditions || null,
         defaultSignatureField: payload.defaultSignatureField ?? defaultSettings.defaultSignatureField,
@@ -84,6 +85,8 @@ export default class InvoiceSettingsUpdate {
         settings.pdpApiKey = pdpApiKeyToStore
       }
       if (payload.pdpSandbox !== undefined) settings.pdpSandbox = payload.pdpSandbox
+      if (payload.defaultOperationCategory !== undefined)
+        settings.defaultOperationCategory = payload.defaultOperationCategory
       if (payload.defaultSubject !== undefined)
         settings.defaultSubject = payload.defaultSubject || null
       if (payload.defaultAcceptanceConditions !== undefined)
@@ -143,6 +146,7 @@ export default class InvoiceSettingsUpdate {
         pdpProvider: settings.pdpProvider || null,
         pdpApiKey: settings.pdpApiKey ? '••••••••' : null,
         pdpSandbox: settings.pdpSandbox ?? true,
+        defaultOperationCategory: settings.defaultOperationCategory || 'service',
         defaultSubject: settings.defaultSubject || null,
         defaultAcceptanceConditions: settings.defaultAcceptanceConditions || null,
         defaultSignatureField: settings.defaultSignatureField || false,
