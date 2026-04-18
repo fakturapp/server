@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Invoice from '#models/invoice/invoice'
 import InvoiceSetting from '#models/team/invoice_setting'
+import documentNumberingService from '#services/documents/document_numbering_service'
 
 export default class NextNumber {
   async handle({ auth, response }: HttpContext) {
@@ -13,12 +14,21 @@ export default class NextNumber {
 
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
     if (settings?.nextInvoiceNumber) {
-      return response.ok({ nextNumber: settings.nextInvoiceNumber })
+      return response.ok({
+        nextNumber: documentNumberingService.normalizePattern(
+          settings.nextInvoiceNumber,
+          'FAC-{annee}-{numero}'
+        ),
+      })
     }
 
-    const pattern = settings?.invoiceFilenamePattern || 'FAK-{annee}-{numero}'
     const currentYear = new Date().getFullYear().toString()
-    const prefix = pattern.replace('{annee}', currentYear).replace('{numero}', '')
+    const fallbackPattern = 'FAC-{annee}-{numero}'
+    const prefix = documentNumberingService.buildSequencePrefix(
+      settings?.invoiceFilenamePattern,
+      fallbackPattern,
+      currentYear
+    )
 
     const lastInvoice = await Invoice.query()
       .where('team_id', teamId)
@@ -26,14 +36,12 @@ export default class NextNumber {
       .orderBy('created_at', 'desc')
       .first()
 
-    let nextNum = 1
-    if (lastInvoice) {
-      const numStr = lastInvoice.invoiceNumber.slice(prefix.length)
-      const parsed = Number.parseInt(numStr, 10)
-      if (!Number.isNaN(parsed)) nextNum = parsed + 1
-    }
-
-    const nextNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`
+    const nextNumber = documentNumberingService.buildNextSequentialNumber({
+      pattern: settings?.invoiceFilenamePattern,
+      fallbackPattern,
+      currentYear,
+      lastNumber: lastInvoice?.invoiceNumber,
+    })
 
     return response.ok({ nextNumber })
   }

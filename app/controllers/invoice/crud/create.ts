@@ -4,6 +4,7 @@ import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { createInvoiceValidator } from '#validators/invoice_validator'
+import documentNumberingService from '#services/documents/document_numbering_service'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class Create {
@@ -23,13 +24,20 @@ export default class Create {
     let invoiceNumber: string
 
     if (settings?.nextInvoiceNumber) {
-      invoiceNumber = settings.nextInvoiceNumber
+      invoiceNumber = documentNumberingService.normalizePattern(
+        settings.nextInvoiceNumber,
+        'FAC-{annee}-{numero}'
+      )
       settings.nextInvoiceNumber = null
       await settings.save()
     } else {
-      const pattern = settings?.invoiceFilenamePattern || 'FAK-{annee}-{numero}'
       const currentYear = new Date().getFullYear().toString()
-      const prefix = pattern.replace('{annee}', currentYear).replace('{numero}', '')
+      const fallbackPattern = 'FAC-{annee}-{numero}'
+      const prefix = documentNumberingService.buildSequencePrefix(
+        settings?.invoiceFilenamePattern,
+        fallbackPattern,
+        currentYear
+      )
 
       const lastInvoice = await Invoice.query()
         .where('team_id', teamId)
@@ -37,14 +45,12 @@ export default class Create {
         .orderBy('created_at', 'desc')
         .first()
 
-      let nextNum = 1
-      if (lastInvoice) {
-        const numStr = lastInvoice.invoiceNumber.slice(prefix.length)
-        const parsed = Number.parseInt(numStr, 10)
-        if (!Number.isNaN(parsed)) nextNum = parsed + 1
-      }
-
-      invoiceNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`
+      invoiceNumber = documentNumberingService.buildNextSequentialNumber({
+        pattern: settings?.invoiceFilenamePattern,
+        fallbackPattern,
+        currentYear,
+        lastNumber: lastInvoice?.invoiceNumber,
+      })
     }
 
     // Calculate totals from lines
