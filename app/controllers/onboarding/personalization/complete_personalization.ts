@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import InvoiceSetting from '#models/team/invoice_setting'
 import Company from '#models/team/company'
+import { buildDefaultInvoiceSettings } from '#services/settings/default_invoice_settings'
 
 const personalizeValidator = vine.compile(
   vine.object({
@@ -42,23 +43,17 @@ export default class CompletePersonalization {
     let settings = await InvoiceSetting.findBy('teamId', user.currentTeamId)
 
     if (!settings) {
+      const defaultSettings = buildDefaultInvoiceSettings(user.currentTeamId)
       settings = await InvoiceSetting.create({
-        teamId: user.currentTeamId,
-        template: payload.template || 'classique',
-        accentColor: payload.accentColor || '#6366f1',
-        billingType: payload.billingType || 'quick',
-        paymentMethods: payload.paymentMethods?.length ? payload.paymentMethods : ['bank_transfer'],
-        darkMode: false,
-        documentFont: 'Lexend',
-        eInvoicingEnabled: false,
-        pdpSandbox: true,
-        defaultShowNotes: true,
-        defaultSignatureField: false,
+        ...defaultSettings,
+        template: payload.template || defaultSettings.template,
+        accentColor: payload.accentColor || defaultSettings.accentColor,
+        billingType: payload.billingType || defaultSettings.billingType,
+        paymentMethods: payload.paymentMethods?.length ? payload.paymentMethods : defaultSettings.paymentMethods,
         defaultVatExempt: payload.vatExemptReason === 'not_subject',
-        defaultShowDeliveryAddress: false,
-        defaultLanguage: payload.language || 'fr',
-        quoteFilenamePattern: quotePattern || 'DEV-{annee}-{numero}',
-        invoiceFilenamePattern: invoicePattern || 'FAC-{annee}-{numero}',
+        defaultLanguage: payload.language || defaultSettings.defaultLanguage,
+        quoteFilenamePattern: quotePattern || defaultSettings.quoteFilenamePattern,
+        invoiceFilenamePattern: invoicePattern || defaultSettings.invoiceFilenamePattern,
       })
     } else {
       if (payload.template) settings.template = payload.template

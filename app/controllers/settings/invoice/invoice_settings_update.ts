@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import InvoiceSetting from '#models/team/invoice_setting'
 import { updateInvoiceSettingsValidator } from '#validators/invoice_settings_validator'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
+import { buildDefaultInvoiceSettings } from '#services/settings/default_invoice_settings'
 
 export default class InvoiceSettingsUpdate {
   async handle(ctx: HttpContext) {
@@ -28,42 +29,43 @@ export default class InvoiceSettingsUpdate {
     let settings = await InvoiceSetting.findBy('teamId', user.currentTeamId)
 
     if (!settings) {
+      const defaultSettings = buildDefaultInvoiceSettings(user.currentTeamId)
       settings = await InvoiceSetting.create({
-        teamId: user.currentTeamId,
+        ...defaultSettings,
         billingType: payload.billingType,
         accentColor: payload.accentColor,
         paymentMethods: payload.paymentMethods,
-        logoSource: payload.logoSource || 'custom',
+        logoSource: payload.logoSource || defaultSettings.logoSource,
         customPaymentMethod: payload.customPaymentMethod || null,
-        template: payload.template || 'classique',
-        darkMode: payload.darkMode ?? false,
-        documentFont: payload.documentFont || 'Lexend',
-        eInvoicingEnabled: payload.eInvoicingEnabled ?? false,
-        pdpProvider: payload.pdpProvider ?? null,
+        template: payload.template || defaultSettings.template,
+        darkMode: payload.darkMode ?? defaultSettings.darkMode,
+        documentFont: payload.documentFont || defaultSettings.documentFont,
+        eInvoicingEnabled: payload.eInvoicingEnabled ?? defaultSettings.eInvoicingEnabled,
+        pdpProvider: payload.pdpProvider ?? defaultSettings.pdpProvider,
         pdpApiKey: pdpApiKeyToStore,
-        pdpSandbox: payload.pdpSandbox ?? true,
+        pdpSandbox: payload.pdpSandbox ?? defaultSettings.pdpSandbox,
         defaultSubject: payload.defaultSubject || null,
         defaultAcceptanceConditions: payload.defaultAcceptanceConditions || null,
-        defaultSignatureField: payload.defaultSignatureField ?? false,
+        defaultSignatureField: payload.defaultSignatureField ?? defaultSettings.defaultSignatureField,
         defaultFreeField: payload.defaultFreeField || null,
-        defaultShowNotes: payload.defaultShowNotes ?? true,
-        defaultVatExempt: payload.defaultVatExempt ?? false,
-        defaultVatRate: payload.defaultVatRate ?? 20,
-        defaultShowQuantityColumn: payload.defaultShowQuantityColumn ?? true,
-        defaultShowUnitColumn: payload.defaultShowUnitColumn ?? true,
-        defaultShowUnitPriceColumn: payload.defaultShowUnitPriceColumn ?? true,
-        defaultShowVatColumn: payload.defaultShowVatColumn ?? true,
+        defaultShowNotes: payload.defaultShowNotes ?? defaultSettings.defaultShowNotes,
+        defaultVatExempt: payload.defaultVatExempt ?? defaultSettings.defaultVatExempt,
+        defaultVatRate: payload.defaultVatRate ?? defaultSettings.defaultVatRate,
+        defaultShowQuantityColumn: payload.defaultShowQuantityColumn ?? defaultSettings.defaultShowQuantityColumn,
+        defaultShowUnitColumn: payload.defaultShowUnitColumn ?? defaultSettings.defaultShowUnitColumn,
+        defaultShowUnitPriceColumn: payload.defaultShowUnitPriceColumn ?? defaultSettings.defaultShowUnitPriceColumn,
+        defaultShowVatColumn: payload.defaultShowVatColumn ?? defaultSettings.defaultShowVatColumn,
         defaultFooterText: payload.defaultFooterText || null,
-        defaultShowDeliveryAddress: payload.defaultShowDeliveryAddress ?? false,
-        defaultLanguage: payload.defaultLanguage || 'fr',
-        quoteFilenamePattern: payload.quoteFilenamePattern || 'DEV-{numero}',
-        invoiceFilenamePattern: payload.invoiceFilenamePattern || 'FAC-{numero}',
-        footerMode: payload.footerMode || 'company_info',
-        logoBorderRadius: payload.logoBorderRadius ?? 0,
-        collaborationEnabled: payload.collaborationEnabled ?? false,
-        aiEnabled: payload.aiEnabled ?? false,
-        aiProvider: 'gemini',
-        aiModel: payload.aiModel || 'nvidia/nemotron-3-super-120b-a12b:free',
+        defaultShowDeliveryAddress: payload.defaultShowDeliveryAddress ?? defaultSettings.defaultShowDeliveryAddress,
+        defaultLanguage: payload.defaultLanguage || defaultSettings.defaultLanguage,
+        quoteFilenamePattern: payload.quoteFilenamePattern || defaultSettings.quoteFilenamePattern,
+        invoiceFilenamePattern: payload.invoiceFilenamePattern || defaultSettings.invoiceFilenamePattern,
+        footerMode: payload.footerMode || defaultSettings.footerMode,
+        logoBorderRadius: payload.logoBorderRadius ?? defaultSettings.logoBorderRadius,
+        collaborationEnabled: payload.collaborationEnabled ?? defaultSettings.collaborationEnabled,
+        aiEnabled: payload.aiEnabled ?? defaultSettings.aiEnabled,
+        aiProvider: defaultSettings.aiProvider,
+        aiModel: payload.aiModel || defaultSettings.aiModel,
       })
     } else {
       settings.billingType = payload.billingType
