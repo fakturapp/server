@@ -4,6 +4,7 @@ import Quote from '#models/quote/quote'
 import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
 import InvoiceSetting from '#models/team/invoice_setting'
+import documentNumberingService from '#services/documents/document_numbering_service'
 import { encryptModelFields } from '#services/crypto/field_encryption_helper'
 
 export default class ConvertQuote {
@@ -32,23 +33,33 @@ export default class ConvertQuote {
     let invoiceNumber: string
 
     if (settings?.nextInvoiceNumber) {
-      invoiceNumber = settings.nextInvoiceNumber
+      invoiceNumber = documentNumberingService.normalizePattern(
+        settings.nextInvoiceNumber,
+        'FAC-{annee}-{numero}'
+      )
       settings.nextInvoiceNumber = null
       await settings.save()
     } else {
+      const currentYear = new Date().getFullYear().toString()
+      const fallbackPattern = 'FAC-{annee}-{numero}'
+      const prefix = documentNumberingService.buildSequencePrefix(
+        settings?.invoiceFilenamePattern,
+        fallbackPattern,
+        currentYear
+      )
+
       const lastInvoice = await Invoice.query()
         .where('team_id', teamId)
+        .where('invoice_number', 'like', `${prefix}%`)
         .orderBy('created_at', 'desc')
         .first()
 
-      invoiceNumber = 'FAC-001'
-      if (lastInvoice) {
-        const match = lastInvoice.invoiceNumber.match(/^FAC-(\d+)$/)
-        if (match) {
-          const num = Number.parseInt(match[1], 10) + 1
-          invoiceNumber = `FAC-${num.toString().padStart(3, '0')}`
-        }
-      }
+      invoiceNumber = documentNumberingService.buildNextSequentialNumber({
+        pattern: settings?.invoiceFilenamePattern,
+        fallbackPattern,
+        currentYear,
+        lastNumber: lastInvoice?.invoiceNumber,
+      })
     }
 
     // Calculate due date: issue date + 30 days
