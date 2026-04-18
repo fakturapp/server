@@ -46,11 +46,11 @@ export async function validatePdpConnection(
   config: PdpConfig
 ): Promise<{ connected: boolean; message: string }> {
   if (config.sandbox) {
-    return { connected: true, message: 'Connexion sandbox reussie' }
+    return { connected: true, message: 'Connexion sandbox réussie' }
   }
 
   if (!config.apiKey) {
-    return { connected: true, message: 'Mode sandbox (aucune cle API)' }
+    return { connected: true, message: 'Mode sandbox (aucune clé API)' }
   }
 
   return await validateB2BRouter(config)
@@ -68,7 +68,7 @@ export async function submitInvoice(
       success: true,
       trackingId: `SANDBOX-${Date.now()}-${Math.random().toString(36).slice(2, 8)}`,
       status: 'submitted',
-      message: 'Document soumis avec succes (mode sandbox)',
+      message: 'Document soumis avec succès (mode sandbox)',
       timestamp,
     }
   }
@@ -85,7 +85,7 @@ export async function checkStatus(config: PdpConfig, trackingId: string): Promis
     return {
       trackingId,
       status: 'accepted',
-      message: 'Document accepte (mode sandbox)',
+      message: 'Document accepté (mode sandbox)',
       updatedAt: new Date().toISOString(),
     }
   }
@@ -110,15 +110,15 @@ export async function validateXml(_config: PdpConfig, xml: string): Promise<PdpV
   }
 
   if (!xml.includes('BuyerTradeParty')) {
-    warnings.push('Acheteur non renseigne dans le document')
+    warnings.push('Acheteur non renseigné dans le document')
   }
 
   if (!xml.includes('SpecifiedTaxRegistration')) {
-    warnings.push('Numero de TVA non renseigne')
+    warnings.push('Numéro de TVA non renseigné')
   }
 
   if (!xml.includes('SpecifiedLegalOrganization')) {
-    warnings.push('SIREN/SIRET non renseigne')
+    warnings.push('SIREN/SIRET non renseigné')
   }
 
   return {
@@ -140,7 +140,7 @@ async function validateB2BRouter(
       headers: { Authorization: `Bearer ${config.apiKey}` },
     })
     return resp.ok
-      ? { connected: true, message: 'Connexion B2Brouter reussie' }
+      ? { connected: true, message: 'Connexion B2Brouter réussie' }
       : { connected: false, message: `Erreur B2Brouter: ${resp.status}` }
   } catch {
     return { connected: false, message: 'Impossible de contacter B2Brouter' }
@@ -187,7 +187,7 @@ async function submitToB2BRouter(
       success: false,
       trackingId: null,
       status: 'error',
-      message: `Erreur reseau: ${err.message}`,
+      message: `Erreur réseau: ${err.message}`,
       timestamp: new Date().toISOString(),
     }
   }
@@ -220,7 +220,7 @@ async function checkB2BRouterStatus(
     return {
       trackingId,
       status: 'error',
-      message: 'Erreur reseau',
+      message: 'Erreur réseau',
       updatedAt: new Date().toISOString(),
     }
   }

@@ -1,5 +1,5 @@
-const NUMBER_PLACEHOLDER_REGEX = /\{num(?:ero|éro|Ã©ro)\}/gi
-const YEAR_PLACEHOLDER_REGEX = /\{ann(?:ee|ée|Ã©e)\}/gi
+const NUMBER_PLACEHOLDER_REGEX = /\{num(?:ero|éro)\}/gi
+const YEAR_PLACEHOLDER_REGEX = /\{ann(?:ee|ée)\}/gi
 
 interface SequenceOptions {
   pattern: string | null | undefined

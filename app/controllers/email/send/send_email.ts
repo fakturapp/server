@@ -123,7 +123,7 @@ export default class SendEmail {
         })
       } else if (emailAccount.provider === 'resend') {
         if (!emailAccount.accessToken) {
-          throw new Error('Clé API Resend manquante')
+          throw new Error('Resend API key missing')
         }
         await ResendUserService.sendEmail({
           encryptedApiKey: emailAccount.accessToken,
@@ -141,7 +141,7 @@ export default class SendEmail {
           !emailAccount.smtpUsername ||
           !emailAccount.smtpPassword
         ) {
-          throw new Error('Configuration SMTP incomplète')
+          throw new Error('SMTP config incomplete')
         }
         await SmtpService.sendEmail({
           host: emailAccount.smtpHost,

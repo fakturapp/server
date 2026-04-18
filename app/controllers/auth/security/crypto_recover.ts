@@ -48,7 +48,7 @@ export default class CryptoRecover {
       const membershipsWithRecovery = memberships.filter((membership) => membership.encryptedTeamDekRecovery)
       if (membershipsWithRecovery.length === 0) {
         return response.badRequest({
-          message: 'Aucune clef de secours configurÃ©e pour ce compte',
+          message: 'Aucune clef de secours configurée pour ce compte',
         })
       }
 
@@ -69,7 +69,7 @@ export default class CryptoRecover {
         rotatedRecoveryKey = rotation.recoveryKey
       } catch {
         return response.unprocessableEntity({
-          message: 'Clef de secours incorrecte. Impossible de dÃ©chiffrer vos donnÃ©es.',
+          message: 'Clef de secours incorrecte. Impossible de déchiffrer vos données.',
         })
       }
     } else {
@@ -107,7 +107,7 @@ export default class CryptoRecover {
         }
       } catch {
         return response.unprocessableEntity({
-          message: 'Ancien mot de passe incorrect. Impossible de dÃ©chiffrer vos donnÃ©es.',
+          message: 'Ancien mot de passe incorrect. Impossible de déchiffrer vos données.',
         })
       }
     }
@@ -127,6 +127,6 @@ export default class CryptoRecover {
       }
     }
 
-    return response.ok({ message: 'DonnÃ©es rÃ©cupÃ©rÃ©es avec succÃ¨s' })
+    return response.ok({ message: 'Données récupérées avec succès' })
   }
 }
