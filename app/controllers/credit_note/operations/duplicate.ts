@@ -2,6 +2,7 @@ import type { HttpContext } from '@adonisjs/core/http'
 import db from '@adonisjs/lucid/services/db'
 import CreditNote from '#models/credit_note/credit_note'
 import CreditNoteLine from '#models/credit_note/credit_note_line'
+import documentNumberingService from '#services/documents/document_numbering_service'
 
 export default class Duplicate {
   async handle({ auth, params, response }: HttpContext) {
@@ -23,7 +24,12 @@ export default class Duplicate {
     }
 
     const currentYear = new Date().getFullYear().toString()
-    const prefix = `AV-${currentYear}-`
+    const fallbackPattern = 'AV-{annee}-{numero}'
+    const prefix = documentNumberingService.buildSequencePrefix(
+      fallbackPattern,
+      fallbackPattern,
+      currentYear
+    )
 
     const lastCreditNote = await CreditNote.query()
       .where('team_id', teamId)
@@ -31,14 +37,12 @@ export default class Duplicate {
       .orderBy('created_at', 'desc')
       .first()
 
-    let nextNum = 1
-    if (lastCreditNote) {
-      const numStr = lastCreditNote.creditNoteNumber.slice(prefix.length)
-      const parsed = Number.parseInt(numStr, 10)
-      if (!Number.isNaN(parsed)) nextNum = parsed + 1
-    }
-
-    const creditNoteNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`
+    const creditNoteNumber = documentNumberingService.buildNextSequentialNumber({
+      pattern: fallbackPattern,
+      fallbackPattern,
+      currentYear,
+      lastNumber: lastCreditNote?.creditNoteNumber,
+    })
     const today = new Date().toISOString().slice(0, 10)
 
     const creditNote = await db.transaction(async (trx) => {

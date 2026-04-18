@@ -3,6 +3,7 @@ import db from '@adonisjs/lucid/services/db'
 import CreditNote from '#models/credit_note/credit_note'
 import CreditNoteLine from '#models/credit_note/credit_note_line'
 import { createCreditNoteValidator } from '#validators/credit_note_validator'
+import documentNumberingService from '#services/documents/document_numbering_service'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 
 export default class Create {
@@ -19,7 +20,12 @@ export default class Create {
     const payload = await request.validateUsing(createCreditNoteValidator)
 
     const currentYear = new Date().getFullYear().toString()
-    const prefix = `AV-${currentYear}-`
+    const fallbackPattern = 'AV-{annee}-{numero}'
+    const prefix = documentNumberingService.buildSequencePrefix(
+      fallbackPattern,
+      fallbackPattern,
+      currentYear
+    )
 
     const lastCreditNote = await CreditNote.query()
       .where('team_id', teamId)
@@ -27,14 +33,12 @@ export default class Create {
       .orderBy('created_at', 'desc')
       .first()
 
-    let nextNum = 1
-    if (lastCreditNote) {
-      const numStr = lastCreditNote.creditNoteNumber.slice(prefix.length)
-      const parsed = Number.parseInt(numStr, 10)
-      if (!Number.isNaN(parsed)) nextNum = parsed + 1
-    }
-
-    const creditNoteNumber = `${prefix}${nextNum.toString().padStart(3, '0')}`
+    const creditNoteNumber = documentNumberingService.buildNextSequentialNumber({
+      pattern: fallbackPattern,
+      fallbackPattern,
+      currentYear,
+      lastNumber: lastCreditNote?.creditNoteNumber,
+    })
 
     // Calculate totals from lines
     let subtotal = 0
