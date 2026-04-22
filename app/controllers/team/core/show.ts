@@ -19,8 +19,17 @@ export default class Show {
       .preload('company')
       .firstOrFail()
 
+    const currentMember = team.members.find((member) => member.userId === user.id)
+    const canAccessRecoveryKey = !!currentMember && ['super_admin', 'admin'].includes(currentMember.role)
+    const serializedTeam = await ctx.serialize.withoutWrapping(TeamTransformer.transform(team))
+
     return response.ok({
-      team: await ctx.serialize.withoutWrapping(TeamTransformer.transform(team)),
+      team: {
+        ...serializedTeam,
+        recoveryKeyAvailable: canAccessRecoveryKey && !!currentMember?.encryptedRecoveryKey,
+        recoveryKeyUnavailableReason:
+          canAccessRecoveryKey && !currentMember?.encryptedRecoveryKey ? 'legacy_team' : null,
+      },
     })
   }
 }
