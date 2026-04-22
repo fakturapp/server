@@ -5,6 +5,8 @@ import TeamMember from '#models/team/team_member'
 import Team from '#models/team/team'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
+import recoveryKeyService from '#services/crypto/recovery_key_service'
+import sessionKekResolver from '#services/crypto/session_kek_resolver'
 
 const acceptInviteValidator = vine.compile(
   vine.object({
@@ -44,12 +46,24 @@ export default class AcceptInvite {
     }
 
     let encryptedTeamDek: string | null = null
-    const kek = keyStore.getKEK(user.id)
+    const kek = await sessionKekResolver.resolvePrimary(user, request)
+
+    if (invitation.encryptedInviteDek && !kek) {
+      return response.unauthorized({
+        code: 'SESSION_EXPIRED',
+        message: 'Session expired. Please log in again.',
+      })
+    }
 
     if (invitation.encryptedInviteDek && kek) {
       const inviteKey = zeroAccessCryptoService.deriveInviteKey(payload.token)
       const teamDek = zeroAccessCryptoService.decryptDEK(invitation.encryptedInviteDek, inviteKey)
       encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
+
+      const storedRecoveryKey = await recoveryKeyService.findStoredRecoveryKeyForUser(user.id)
+      if (storedRecoveryKey) {
+        recoveryKeyService.applyRecoveryKeyToMembership(invitation, teamDek, storedRecoveryKey)
+      }
 
       keyStore.storeDEK(user.id, invitation.teamId, teamDek)
     }
