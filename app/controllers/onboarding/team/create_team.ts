@@ -7,6 +7,7 @@ import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service
 import keyStore from '#services/crypto/key_store'
 import RecoveryKeyGenerated from '#events/recovery_key_generated'
 import recoveryKeyService from '#services/crypto/recovery_key_service'
+import sessionKekResolver from '#services/crypto/session_kek_resolver'
 
 export default class CreateTeam {
   async handle({ auth, request, response }: HttpContext) {
@@ -16,7 +17,7 @@ export default class CreateTeam {
       return response.conflict({ message: 'You already have a team' })
     }
 
-    const kek = keyStore.getKEK(user.id)
+    const kek = await sessionKekResolver.resolvePrimary(user, request)
     if (!kek) {
       return response.unauthorized({
         code: 'SESSION_EXPIRED',

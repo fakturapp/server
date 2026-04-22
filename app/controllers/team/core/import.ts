@@ -29,6 +29,7 @@ import BankAccount from '#models/team/bank_account'
 import { decryptBuffer } from '#services/team/export_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
+import sessionKekResolver from '#services/crypto/session_kek_resolver'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import RecoveryKeyGenerated from '#events/recovery_key_generated'
 import recoveryKeyService from '#services/crypto/recovery_key_service'
@@ -37,7 +38,7 @@ export default class Import {
   async handle(ctx: HttpContext) {
     const { auth, request, response } = ctx
     const user = auth.user!
-    const kek = keyStore.getKEK(user.id)
+    const kek = await sessionKekResolver.resolvePrimary(user, request)
 
     if (!kek) {
       return response.unauthorized({
