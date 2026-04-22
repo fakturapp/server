@@ -9,7 +9,7 @@ const DEFAULT_TTL_MS = 15 * 24 * 60 * 60 * 1000
 class KeyStore {
   private store = new Map<string, UserKeys>()
 
-  storeKeys(userId: string, kek: Buffer, teamId: string, dek: Buffer): void {
+  storeKEK(userId: string, kek: Buffer): void {
     let entry = this.store.get(userId)
     if (!entry) {
       entry = {
@@ -18,10 +18,20 @@ class KeyStore {
         expiresAt: Date.now() + DEFAULT_TTL_MS,
       }
       this.store.set(userId, entry)
-    } else {
-      entry.kek = kek
-      entry.expiresAt = Date.now() + DEFAULT_TTL_MS
+      return
     }
+
+    if (entry.kek !== kek) {
+      entry.kek.fill(0)
+    }
+
+    entry.kek = kek
+    entry.expiresAt = Date.now() + DEFAULT_TTL_MS
+  }
+
+  storeKeys(userId: string, kek: Buffer, teamId: string, dek: Buffer): void {
+    this.storeKEK(userId, kek)
+    const entry = this.store.get(userId)!
     entry.deks.set(teamId, dek)
   }
 
@@ -48,6 +58,9 @@ class KeyStore {
     if (!entry) return null
     if (Date.now() > entry.expiresAt) {
       this.clear(userId)
+      return null
+    }
+    if (entry.kek.length === 0) {
       return null
     }
     return entry.kek

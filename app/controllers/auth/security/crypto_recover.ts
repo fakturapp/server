@@ -1,9 +1,12 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import crypto from 'node:crypto'
+import db from '@adonisjs/lucid/services/db'
 import TeamMember from '#models/team/team_member'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 import keyStoreWarmer from '#services/crypto/key_store_warmer'
 import RecoveryKeyGenerated from '#events/recovery_key_generated'
+import encryptionService from '#services/encryption/encryption_service'
 import recoveryKeyService from '#services/crypto/recovery_key_service'
 
 export default class CryptoRecover {
@@ -45,10 +48,12 @@ export default class CryptoRecover {
       const normalizedKey = recoveryKey.replace(/-/g, '').toUpperCase()
       const recoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(normalizedKey)
 
-      const membershipsWithRecovery = memberships.filter((membership) => membership.encryptedTeamDekRecovery)
+      const membershipsWithRecovery = memberships.filter(
+        (membership) => membership.encryptedTeamDekRecovery
+      )
       if (membershipsWithRecovery.length === 0) {
         return response.badRequest({
-          message: 'Aucune clef de secours configurée pour ce compte',
+          message: 'Aucune clef de secours configur\u00e9e pour ce compte',
         })
       }
 
@@ -69,7 +74,7 @@ export default class CryptoRecover {
         rotatedRecoveryKey = rotation.recoveryKey
       } catch {
         return response.unprocessableEntity({
-          message: 'Clef de secours incorrecte. Impossible de déchiffrer vos données.',
+          message: 'Clef de secours incorrecte. Impossible de d\u00e9chiffrer vos donn\u00e9es.',
         })
       }
     } else {
@@ -107,7 +112,8 @@ export default class CryptoRecover {
         }
       } catch {
         return response.unprocessableEntity({
-          message: 'Ancien mot de passe incorrect. Impossible de déchiffrer vos données.',
+          message:
+            'Ancien mot de passe incorrect. Impossible de d\u00e9chiffrer vos donn\u00e9es.',
         })
       }
     }
@@ -120,13 +126,19 @@ export default class CryptoRecover {
       RecoveryKeyGenerated.dispatch(user.email, rotatedRecoveryKey, user.fullName ?? undefined)
     }
 
-    if (user.currentTeamId) {
-      const dek = keyStore.getDEK(user.id, user.currentTeamId)
-      if (dek) {
-        keyStore.storeKeys(user.id, newKek, user.currentTeamId, dek)
-      }
-    }
+    keyStore.storeKEK(user.id, newKek)
 
-    return response.ok({ message: 'Données récupérées avec succès' })
+    const sessionKey = crypto.randomBytes(32)
+    const layer1 = encryptionService.encryptWithCustomKey(newKek.toString('hex'), sessionKey)
+    const layer2 = encryptionService.encrypt(layer1)
+    await db
+      .from('auth_access_tokens')
+      .where('id', String(user.currentAccessToken.identifier))
+      .update({ encrypted_kek: layer2 })
+
+    return response.ok({
+      message: 'Donn\u00e9es r\u00e9cup\u00e9r\u00e9es avec succ\u00e8s',
+      vaultKey: sessionKey.toString('hex'),
+    })
   }
 }

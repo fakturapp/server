@@ -1,10 +1,14 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import crypto from 'node:crypto'
+import db from '@adonisjs/lucid/services/db'
 import hash from '@adonisjs/core/services/hash'
 import TeamMember from '#models/team/team_member'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
+import encryptionService from '#services/encryption/encryption_service'
 import { changePasswordValidator } from '#validators/account_validator'
 import RecoveryKeyGenerated from '#events/recovery_key_generated'
+import recoveryKeyService from '#services/crypto/recovery_key_service'
 
 export default class Password {
   async handle({ auth, request, response }: HttpContext) {
@@ -33,29 +37,20 @@ export default class Password {
         .where('status', 'active')
         .whereNotNull('encryptedTeamDek')
 
-      newRecoveryKey = zeroAccessCryptoService.generateRecoveryKey()
-      const newRecoveryKEK = zeroAccessCryptoService.deriveRecoveryKEK(newRecoveryKey)
-
       for (const membership of memberships) {
         const teamDek = zeroAccessCryptoService.decryptDEK(membership.encryptedTeamDek!, oldKek)
         membership.encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, newKek)
-        membership.encryptedTeamDekRecovery = zeroAccessCryptoService.encryptDEK(
-          teamDek,
-          newRecoveryKEK
-        )
         await membership.save()
 
         keyStore.storeDEK(user.id, membership.teamId, teamDek)
       }
+
+      const rotation = await recoveryKeyService.rotateForUser(user, newKek)
+      newRecoveryKey = rotation.recoveryKey
     }
 
     user.password = payload.password
     user.saltKdf = newSalt.toString('hex')
-
-    if (newRecoveryKey) {
-      user.recoveryKeyHash = zeroAccessCryptoService.hashRecoveryKey(newRecoveryKey)
-      user.hasRecoveryKey = true
-    }
 
     await user.save()
 
@@ -63,17 +58,24 @@ export default class Password {
       RecoveryKeyGenerated.dispatch(user.email, newRecoveryKey, user.fullName ?? undefined)
     }
 
-    if (user.currentTeamId) {
-      const currentDek = keyStore.getDEK(user.id, user.currentTeamId)
-      if (currentDek) {
-        keyStore.storeKeys(user.id, newKek, user.currentTeamId, currentDek)
-      }
-    }
+    keyStore.storeKEK(user.id, newKek)
+
+    const sessionKey = crypto.randomBytes(32)
+    const layer1 = encryptionService.encryptWithCustomKey(newKek.toString('hex'), sessionKey)
+    const layer2 = encryptionService.encrypt(layer1)
+    await db
+      .from('auth_access_tokens')
+      .where('id', String(user.currentAccessToken.identifier))
+      .update({ encrypted_kek: layer2 })
 
     const formatted = newRecoveryKey
       ? zeroAccessCryptoService.formatRecoveryKey(newRecoveryKey)
       : undefined
 
-    return response.ok({ message: 'Password changed successfully', recoveryKey: formatted })
+    return response.ok({
+      message: 'Password changed successfully',
+      recoveryKey: formatted,
+      vaultKey: sessionKey.toString('hex'),
+    })
   }
 }
