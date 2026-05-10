@@ -2,9 +2,11 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Invoice from '#models/invoice/invoice'
 import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
+import { recordAuditEvent } from '#services/audit/audit_log_service'
 
 export default class UpdateStatus {
-  async handle({ auth, params, request, response }: HttpContext) {
+  async handle(ctx: HttpContext) {
+    const { auth, params, request, response } = ctx
     const user = auth.user!
     const teamId = user.currentTeamId
 
@@ -49,6 +51,19 @@ export default class UpdateStatus {
 
     await invoice.save()
     broadcastDocumentSaved('invoice', invoice.id, user.id)
+
+    await recordAuditEvent(ctx, {
+      action: 'invoice.status_updated',
+      resourceType: 'invoice',
+      resourceId: invoice.id,
+      metadata: {
+        teamId,
+        status,
+        paidDate: invoice.paidDate,
+        paymentDate: paymentDate || null,
+        paymentMethod: paymentMethod || null,
+      },
+    })
 
     const promptExtraInfo = status === 'paid'
 
