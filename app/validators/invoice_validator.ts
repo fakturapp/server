@@ -1,5 +1,7 @@
 import vine from '@vinejs/vine'
 
+const OPERATION_CATEGORIES = ['service', 'goods', 'mixed'] as const
+
 export const createInvoiceValidator = vine.compile(
   vine.object({
     clientId: vine.string().trim().optional(),
@@ -31,6 +33,8 @@ export const createInvoiceValidator = vine.compile(
     paymentTerms: vine.string().trim().maxLength(255).optional(),
     paymentMethod: vine.string().trim().maxLength(50).optional(),
     bankAccountId: vine.string().trim().optional(),
+    vatOnDebits: vine.boolean().optional(),
+    operationCategory: vine.enum(OPERATION_CATEGORIES).optional().nullable(),
     clientSnapshot: vine
       .object({
         type: vine.string().trim().maxLength(20).optional(),
