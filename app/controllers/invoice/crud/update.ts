@@ -5,6 +5,7 @@ import InvoiceLine from '#models/invoice/invoice_line'
 import { createInvoiceValidator } from '#validators/invoice_validator'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
+import { recordAuditEvent } from '#services/audit/audit_log_service'
 
 export default class Update {
   async handle(ctx: HttpContext) {
@@ -112,6 +113,19 @@ export default class Update {
     })
 
     broadcastDocumentSaved('invoice', invoice.id, user.id)
+
+    await recordAuditEvent(ctx, {
+      action: 'invoice.updated',
+      resourceType: 'invoice',
+      resourceId: invoice.id,
+      metadata: {
+        teamId,
+        invoiceNumber: invoice.invoiceNumber,
+        operationCategory: invoiceUpdateData.operationCategory,
+        vatOnDebits: invoiceUpdateData.vatOnDebits,
+        total: invoiceUpdateData.total,
+      },
+    })
 
     return response.ok({
       message: 'Invoice updated',
