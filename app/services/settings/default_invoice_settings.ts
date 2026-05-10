@@ -22,6 +22,7 @@ export function buildDefaultInvoiceSettings(teamId: string) {
     defaultShowNotes: true,
     defaultVatExempt: false,
     defaultVatRate: 20,
+    defaultVatOnDebits: false,
     defaultShowQuantityColumn: true,
     defaultShowUnitColumn: true,
     defaultShowUnitPriceColumn: true,
