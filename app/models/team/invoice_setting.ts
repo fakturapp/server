@@ -79,6 +79,9 @@ export default class InvoiceSetting extends BaseModel {
   declare defaultVatRate: number
 
   @column()
+  declare defaultVatOnDebits: boolean
+
+  @column()
   declare defaultShowQuantityColumn: boolean
 
   @column()
