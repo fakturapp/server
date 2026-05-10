@@ -121,6 +121,10 @@ export async function validateXml(_config: PdpConfig, xml: string): Promise<PdpV
     warnings.push('SIREN/SIRET non renseigné')
   }
 
+  if (!xml.includes('BuyerReference')) {
+    warnings.push("Nature de l'operation non renseignee")
+  }
+
   return {
     valid: errors.length === 0,
     errors,
