@@ -49,6 +49,7 @@ export interface FacturXDocument {
   language?: string
   operationCategory?: 'service' | 'goods' | 'mixed' | null
   deliveryAddress?: string | null
+  vatOnDebits?: boolean
 }
 
 function escapeXml(str: string): string {
@@ -97,6 +98,10 @@ function getOperationCategoryCode(category?: 'service' | 'goods' | 'mixed' | nul
   }
 }
 
+function getVatOnDebitsNote(vatOnDebits?: boolean): string | null {
+  return vatOnDebits ? 'TVA acquittée d’après les débits' : null
+}
+
 function splitAddress(address?: string | null): string[] {
   return (address || '')
     .split(/\r?\n|,/)
@@ -128,6 +133,14 @@ export function generateFacturXXml(doc: FacturXDocument): string {
     xml += `
     <ram:IncludedNote>
       <ram:Content>${escapeXml(doc.notes)}</ram:Content>
+    </ram:IncludedNote>`
+  }
+
+  const vatOnDebitsNote = getVatOnDebitsNote(doc.vatOnDebits)
+  if (vatOnDebitsNote) {
+    xml += `
+    <ram:IncludedNote>
+      <ram:Content>${escapeXml(vatOnDebitsNote)}</ram:Content>
     </ram:IncludedNote>`
   }
 
@@ -417,6 +430,7 @@ export function buildFacturXFromInvoice(
     language: invoiceData.language,
     operationCategory: invoiceData.operationCategory || null,
     deliveryAddress: invoiceData.deliveryAddress || null,
+    vatOnDebits: invoiceData.vatOnDebits || false,
   }
 }
 
