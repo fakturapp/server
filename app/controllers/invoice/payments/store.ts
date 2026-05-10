@@ -3,6 +3,7 @@ import vine from '@vinejs/vine'
 import Invoice from '#models/invoice/invoice'
 import InvoicePayment from '#models/invoice/invoice_payment'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import { recordAuditEvent } from '#services/audit/audit_log_service'
 
 const storePaymentValidator = vine.compile(
   vine.object({
@@ -63,6 +64,21 @@ export default class Store {
     }
 
     await invoice.save()
+
+    await recordAuditEvent(ctx, {
+      action: 'invoice.payment_recorded',
+      resourceType: 'invoice',
+      resourceId: invoice.id,
+      metadata: {
+        teamId,
+        paymentId: payment.id,
+        amount: paymentData.amount,
+        paymentDate: payload.paymentDate,
+        invoiceStatus: invoice.status,
+        amountPaid: Math.round(amountPaid * 100) / 100,
+        amountDue: Math.round((invoiceTotal - amountPaid) * 100) / 100,
+      },
+    })
 
     return response.created({
       message: 'Payment recorded',
