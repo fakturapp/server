@@ -38,6 +38,7 @@ export default class InvoiceTransformer extends BaseTransformer<Invoice> {
         'taxAmount',
         'total',
         'vatExemptReason',
+        'vatOnDebits',
         'sourceQuoteId',
         'paymentMethod',
         'operationCategory',
