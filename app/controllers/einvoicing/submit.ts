@@ -1,8 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
-import Quote from '#models/quote/quote'
+import Invoice from '#models/invoice/invoice'
 import Company from '#models/team/company'
 import InvoiceSetting from '#models/team/invoice_setting'
-import { buildFacturXFromQuote, generateFacturXXml } from '#services/pdf/facturx_generator'
+import { buildFacturXFromInvoice, generateFacturXXml } from '#services/pdf/facturx_generator'
 import { submitInvoice, validateXml, buildPdpConfig } from '#services/einvoicing/pdp_service'
 import {
   decryptModelFields,
@@ -26,21 +26,21 @@ export default class EInvoicingSubmit {
       return response.forbidden({ message: "La facturation electronique n'est pas activee" })
     }
 
-    const quote = await Quote.query()
+    const invoice = await Invoice.query()
       .where('id', params.id)
       .where('team_id', teamId)
       .preload('client')
       .preload('lines', (q) => q.orderBy('position', 'asc'))
       .first()
 
-    if (!quote) {
-      return response.notFound({ message: 'Document non trouve' })
+    if (!invoice) {
+      return response.notFound({ message: 'Facture non trouvee' })
     }
 
-    decryptModelFields(quote, [...ENCRYPTED_FIELDS.quote], dek)
-    decryptModelFieldsArray(quote.lines, [...ENCRYPTED_FIELDS.quoteLine], dek)
-    if (quote.client) {
-      decryptModelFields(quote.client, [...ENCRYPTED_FIELDS.client], dek)
+    decryptModelFields(invoice, [...ENCRYPTED_FIELDS.invoice], dek)
+    decryptModelFieldsArray(invoice.lines, [...ENCRYPTED_FIELDS.invoiceLine], dek)
+    if (invoice.client) {
+      decryptModelFields(invoice.client, [...ENCRYPTED_FIELDS.client], dek)
     }
 
     const company = await Company.query().where('team_id', teamId).first()
@@ -48,20 +48,23 @@ export default class EInvoicingSubmit {
       decryptModelFields(company, [...ENCRYPTED_FIELDS.company], dek)
     }
 
-    const quoteData = {
-      quoteNumber: quote.quoteNumber,
-      subject: quote.subject,
-      issueDate: quote.issueDate,
-      validityDate: quote.validityDate,
-      billingType: quote.billingType,
-      subtotal: quote.subtotal,
-      taxAmount: quote.taxAmount,
-      total: quote.total,
-      notes: quote.notes,
-      language: quote.language || 'fr',
+    const invoiceData = {
+      invoiceNumber: invoice.invoiceNumber,
+      subject: invoice.subject,
+      issueDate: invoice.issueDate,
+      dueDate: invoice.dueDate,
+      billingType: invoice.billingType,
+      subtotal: invoice.subtotal,
+      taxAmount: invoice.taxAmount,
+      total: invoice.total,
+      notes: invoice.notes,
+      language: invoice.language || 'fr',
+      operationCategory: invoice.operationCategory,
+      deliveryAddress: invoice.deliveryAddress,
+      vatOnDebits: invoice.vatOnDebits,
     }
 
-    const linesData = quote.lines.map((l) => ({
+    const linesData = invoice.lines.map((l) => ({
       description: l.description,
       saleType: l.saleType,
       quantity: l.quantity,
@@ -70,38 +73,42 @@ export default class EInvoicingSubmit {
       total: l.total,
     }))
 
-    const clientData = quote.client
-      ? {
-          displayName: quote.client.displayName,
-          companyName: quote.client.companyName,
-          firstName: quote.client.firstName,
-          lastName: quote.client.lastName,
-          email: quote.client.email,
-          address: quote.client.address,
-          postalCode: quote.client.postalCode,
-          city: quote.client.city,
-          country: quote.client.country,
-          siren: quote.client.siren,
-          vatNumber: quote.client.vatNumber,
-        }
-      : null
+    const clientData = invoice.clientSnapshot
+      ? JSON.parse(invoice.clientSnapshot)
+      : invoice.client
+        ? {
+            displayName: invoice.client.displayName,
+            companyName: invoice.client.companyName,
+            firstName: invoice.client.firstName,
+            lastName: invoice.client.lastName,
+            email: invoice.client.email,
+            address: invoice.client.address,
+            postalCode: invoice.client.postalCode,
+            city: invoice.client.city,
+            country: invoice.client.country,
+            siren: invoice.clientSiren || invoice.client.siren,
+            vatNumber: invoice.clientVatNumber || invoice.client.vatNumber,
+          }
+        : null
 
-    const companyData = company
-      ? {
-          legalName: company.legalName,
-          siren: company.siren,
-          siret: company.siret,
-          vatNumber: company.vatNumber,
-          addressLine1: company.addressLine1,
-          postalCode: company.postalCode,
-          city: company.city,
-          country: company.country,
-          email: company.email,
-          phone: company.phone,
-        }
-      : null
+    const companyData = invoice.companySnapshot
+      ? JSON.parse(invoice.companySnapshot)
+      : company
+        ? {
+            legalName: company.legalName,
+            siren: company.siren,
+            siret: company.siret,
+            vatNumber: company.vatNumber,
+            addressLine1: company.addressLine1,
+            postalCode: company.postalCode,
+            city: company.city,
+            country: company.country,
+            email: company.email,
+            phone: company.phone,
+          }
+        : null
 
-    const facturxDoc = buildFacturXFromQuote(quoteData, linesData, clientData, companyData)
+    const facturxDoc = buildFacturXFromInvoice(invoiceData, linesData, clientData, companyData)
     const xml = generateFacturXXml(facturxDoc)
 
     decryptModelFields(invoiceSettings, [...ENCRYPTED_FIELDS.invoiceSetting], dek)
@@ -118,8 +125,8 @@ export default class EInvoicingSubmit {
     }
 
     const result = await submitInvoice(pdpConfig, xml, {
-      documentNumber: quote.quoteNumber,
-      documentType: 'quote',
+      documentNumber: invoice.invoiceNumber,
+      documentType: 'invoice',
     })
 
     return response.ok({
