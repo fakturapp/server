@@ -179,6 +179,7 @@ export async function generateInvoicePdf(
     total: invoice.total,
     language: invoice.language || 'fr',
     vatExemptReason: invoice.vatExemptReason || 'none',
+    vatOnDebits: invoice.vatOnDebits || false,
     footerText: invoiceSettings?.defaultFooterText || null,
     logoBorderRadius: invoiceSettings?.logoBorderRadius ?? 0,
   }
@@ -312,6 +313,7 @@ export async function generateQuotePdf(
     total: quote.total,
     language: quote.language || 'fr',
     vatExemptReason: quote.vatExemptReason || 'none',
+    vatOnDebits: false,
     footerText: invoiceSettings?.defaultFooterText || null,
     logoBorderRadius: invoiceSettings?.logoBorderRadius ?? 0,
   }
@@ -418,6 +420,7 @@ export async function generateCreditNotePdf(
     total: creditNote.total,
     language: creditNote.language || 'fr',
     vatExemptReason: creditNote.vatExemptReason || 'none',
+    vatOnDebits: false,
     footerText: invoiceSettings?.defaultFooterText || null,
     logoBorderRadius: invoiceSettings?.logoBorderRadius ?? 0,
   }
