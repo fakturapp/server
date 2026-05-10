@@ -9,6 +9,7 @@ import {
   decryptModelFieldsArray,
   ENCRYPTED_FIELDS,
 } from '#services/crypto/field_encryption_helper'
+import { recordAuditEvent } from '#services/audit/audit_log_service'
 
 export default class EInvoicingSubmit {
   async handle(ctx: HttpContext) {
@@ -117,6 +118,19 @@ export default class EInvoicingSubmit {
 
     const validation = await validateXml(pdpConfig, xml)
     if (!validation.valid) {
+      await recordAuditEvent(ctx, {
+        action: 'einvoicing.validation_failed',
+        resourceType: 'invoice',
+        resourceId: invoice.id,
+        severity: 'warning',
+        metadata: {
+          teamId,
+          provider: pdpConfig.provider,
+          errors: validation.errors,
+          warnings: validation.warnings,
+        },
+      })
+
       return response.unprocessableEntity({
         message: 'Le document ne passe pas la validation',
         errors: validation.errors,
@@ -127,6 +141,21 @@ export default class EInvoicingSubmit {
     const result = await submitInvoice(pdpConfig, xml, {
       documentNumber: invoice.invoiceNumber,
       documentType: 'invoice',
+    })
+
+    await recordAuditEvent(ctx, {
+      action: result.success ? 'einvoicing.submitted' : 'einvoicing.submission_failed',
+      resourceType: 'invoice',
+      resourceId: invoice.id,
+      severity: result.success ? 'info' : 'warning',
+      metadata: {
+        teamId,
+        provider: pdpConfig.provider,
+        sandbox: pdpConfig.sandbox,
+        status: result.status,
+        trackingId: result.trackingId,
+        warnings: validation.warnings,
+      },
     })
 
     return response.ok({
