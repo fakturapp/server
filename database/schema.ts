@@ -861,7 +861,7 @@ export class InvoicePaymentSchema extends BaseModel {
 }
 
 export class InvoiceSettingSchema extends BaseModel {
-  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'b2BAccountId', 'b2BEnterpriseSize', 'b2BEreportingEnabled', 'b2BNafCode', 'b2BTypeOperation', 'billingType', 'collaborationEnabled', 'createdAt', 'creditNoteFilenamePattern', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultShowQuantityColumn', 'defaultShowUnitColumn', 'defaultShowUnitPriceColumn', 'defaultShowVatColumn', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'defaultVatRate', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'invoiceNumberPattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextCreditNoteNumber', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'quoteNumberPattern', 'stripePublishableKey', 'stripeSecretKey', 'stripeWebhookSecret', 'stripeWebhookSecretApp', 'teamId', 'template', 'updatedAt'] as const
+  static $columns = ['accentColor', 'aiApiKeyClaude', 'aiApiKeyGemini', 'aiApiKeyGroq', 'aiCustomApiKey', 'aiEnabled', 'aiKeyMode', 'aiModel', 'aiProvider', 'b2BAccountId', 'b2BEnterpriseSize', 'b2BEreportingEnabled', 'b2BNafCode', 'b2BTypeOperation', 'billingType', 'collaborationEnabled', 'createdAt', 'creditNoteFilenamePattern', 'customPaymentMethod', 'darkMode', 'defaultAcceptanceConditions', 'defaultFooterText', 'defaultFreeField', 'defaultLanguage', 'defaultOperationCategory', 'defaultShowDeliveryAddress', 'defaultShowNotes', 'defaultShowQuantityColumn', 'defaultShowUnitColumn', 'defaultShowUnitPriceColumn', 'defaultShowVatColumn', 'defaultSignatureField', 'defaultSubject', 'defaultVatExempt', 'defaultVatOnDebits', 'defaultVatRate', 'documentFont', 'eInvoicingEnabled', 'footerMode', 'id', 'invoiceFilenamePattern', 'invoiceNumberPattern', 'logoBorderRadius', 'logoSource', 'logoUrl', 'nextCreditNoteNumber', 'nextInvoiceNumber', 'nextQuoteNumber', 'paymentMethods', 'pdpApiKey', 'pdpProvider', 'pdpSandbox', 'quoteFilenamePattern', 'quoteNumberPattern', 'stripePublishableKey', 'stripeSecretKey', 'stripeWebhookSecret', 'stripeWebhookSecretApp', 'teamId', 'template', 'updatedAt'] as const
   $columns = InvoiceSettingSchema.$columns
   @column()
   declare accentColor: string
@@ -932,6 +932,8 @@ export class InvoiceSettingSchema extends BaseModel {
   @column()
   declare defaultVatExempt: boolean | null
   @column()
+  declare defaultVatOnDebits: boolean
+  @column()
   declare defaultVatRate: number
   @column()
   declare documentFont: string | null
@@ -986,7 +988,7 @@ export class InvoiceSettingSchema extends BaseModel {
 }
 
 export class InvoiceSchema extends BaseModel {
-  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'companySnapshot', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'paidDate', 'paymentMethod', 'paymentTerms', 'showQuantityColumn', 'showUnitColumn', 'showUnitPriceColumn', 'showVatColumn', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason'] as const
+  static $columns = ['accentColor', 'acceptanceConditions', 'bankAccountId', 'billingType', 'clientId', 'clientSiren', 'clientSnapshot', 'clientVatNumber', 'comment', 'companySnapshot', 'createdAt', 'deliveryAddress', 'documentTitle', 'dueDate', 'freeField', 'globalDiscountType', 'globalDiscountValue', 'id', 'invoiceNumber', 'issueDate', 'language', 'logoUrl', 'notes', 'operationCategory', 'paidDate', 'paymentMethod', 'paymentTerms', 'showQuantityColumn', 'showUnitColumn', 'showUnitPriceColumn', 'showVatColumn', 'signatureField', 'sourceQuoteId', 'status', 'subject', 'subtotal', 'taxAmount', 'teamId', 'total', 'updatedAt', 'vatExemptReason', 'vatOnDebits'] as const
   $columns = InvoiceSchema.$columns
   @column()
   declare accentColor: string
@@ -1070,6 +1072,8 @@ export class InvoiceSchema extends BaseModel {
   declare updatedAt: DateTime | null
   @column()
   declare vatExemptReason: string
+  @column()
+  declare vatOnDebits: boolean
 }
 
 export class LoginHistorySchema extends BaseModel {
