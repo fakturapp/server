@@ -85,6 +85,8 @@ export default class Update {
       paymentMethod: payload.paymentMethod || null,
       bankAccountId: payload.bankAccountId || null,
       vatExemptReason: payload.vatExemptReason || 'none',
+      vatOnDebits: payload.vatOnDebits ?? false,
+      operationCategory: payload.operationCategory || null,
       clientSnapshot: payload.clientSnapshot ? JSON.stringify(payload.clientSnapshot) : null,
       companySnapshot: payload.companySnapshot ? JSON.stringify(payload.companySnapshot) : null,
     }
