@@ -6,6 +6,7 @@ import InvoiceSetting from '#models/team/invoice_setting'
 import { createInvoiceValidator } from '#validators/invoice_validator'
 import documentNumberingService from '#services/documents/document_numbering_service'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
+import { recordAuditEvent } from '#services/audit/audit_log_service'
 
 export default class Create {
   async handle(ctx: HttpContext) {
@@ -142,6 +143,19 @@ export default class Create {
       }
 
       return inv
+    })
+
+    await recordAuditEvent(ctx, {
+      action: 'invoice.created',
+      resourceType: 'invoice',
+      resourceId: invoice.id,
+      metadata: {
+        teamId,
+        invoiceNumber,
+        operationCategory: invoiceData.operationCategory,
+        vatOnDebits: invoiceData.vatOnDebits,
+        total: invoiceData.total,
+      },
     })
 
     return response.created({
