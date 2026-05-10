@@ -52,6 +52,7 @@ export default class InvoiceSettingsUpdate {
         defaultShowNotes: payload.defaultShowNotes ?? defaultSettings.defaultShowNotes,
         defaultVatExempt: payload.defaultVatExempt ?? defaultSettings.defaultVatExempt,
         defaultVatRate: payload.defaultVatRate ?? defaultSettings.defaultVatRate,
+        defaultVatOnDebits: payload.defaultVatOnDebits ?? defaultSettings.defaultVatOnDebits,
         defaultShowQuantityColumn: payload.defaultShowQuantityColumn ?? defaultSettings.defaultShowQuantityColumn,
         defaultShowUnitColumn: payload.defaultShowUnitColumn ?? defaultSettings.defaultShowUnitColumn,
         defaultShowUnitPriceColumn: payload.defaultShowUnitPriceColumn ?? defaultSettings.defaultShowUnitPriceColumn,
@@ -97,6 +98,7 @@ export default class InvoiceSettingsUpdate {
       if (payload.defaultShowNotes !== undefined) settings.defaultShowNotes = payload.defaultShowNotes
       if (payload.defaultVatExempt !== undefined) settings.defaultVatExempt = payload.defaultVatExempt
       if (payload.defaultVatRate !== undefined) settings.defaultVatRate = payload.defaultVatRate
+      if (payload.defaultVatOnDebits !== undefined) settings.defaultVatOnDebits = payload.defaultVatOnDebits
       if (payload.defaultShowQuantityColumn !== undefined) {
         settings.defaultShowQuantityColumn = payload.defaultShowQuantityColumn
       }
