@@ -48,6 +48,7 @@ export interface FacturXDocument {
   notes?: string | null
   language?: string
   operationCategory?: 'service' | 'goods' | 'mixed' | null
+  deliveryAddress?: string | null
 }
 
 function escapeXml(str: string): string {
@@ -94,6 +95,13 @@ function getOperationCategoryCode(category?: 'service' | 'goods' | 'mixed' | nul
     default:
       return null
   }
+}
+
+function splitAddress(address?: string | null): string[] {
+  return (address || '')
+    .split(/\r?\n|,/)
+    .map((part) => part.trim())
+    .filter(Boolean)
 }
 
 export function generateFacturXXml(doc: FacturXDocument): string {
@@ -277,8 +285,29 @@ export function generateFacturXXml(doc: FacturXDocument): string {
     </ram:ApplicableHeaderTradeAgreement>`
 
   // ── Trade delivery ──
-  xml += `
+  const deliveryParts = splitAddress(doc.deliveryAddress)
+  if (deliveryParts.length > 0) {
+    xml += `
+    <ram:ApplicableHeaderTradeDelivery>
+      <ram:ShipToTradeParty>
+        <ram:Name>${escapeXml(doc.buyer?.name || 'Destinataire')}</ram:Name>
+        <ram:PostalTradeAddress>
+          <ram:LineOne>${escapeXml(deliveryParts[0])}</ram:LineOne>`
+
+    if (deliveryParts[1]) {
+      xml += `
+          <ram:LineTwo>${escapeXml(deliveryParts[1])}</ram:LineTwo>`
+    }
+
+    xml += `
+          <ram:CountryID>${buyerCountry}</ram:CountryID>
+        </ram:PostalTradeAddress>
+      </ram:ShipToTradeParty>
+    </ram:ApplicableHeaderTradeDelivery>`
+  } else {
+    xml += `
     <ram:ApplicableHeaderTradeDelivery/>`
+  }
 
   // ── Trade settlement ──
   xml += `
@@ -387,6 +416,7 @@ export function buildFacturXFromInvoice(
     notes: invoiceData.notes,
     language: invoiceData.language,
     operationCategory: invoiceData.operationCategory || null,
+    deliveryAddress: invoiceData.deliveryAddress || null,
   }
 }
 
