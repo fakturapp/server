@@ -38,6 +38,7 @@ export const updateInvoiceSettingsValidator = vine.compile(
     defaultShowNotes: looseBool.clone(),
     defaultVatExempt: looseBool.clone(),
     defaultVatRate: vine.number().min(0).max(100).optional(),
+    defaultVatOnDebits: looseBool.clone(),
     defaultShowQuantityColumn: looseBool.clone(),
     defaultShowUnitColumn: looseBool.clone(),
     defaultShowUnitPriceColumn: looseBool.clone(),
