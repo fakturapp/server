@@ -28,6 +28,7 @@ interface QuoteData {
   total: number
   language: string
   vatExemptReason?: 'none' | 'not_subject' | 'france_no_vat' | 'outside_france'
+  vatOnDebits?: boolean
   footerText?: string | null
   logoBorderRadius?: number
 }
@@ -223,6 +224,7 @@ interface I18n {
   vatExemptNotSubject: string
   vatExemptFranceNoVat: string
   vatExemptOutsideFrance: string
+  vatOnDebits: string
 }
 
 function getI18n(lang: string): I18n {
@@ -266,6 +268,7 @@ function getI18n(lang: string): I18n {
       vatExemptFranceNoVat: 'VAT exemption, article 261 of the CGI',
       vatExemptOutsideFrance:
         'VAT not applicable — service performed outside France, article 259-1 of the CGI',
+      vatOnDebits: 'VAT payable on debits',
     }
   return {
     quote: 'DEVIS',
@@ -306,6 +309,7 @@ function getI18n(lang: string): I18n {
     vatExemptFranceNoVat: 'Exon\u00e9ration de TVA, article 261 du CGI',
     vatExemptOutsideFrance:
       'TVA non applicable \u2014 prestation de services r\u00e9alis\u00e9e hors de France, article 259-1 du CGI',
+    vatOnDebits: 'TVA acquittée d’après les débits',
   }
 }
 
@@ -807,6 +811,9 @@ function renderStandardPage(
   if (vatText) {
     html += `<div class="vat-exempt">${vatText}</div>`
   }
+  if (quote.vatOnDebits) {
+    html += `<div class="vat-exempt">${i.vatOnDebits}</div>`
+  }
 
   // Notes
   if (quote.notes) {
@@ -1188,6 +1195,7 @@ function renderLateral(
 
   const lateralVatText = getVatExemptText(quote.vatExemptReason, i)
   if (lateralVatText) main += `<div class="vat-exempt">${lateralVatText}</div>`
+  if (quote.vatOnDebits) main += `<div class="vat-exempt">${i.vatOnDebits}</div>`
   if (quote.notes)
     main += `<div class="notes-section"><div class="section-label">${i.conditionsAndNotes}</div><div class="notes-text">${formatText(quote.notes)}</div></div>`
   if (quote.acceptanceConditions)
