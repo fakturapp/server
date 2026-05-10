@@ -20,6 +20,7 @@ type InvoiceSettingsSource = {
   defaultShowNotes?: boolean | null
   defaultVatExempt?: boolean | null
   defaultVatRate?: number | null
+  defaultVatOnDebits?: boolean | null
   defaultShowQuantityColumn?: boolean | null
   defaultShowUnitColumn?: boolean | null
   defaultShowUnitPriceColumn?: boolean | null
@@ -61,6 +62,7 @@ export function serializeInvoiceSettings(settings: InvoiceSettingsSource) {
     defaultShowNotes: settings.defaultShowNotes ?? true,
     defaultVatExempt: settings.defaultVatExempt || false,
     defaultVatRate: settings.defaultVatRate ?? 20,
+    defaultVatOnDebits: settings.defaultVatOnDebits ?? false,
     defaultShowQuantityColumn: settings.defaultShowQuantityColumn ?? true,
     defaultShowUnitColumn: settings.defaultShowUnitColumn ?? true,
     defaultShowUnitPriceColumn: settings.defaultShowUnitPriceColumn ?? true,
