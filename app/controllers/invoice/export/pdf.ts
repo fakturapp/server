@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { generateInvoicePdf } from '#services/pdf/document_pdf_service'
+import { recordAuditEvent } from '#services/audit/audit_log_service'
 
 export default class Pdf {
   async handle(ctx: HttpContext) {
@@ -14,6 +15,13 @@ export default class Pdf {
 
     try {
       const { pdfBuffer, filename } = await generateInvoicePdf(params.id, teamId, dek)
+
+      await recordAuditEvent(ctx, {
+        action: 'invoice.pdf_exported',
+        resourceType: 'invoice',
+        resourceId: params.id,
+        metadata: { teamId, filename },
+      })
 
       response.header('Content-Type', 'application/pdf')
       response.header('Content-Disposition', `attachment; filename="${filename}"`)
