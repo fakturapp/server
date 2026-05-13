@@ -1700,7 +1700,7 @@ export class RecurringInvoiceSchema extends BaseModel {
 }
 
 export class TeamMemberSchema extends BaseModel {
-  static $columns = ['createdAt', 'dekVersion', 'encryptedInviteDek', 'encryptedTeamDek', 'encryptedTeamDekRecovery', 'id', 'invitationExpiresAt', 'invitationToken', 'invitedAt', 'invitedEmail', 'joinedAt', 'role', 'status', 'teamId', 'updatedAt', 'userId'] as const
+  static $columns = ['createdAt', 'dekVersion', 'encryptedInviteDek', 'encryptedRecoveryKey', 'encryptedTeamDek', 'encryptedTeamDekRecovery', 'id', 'invitationExpiresAt', 'invitationToken', 'invitedAt', 'invitedEmail', 'joinedAt', 'role', 'status', 'teamId', 'updatedAt', 'userId'] as const
   $columns = TeamMemberSchema.$columns
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
@@ -1708,6 +1708,8 @@ export class TeamMemberSchema extends BaseModel {
   declare dekVersion: number | null
   @column()
   declare encryptedInviteDek: string | null
+  @column()
+  declare encryptedRecoveryKey: string | null
   @column()
   declare encryptedTeamDek: string | null
   @column()

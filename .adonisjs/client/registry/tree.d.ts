@@ -74,9 +74,12 @@ export interface ApiDefinition {
     cashFlow: typeof routes['dashboard.cashFlow']
   }
   serveIcon: typeof routes['serve_icon']
+  confirmPrivate: typeof routes['confirm_private']
+  migrateToStandard: typeof routes['migrate_to_standard']
   teamList: typeof routes['team_list']
   teamCreate: typeof routes['team_create']
   teamShow: typeof routes['team_show']
+  teamShowRecoveryKey: typeof routes['team_show_recovery_key']
   teamUpdate: typeof routes['team_update']
   teamDelete: typeof routes['team_delete']
   teamLeave: typeof routes['team_leave']

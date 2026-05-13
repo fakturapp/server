@@ -811,6 +811,30 @@ export interface Registry {
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/media/serve_icon').default['handle']>>>
     }
   }
+  'confirm_private': {
+    methods: ["POST"]
+    pattern: '/api/v1/team/encryption/confirm-private'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/team/encryption_validators').confirmPrivateValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/team/encryption_validators').confirmPrivateValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/encryption/confirm_private').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/encryption/confirm_private').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
+  'migrate_to_standard': {
+    methods: ["POST"]
+    pattern: '/api/v1/team/encryption/migrate-to-standard'
+    types: {
+      body: ExtractBody<InferInput<(typeof import('#validators/team/encryption_validators').migrateToStandardValidator)>>
+      paramsTuple: []
+      params: {}
+      query: ExtractQuery<InferInput<(typeof import('#validators/team/encryption_validators').migrateToStandardValidator)>>
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/encryption/migrate_to_standard').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/encryption/migrate_to_standard').default['handle']>>> | { status: 422; response: { errors: SimpleError[] } }
+    }
+  }
   'team_list': {
     methods: ["GET","HEAD"]
     pattern: '/api/v1/team/all'
@@ -845,6 +869,18 @@ export interface Registry {
       query: {}
       response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/core/show').default['handle']>>>
       errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/core/show').default['handle']>>>
+    }
+  }
+  'team_show_recovery_key': {
+    methods: ["GET","HEAD"]
+    pattern: '/api/v1/team/recovery-key'
+    types: {
+      body: {}
+      paramsTuple: []
+      params: {}
+      query: {}
+      response: ExtractResponse<Awaited<ReturnType<import('#controllers/team/core/show_recovery_key').default['handle']>>>
+      errorResponse: ExtractErrorResponse<Awaited<ReturnType<import('#controllers/team/core/show_recovery_key').default['handle']>>>
     }
   }
   'team_update': {

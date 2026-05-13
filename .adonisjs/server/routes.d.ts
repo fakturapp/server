@@ -71,9 +71,12 @@ export type ScannedRoutes = {
     'dashboard.charts.micro': { paramsTuple?: []; params?: {} }
     'dashboard.cashFlow': { paramsTuple?: []; params?: {} }
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
+    'confirm_private': { paramsTuple?: []; params?: {} }
+    'migrate_to_standard': { paramsTuple?: []; params?: {} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_create': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
+    'team_show_recovery_key': { paramsTuple?: []; params?: {} }
     'team_update': { paramsTuple?: []; params?: {} }
     'team_delete': { paramsTuple?: []; params?: {} }
     'team_leave': { paramsTuple?: []; params?: {} }
@@ -298,6 +301,8 @@ export type ScannedRoutes = {
     'create_company': { paramsTuple?: []; params?: {} }
     'skip_company': { paramsTuple?: []; params?: {} }
     'complete_personalization': { paramsTuple?: []; params?: {} }
+    'confirm_private': { paramsTuple?: []; params?: {} }
+    'migrate_to_standard': { paramsTuple?: []; params?: {} }
     'team_create': { paramsTuple?: []; params?: {} }
     'team_leave': { paramsTuple?: []; params?: {} }
     'upload_icon': { paramsTuple?: []; params?: {} }
@@ -384,6 +389,7 @@ export type ScannedRoutes = {
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
+    'team_show_recovery_key': { paramsTuple?: []; params?: {} }
     'team_members': { paramsTuple?: []; params?: {} }
     'search_users': { paramsTuple?: []; params?: {} }
     'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }
@@ -477,6 +483,7 @@ export type ScannedRoutes = {
     'serve_icon': { paramsTuple: [ParamValue]; params: {'filename': ParamValue} }
     'team_list': { paramsTuple?: []; params?: {} }
     'team_show': { paramsTuple?: []; params?: {} }
+    'team_show_recovery_key': { paramsTuple?: []; params?: {} }
     'team_members': { paramsTuple?: []; params?: {} }
     'search_users': { paramsTuple?: []; params?: {} }
     'invite_info': { paramsTuple: [ParamValue]; params: {'token': ParamValue} }

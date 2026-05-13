@@ -400,9 +400,14 @@ export const controllers = {
       Import: () => import('#controllers/team/core/import'),
       Leave: () => import('#controllers/team/core/leave'),
       List: () => import('#controllers/team/core/list'),
+      ShowRecoveryKey: () => import('#controllers/team/core/show_recovery_key'),
       Show: () => import('#controllers/team/core/show'),
       Switch: () => import('#controllers/team/core/switch'),
       Update: () => import('#controllers/team/core/update'),
+    },
+    encryption: {
+      ConfirmPrivate: () => import('#controllers/team/encryption/confirm_private'),
+      MigrateToStandard: () => import('#controllers/team/encryption/migrate_to_standard'),
     },
     invitations: {
       AcceptInvite: () => import('#controllers/team/invitations/accept_invite'),

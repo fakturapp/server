@@ -408,6 +408,18 @@ const routes = {
     tokens: [{"old":"/api/v1/team-icons/:filename","type":0,"val":"api","end":""},{"old":"/api/v1/team-icons/:filename","type":0,"val":"v1","end":""},{"old":"/api/v1/team-icons/:filename","type":0,"val":"team-icons","end":""},{"old":"/api/v1/team-icons/:filename","type":1,"val":"filename","end":""}],
     types: placeholder as Registry['serve_icon']['types'],
   },
+  'confirm_private': {
+    methods: ["POST"],
+    pattern: '/api/v1/team/encryption/confirm-private',
+    tokens: [{"old":"/api/v1/team/encryption/confirm-private","type":0,"val":"api","end":""},{"old":"/api/v1/team/encryption/confirm-private","type":0,"val":"v1","end":""},{"old":"/api/v1/team/encryption/confirm-private","type":0,"val":"team","end":""},{"old":"/api/v1/team/encryption/confirm-private","type":0,"val":"encryption","end":""},{"old":"/api/v1/team/encryption/confirm-private","type":0,"val":"confirm-private","end":""}],
+    types: placeholder as Registry['confirm_private']['types'],
+  },
+  'migrate_to_standard': {
+    methods: ["POST"],
+    pattern: '/api/v1/team/encryption/migrate-to-standard',
+    tokens: [{"old":"/api/v1/team/encryption/migrate-to-standard","type":0,"val":"api","end":""},{"old":"/api/v1/team/encryption/migrate-to-standard","type":0,"val":"v1","end":""},{"old":"/api/v1/team/encryption/migrate-to-standard","type":0,"val":"team","end":""},{"old":"/api/v1/team/encryption/migrate-to-standard","type":0,"val":"encryption","end":""},{"old":"/api/v1/team/encryption/migrate-to-standard","type":0,"val":"migrate-to-standard","end":""}],
+    types: placeholder as Registry['migrate_to_standard']['types'],
+  },
   'team_list': {
     methods: ["GET","HEAD"],
     pattern: '/api/v1/team/all',
@@ -425,6 +437,12 @@ const routes = {
     pattern: '/api/v1/team',
     tokens: [{"old":"/api/v1/team","type":0,"val":"api","end":""},{"old":"/api/v1/team","type":0,"val":"v1","end":""},{"old":"/api/v1/team","type":0,"val":"team","end":""}],
     types: placeholder as Registry['team_show']['types'],
+  },
+  'team_show_recovery_key': {
+    methods: ["GET","HEAD"],
+    pattern: '/api/v1/team/recovery-key',
+    tokens: [{"old":"/api/v1/team/recovery-key","type":0,"val":"api","end":""},{"old":"/api/v1/team/recovery-key","type":0,"val":"v1","end":""},{"old":"/api/v1/team/recovery-key","type":0,"val":"team","end":""},{"old":"/api/v1/team/recovery-key","type":0,"val":"recovery-key","end":""}],
+    types: placeholder as Registry['team_show_recovery_key']['types'],
   },
   'team_update': {
     methods: ["PUT"],
