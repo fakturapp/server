@@ -20,6 +20,12 @@ export default class Team extends BaseModel {
   @column()
   declare ownerId: string
 
+  @column()
+  declare encryptionMode: 'private' | 'standard'
+
+  @column.dateTime()
+  declare encryptionModeConfirmedAt: DateTime | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
