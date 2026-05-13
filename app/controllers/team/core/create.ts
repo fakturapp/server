@@ -78,8 +78,10 @@ export default class Create {
       dekVersion: 1,
     })
 
+    // Création depuis le dashboard : on switch sur la nouvelle équipe
+    // SANS reset onboardingCompleted (sinon le user est renvoyé vers
+    // /onboarding/team par auth.tsx).
     user.currentTeamId = team.id
-    user.onboardingCompleted = false
     await user.save()
 
     if (encryptionMode === 'private' && kek) {
