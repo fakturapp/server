@@ -43,6 +43,25 @@ class KeyStore {
     entry.deks.set(teamId, dek)
   }
 
+  /**
+   * Store a DEK for a server-mode team (no KEK required).
+   * Bootstraps an entry with an empty KEK if the user has no prior keystore state.
+   */
+  storeServerDek(userId: string, teamId: string, dek: Buffer): void {
+    let entry = this.store.get(userId)
+    if (!entry) {
+      entry = {
+        kek: Buffer.alloc(0),
+        deks: new Map(),
+        expiresAt: Date.now() + DEFAULT_TTL_MS,
+      }
+      this.store.set(userId, entry)
+    } else {
+      entry.expiresAt = Date.now() + DEFAULT_TTL_MS
+    }
+    entry.deks.set(teamId, dek)
+  }
+
   getDEK(userId: string, teamId: string): Buffer | null {
     const entry = this.store.get(userId)
     if (!entry) return null
