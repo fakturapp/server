@@ -38,9 +38,14 @@ export default class CryptoRecover {
       })
     }
 
-    const memberships = await TeamMember.query()
+    const allMemberships = await TeamMember.query()
       .where('userId', user.id)
       .where('status', 'active')
+      .preload('team')
+
+    const memberships = allMemberships.filter(
+      (m) => ((m as any).team as { encryptionMode?: string } | null)?.encryptionMode === 'private'
+    )
 
     let rotatedRecoveryKey: string | null = null
 

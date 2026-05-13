@@ -36,8 +36,14 @@ export default class Password {
         .where('userId', user.id)
         .where('status', 'active')
         .whereNotNull('encryptedTeamDek')
+        .preload('team')
 
+      let hasPrivateTeam = false
       for (const membership of memberships) {
+        const team = (membership as any).team as { encryptionMode: 'private' | 'standard' } | null
+        if (!team || team.encryptionMode !== 'private') continue
+
+        hasPrivateTeam = true
         const teamDek = zeroAccessCryptoService.decryptDEK(membership.encryptedTeamDek!, oldKek)
         membership.encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, newKek)
         await membership.save()
@@ -45,8 +51,10 @@ export default class Password {
         keyStore.storeDEK(user.id, membership.teamId, teamDek)
       }
 
-      const rotation = await recoveryKeyService.rotateForUser(user, newKek)
-      newRecoveryKey = rotation.recoveryKey
+      if (hasPrivateTeam) {
+        const rotation = await recoveryKeyService.rotateForUser(user, newKek)
+        newRecoveryKey = rotation.recoveryKey
+      }
     }
 
     user.password = payload.password
