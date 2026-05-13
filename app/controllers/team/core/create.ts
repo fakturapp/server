@@ -29,9 +29,6 @@ export default class Create {
     if (encryptionMode === 'private') {
       kek = await sessionKekResolver.resolvePrimary(user, request)
 
-      // KEK pas dans le keystore (login récent sur navigateur frais, restart
-      // serveur, etc.) → on accepte un mot de passe envoyé dans le payload
-      // pour redériver la KEK à la volée sans logout.
       if (!kek && payload.confirmPassword && user.saltKdf) {
         const valid = await hash.verify(user.password, payload.confirmPassword)
         if (!valid) {
@@ -78,9 +75,6 @@ export default class Create {
       dekVersion: 1,
     })
 
-    // Création depuis le dashboard : on switch sur la nouvelle équipe
-    // SANS reset onboardingCompleted (sinon le user est renvoyé vers
-    // /onboarding/team par auth.tsx).
     user.currentTeamId = team.id
     await user.save()
 
