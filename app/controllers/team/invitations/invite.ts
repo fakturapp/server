@@ -2,11 +2,13 @@ import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
 import TeamMember from '#models/team/team_member'
+import Team from '#models/team/team'
 import User from '#models/account/user'
 import TeamMemberInvited from '#events/team_member_invited'
 import env from '#start/env'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
+import teamEncryptionService from '#services/crypto/team_encryption_service'
 import { inviteValidator } from '#validators/team_validator'
 
 export default class Invite {
@@ -15,6 +17,11 @@ export default class Invite {
     const user = auth.user!
 
     if (!user.currentTeamId) {
+      return response.notFound({ message: 'No team found' })
+    }
+
+    const team = await Team.find(user.currentTeamId)
+    if (!team) {
       return response.notFound({ message: 'No team found' })
     }
 
@@ -55,7 +62,16 @@ export default class Invite {
 
     const teamDek = keyStore.getDEK(user.id, user.currentTeamId)
     let encryptedInviteDek: string | null = null
-    if (teamDek) {
+    let encryptedTeamDek: string | null = null
+
+    if (team.encryptionMode === 'standard') {
+      if (!teamDek) {
+        return response.internalServerError({
+          message: "Impossible de résoudre la clef de l'équipe pour cette invitation.",
+        })
+      }
+      encryptedTeamDek = teamEncryptionService.wrapDekForTeam(team, teamDek)
+    } else if (teamDek) {
       const inviteKey = zeroAccessCryptoService.deriveInviteKey(token)
       encryptedInviteDek = zeroAccessCryptoService.encryptDEK(teamDek, inviteKey)
     }
@@ -69,6 +85,8 @@ export default class Invite {
       invitedEmail: payload.email,
       invitedAt: DateTime.now(),
       encryptedInviteDek,
+      encryptedTeamDek,
+      dekVersion: 1,
     })
 
     const frontendUrl = env.get('FRONTEND_URL') || 'http://localhost:3000'

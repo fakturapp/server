@@ -7,6 +7,7 @@ import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service
 import keyStore from '#services/crypto/key_store'
 import recoveryKeyService from '#services/crypto/recovery_key_service'
 import sessionKekResolver from '#services/crypto/session_kek_resolver'
+import teamEncryptionService from '#services/crypto/team_encryption_service'
 
 const acceptInviteValidator = vine.compile(
   vine.object({
@@ -45,27 +46,38 @@ export default class AcceptInvite {
       return response.conflict({ message: 'You are already a member of this team' })
     }
 
-    let encryptedTeamDek: string | null = null
-    const kek = await sessionKekResolver.resolvePrimary(user, request)
+    const team = await Team.findOrFail(invitation.teamId)
 
-    if (invitation.encryptedInviteDek && !kek) {
-      return response.unauthorized({
-        code: 'SESSION_EXPIRED',
-        message: 'Session expired. Please log in again.',
-      })
-    }
+    let encryptedTeamDek: string | null = invitation.encryptedTeamDek
+    let teamDek: Buffer | null = null
 
-    if (invitation.encryptedInviteDek && kek) {
-      const inviteKey = zeroAccessCryptoService.deriveInviteKey(payload.token)
-      const teamDek = zeroAccessCryptoService.decryptDEK(invitation.encryptedInviteDek, inviteKey)
-      encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
+    if (team.encryptionMode === 'standard') {
+      teamDek = teamEncryptionService.unwrapDekForMembership(team, invitation)
+      if (!teamDek) {
+        return response.internalServerError({
+          message: "Impossible de résoudre la clef de l'équipe pour cette invitation.",
+        })
+      }
+    } else {
+      const kek = await sessionKekResolver.resolvePrimary(user, request)
 
-      const storedRecoveryKey = await recoveryKeyService.findStoredRecoveryKeyForUser(user.id)
-      if (storedRecoveryKey) {
-        recoveryKeyService.applyRecoveryKeyToMembership(invitation, teamDek, storedRecoveryKey)
+      if (invitation.encryptedInviteDek && !kek) {
+        return response.unauthorized({
+          code: 'SESSION_EXPIRED',
+          message: 'Session expired. Please log in again.',
+        })
       }
 
-      keyStore.storeDEK(user.id, invitation.teamId, teamDek)
+      if (invitation.encryptedInviteDek && kek) {
+        const inviteKey = zeroAccessCryptoService.deriveInviteKey(payload.token)
+        teamDek = zeroAccessCryptoService.decryptDEK(invitation.encryptedInviteDek, inviteKey)
+        encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
+
+        const storedRecoveryKey = await recoveryKeyService.findStoredRecoveryKeyForUser(user.id)
+        if (storedRecoveryKey) {
+          recoveryKeyService.applyRecoveryKeyToMembership(invitation, teamDek, storedRecoveryKey)
+        }
+      }
     }
 
     invitation.userId = user.id
@@ -79,13 +91,20 @@ export default class AcceptInvite {
     user.currentTeamId = invitation.teamId
     await user.save()
 
-    const team = await Team.findOrFail(invitation.teamId)
+    if (teamDek) {
+      if (team.encryptionMode === 'standard') {
+        keyStore.storeServerDek(user.id, invitation.teamId, teamDek)
+      } else {
+        keyStore.storeDEK(user.id, invitation.teamId, teamDek)
+      }
+    }
 
     return response.ok({
       message: 'Invitation accepted',
       team: {
         id: team.id,
         name: team.name,
+        encryptionMode: team.encryptionMode,
       },
     })
   }
