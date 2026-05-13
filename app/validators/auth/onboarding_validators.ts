@@ -7,6 +7,10 @@ export const createTeamValidator = vine.compile(
     encryptionMode: vine.enum(['private', 'standard'] as const).optional(),
     ackDataLoss: vine.boolean().optional(),
     ackNotResponsible: vine.boolean().optional(),
+    /** When the in-memory KEK is unavailable (fresh login, server restart),
+     *  the user is prompted to confirm their Faktur password — sent here so
+     *  the backend can re-derive the KEK on the fly and wrap the new team DEK. */
+    confirmPassword: vine.string().minLength(1).optional(),
   })
 )
 

@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
+import hash from '@adonisjs/core/services/hash'
 import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import { createTeamValidator } from '#validators/auth/onboarding_validators'
@@ -27,10 +28,29 @@ export default class Create {
     let kek: Buffer | null = null
     if (encryptionMode === 'private') {
       kek = await sessionKekResolver.resolvePrimary(user, request)
+
+      // KEK pas dans le keystore (login récent sur navigateur frais, restart
+      // serveur, etc.) → on accepte un mot de passe envoyé dans le payload
+      // pour redériver la KEK à la volée sans logout.
+      if (!kek && payload.confirmPassword && user.saltKdf) {
+        const valid = await hash.verify(user.password, payload.confirmPassword)
+        if (!valid) {
+          return response.unprocessableEntity({
+            code: 'INVALID_PASSWORD',
+            message: 'Mot de passe incorrect.',
+          })
+        }
+        kek = await zeroAccessCryptoService.deriveKEK(
+          payload.confirmPassword,
+          Buffer.from(user.saltKdf, 'hex'),
+        )
+        keyStore.storeKEK(user.id, kek)
+      }
+
       if (!kek) {
-        return response.unauthorized({
-          code: 'SESSION_EXPIRED',
-          message: 'Session expired. Please log in again.',
+        return response.unprocessableEntity({
+          code: 'KEK_REQUIRED',
+          message: 'Confirmez votre mot de passe pour activer le chiffrement Privé.',
         })
       }
     }
