@@ -1,8 +1,10 @@
 import db from '@adonisjs/lucid/services/db'
+import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
+import teamEncryptionService from '#services/crypto/team_encryption_service'
 
 export class KeyStoreWarmer {
   async warmKekFromRequest(
@@ -39,31 +41,42 @@ export class KeyStoreWarmer {
     tokenIdentifier: string | null,
     sessionKeyHex: string | null | undefined
   ): Promise<boolean> {
+    if (!currentTeamId) {
+      const kek = await this.warmKekFromRequest(userId, tokenIdentifier, sessionKeyHex)
+      return !!kek
+    }
+
+    const team = await Team.find(currentTeamId)
+    if (!team) return false
+
+    const member = await TeamMember.query()
+      .where('teamId', currentTeamId)
+      .where('userId', userId)
+      .where('status', 'active')
+      .first()
+
+    if (team.encryptionMode === 'standard') {
+      const dek = member ? teamEncryptionService.unwrapDekForMembership(team, member) : null
+      if (!dek) return false
+      keyStore.storeServerDek(userId, currentTeamId, dek)
+      return true
+    }
+
     const kek = await this.warmKekFromRequest(userId, tokenIdentifier, sessionKeyHex)
     if (!kek) return false
 
     try {
-      if (currentTeamId) {
-        const teamMember = await TeamMember.query()
-          .where('teamId', currentTeamId)
-          .where('userId', userId)
-          .where('status', 'active')
-          .first()
-
-        const dek = this.decryptTeamDek(teamMember, kek)
-        if (dek) {
-          keyStore.storeKeys(userId, kek, currentTeamId, dek)
-          return true
-        }
+      const dek = this.decryptPrivateTeamDek(member, kek)
+      if (dek) {
+        keyStore.storeKeys(userId, kek, currentTeamId, dek)
       }
-
       return true
     } catch {
       return false
     }
   }
 
-  private decryptTeamDek(teamMember: TeamMember | null, kek: Buffer): Buffer | null {
+  private decryptPrivateTeamDek(teamMember: TeamMember | null, kek: Buffer): Buffer | null {
     if (!teamMember) {
       return null
     }
