@@ -2,6 +2,8 @@ import type { HttpContext } from '@adonisjs/core/http'
 import env from '#start/env'
 import AuthProvider from '#models/account/auth_provider'
 import PasskeyCredential from '#models/account/passkey_credential'
+import Team from '#models/team/team'
+import TeamMember from '#models/team/team_member'
 import keyStore from '#services/crypto/key_store'
 import keyStoreWarmer from '#services/crypto/key_store_warmer'
 import UserTransformer from '#transformers/user_transformer'
@@ -22,20 +24,33 @@ export default class Me {
         .first(),
     ])
 
-    let vaultLocked =
-      user.saltKdf && user.currentTeamId ? !keyStore.isUnlocked(user.id, user.currentTeamId) : false
+    const memberships = await TeamMember.query()
+      .where('userId', user.id)
+      .where('status', 'active')
+      .select(['team_id'])
+    const teamIds = memberships.map((m) => m.teamId)
+    const teams = teamIds.length > 0 ? await Team.query().whereIn('id', teamIds) : []
 
-    if (vaultLocked && user.currentTeamId) {
-      const sessionKeyHex = request.header('X-Vault-Key')
-      if (sessionKeyHex) {
-        const recovered = await this.tryAutoRecover(
-          user.id,
-          user.currentTeamId,
-          String(user.currentAccessToken.identifier),
-          sessionKeyHex
-        )
-        if (recovered) {
-          vaultLocked = false
+    const currentTeam = user.currentTeamId
+      ? teams.find((t) => t.id === user.currentTeamId) ?? null
+      : null
+    const currentTeamEncryptionMode = currentTeam ? currentTeam.encryptionMode : null
+
+    let vaultLocked = false
+    if (currentTeam && currentTeam.encryptionMode === 'private' && user.saltKdf) {
+      vaultLocked = !keyStore.isUnlocked(user.id, currentTeam.id)
+      if (vaultLocked) {
+        const sessionKeyHex = request.header('X-Vault-Key')
+        if (sessionKeyHex) {
+          const recovered = await keyStoreWarmer.warmFromRequest(
+            user.id,
+            currentTeam.id,
+            String(user.currentAccessToken.identifier),
+            sessionKeyHex
+          )
+          if (recovered && keyStore.isUnlocked(user.id, currentTeam.id)) {
+            vaultLocked = false
+          }
         }
       }
     }
@@ -46,6 +61,15 @@ export default class Me {
       .filter(Boolean)
     const isAdmin = adminEmails.includes(user.email.toLowerCase())
 
+    const teamsSummary = teams.map((t) => ({
+      id: t.id,
+      name: t.name,
+      encryptionMode: t.encryptionMode,
+      encryptionModeConfirmedAt: t.encryptionModeConfirmedAt
+        ? t.encryptionModeConfirmedAt.toISO()
+        : null,
+    }))
+
     return response.ok({
       user: {
         ...(await ctx.serialize.withoutWrapping(UserTransformer.transform(user))),
@@ -53,16 +77,9 @@ export default class Me {
         hasPasskeys: Number(passkeyCount?.$extras.total || 0) > 0,
         vaultLocked,
         isAdmin,
+        currentTeamEncryptionMode,
+        teams: teamsSummary,
       },
     })
-  }
-
-  private async tryAutoRecover(
-    userId: string,
-    teamId: string,
-    tokenIdentifier: string,
-    sessionKeyHex: string
-  ): Promise<boolean> {
-    return keyStoreWarmer.warmFromRequest(userId, teamId, tokenIdentifier, sessionKeyHex)
   }
 }
