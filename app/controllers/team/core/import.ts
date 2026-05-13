@@ -26,10 +26,12 @@ import ExpenseCategory from '#models/expense/expense_category'
 import EmailTemplate from '#models/email/email_template'
 import PaymentReminderSetting from '#models/reminder/payment_reminder_setting'
 import BankAccount from '#models/team/bank_account'
+import { DateTime } from 'luxon'
 import { decryptBuffer } from '#services/team/export_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 import sessionKekResolver from '#services/crypto/session_kek_resolver'
+import teamEncryptionService from '#services/crypto/team_encryption_service'
 import { encryptModelFields, ENCRYPTED_FIELDS } from '#services/crypto/field_encryption_helper'
 import RecoveryKeyGenerated from '#events/recovery_key_generated'
 import recoveryKeyService from '#services/crypto/recovery_key_service'
@@ -38,13 +40,26 @@ export default class Import {
   async handle(ctx: HttpContext) {
     const { auth, request, response } = ctx
     const user = auth.user!
-    const kek = await sessionKekResolver.resolvePrimary(user, request)
 
-    if (!kek) {
-      return response.unauthorized({
-        code: 'SESSION_EXPIRED',
-        message: 'Session expired. Please log in again.',
+    const encryptionMode = request.input('encryptionMode', 'standard') === 'private' ? 'private' : 'standard'
+    const ackDataLoss = request.input('ackDataLoss') === true || request.input('ackDataLoss') === 'true'
+    const ackNotResponsible = request.input('ackNotResponsible') === true || request.input('ackNotResponsible') === 'true'
+
+    if (encryptionMode === 'private' && (!ackDataLoss || !ackNotResponsible)) {
+      return response.unprocessableEntity({
+        message: 'Vous devez accepter les avertissements pour activer le mode Privé.',
       })
+    }
+
+    let kek: Buffer | null = null
+    if (encryptionMode === 'private') {
+      kek = await sessionKekResolver.resolvePrimary(user, request)
+      if (!kek) {
+        return response.unauthorized({
+          code: 'SESSION_EXPIRED',
+          message: 'Session expired. Please log in again.',
+        })
+      }
     }
 
     const file = request.file('file', {
@@ -127,13 +142,22 @@ export default class Import {
     }
 
     const teamDek = zeroAccessCryptoService.generateDEK()
-    const encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
 
     const team = await db.transaction(async (trx) => {
       const newTeam = await Team.create(
-        { name: teamName, iconUrl: teamData.iconUrl || null, ownerId: user.id },
+        {
+          name: teamName,
+          iconUrl: teamData.iconUrl || null,
+          ownerId: user.id,
+          encryptionMode,
+          encryptionModeConfirmedAt: DateTime.now(),
+        },
         { client: trx }
       )
+
+      const encryptedTeamDek = teamEncryptionService.wrapDekForTeam(newTeam, teamDek, {
+        userKek: kek ?? undefined,
+      })
 
       await TeamMember.create(
         {
@@ -329,8 +353,13 @@ export default class Import {
       return newTeam
     })
 
-    keyStore.storeDEK(user.id, team.id, teamDek)
-    const rotation = await recoveryKeyService.rotateForUser(user, kek)
+    let rotation: { recoveryKey: string; formattedRecoveryKey: string } | null = null
+    if (encryptionMode === 'private' && kek) {
+      keyStore.storeDEK(user.id, team.id, teamDek)
+      rotation = await recoveryKeyService.rotateForUser(user, kek)
+    } else {
+      keyStore.storeServerDek(user.id, team.id, teamDek)
+    }
 
     const uploadsBase = join(app.tmpPath(), 'uploads')
     const assetDirs = ['team-icons', 'company-logos', 'invoice-logos'] as const
@@ -366,15 +395,27 @@ export default class Import {
     // Switch user to the new team
     user.currentTeamId = team.id
     await user.save()
-    RecoveryKeyGenerated.dispatch(user.email, rotation.recoveryKey, user.fullName ?? undefined)
+
+    if (rotation) {
+      RecoveryKeyGenerated.dispatch(user.email, rotation.recoveryKey, user.fullName ?? undefined)
+      return response.ok({
+        message: 'Équipe importée avec succès',
+        team: {
+          id: team.id,
+          name: team.name,
+          encryptionMode: team.encryptionMode,
+        },
+        recoveryKey: rotation.formattedRecoveryKey,
+      })
+    }
 
     return response.ok({
       message: 'Équipe importée avec succès',
       team: {
         id: team.id,
         name: team.name,
+        encryptionMode: team.encryptionMode,
       },
-      recoveryKey: rotation.formattedRecoveryKey,
     })
   }
 }
