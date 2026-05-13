@@ -68,6 +68,18 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'Invalid vault key',
   },
+  kek_required: {
+    type: 'kek_required_error',
+    status: 422,
+    visibility: 'user_facing',
+    defaultMessage: 'Confirmez votre mot de passe pour activer le chiffrement Privé.',
+  },
+  invalid_password: {
+    type: 'kek_required_error',
+    status: 422,
+    visibility: 'user_facing',
+    defaultMessage: 'Mot de passe incorrect.',
+  },
   permission_denied: {
     type: 'permission_error',
     status: 403,

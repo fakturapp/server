@@ -38,7 +38,7 @@ export default class CreateTeam {
         const valid = await hash.verify(user.password, payload.confirmPassword)
         if (!valid) {
           return response.unprocessableEntity({
-            code: 'INVALID_PASSWORD',
+            code: 'invalid_password',
             message: 'Mot de passe incorrect.',
           })
         }
@@ -51,7 +51,7 @@ export default class CreateTeam {
 
       if (!kek) {
         return response.unprocessableEntity({
-          code: 'KEK_REQUIRED',
+          code: 'kek_required',
           message: 'Confirmez votre mot de passe pour activer le chiffrement Privé.',
         })
       }
