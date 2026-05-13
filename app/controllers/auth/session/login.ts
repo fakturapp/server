@@ -12,6 +12,8 @@ import crypto from 'node:crypto'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
+import teamEncryptionService from '#services/crypto/team_encryption_service'
+import Team from '#models/team/team'
 import UserTransformer from '#transformers/user_transformer'
 
 export default class Login {
@@ -150,22 +152,44 @@ export default class Login {
       severity: 'info',
     })
 
-    if (user.saltKdf) {
+    const memberships = await TeamMember.query()
+      .where('userId', user.id)
+      .where('status', 'active')
+
+    const teamIds = memberships.map((m) => m.teamId)
+    const teams = teamIds.length > 0 ? await Team.query().whereIn('id', teamIds) : []
+    const teamById = new Map(teams.map((t) => [t.id, t]))
+
+    const hasPrivateTeam = memberships.some(
+      (m) => teamById.get(m.teamId)?.encryptionMode === 'private'
+    )
+
+    if (user.saltKdf && hasPrivateTeam) {
       const salt = Buffer.from(user.saltKdf, 'hex')
       const kek = await zeroAccessCryptoService.deriveKEK(password, salt)
 
       if (!user.cryptoResetNeeded) {
         if (user.currentTeamId) {
-          const teamMember = await TeamMember.query()
-            .where('teamId', user.currentTeamId)
-            .where('userId', user.id)
-            .where('status', 'active')
-            .first()
+          const teamMember = memberships.find((m) => m.teamId === user.currentTeamId)
+          const currentTeam = teamMember ? teamById.get(teamMember.teamId) : null
 
-          if (teamMember?.encryptedTeamDek) {
+          if (teamMember?.encryptedTeamDek && currentTeam) {
             try {
-              const teamDek = zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
-              keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+              const teamDek =
+                currentTeam.encryptionMode === 'standard'
+                  ? teamEncryptionService.unwrapDekForMembership(currentTeam, teamMember)
+                  : zeroAccessCryptoService.decryptDEK(teamMember.encryptedTeamDek, kek)
+
+              if (teamDek) {
+                if (currentTeam.encryptionMode === 'standard') {
+                  keyStore.storeKEK(user.id, kek)
+                  keyStore.storeServerDek(user.id, user.currentTeamId, teamDek)
+                } else {
+                  keyStore.storeKeys(user.id, kek, user.currentTeamId, teamDek)
+                }
+              } else {
+                keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
+              }
             } catch {
               user.cryptoResetNeeded = true
               await user.save()
@@ -195,6 +219,17 @@ export default class Login {
         token: token.value!.release(),
         vaultKey: sessionKey.toString('hex'),
       })
+    }
+
+    if (user.currentTeamId) {
+      const currentMembership = memberships.find((m) => m.teamId === user.currentTeamId)
+      const currentTeam = currentMembership ? teamById.get(currentMembership.teamId) : null
+      if (currentTeam && currentMembership && currentTeam.encryptionMode === 'standard') {
+        const dek = teamEncryptionService.unwrapDekForMembership(currentTeam, currentMembership)
+        if (dek) {
+          keyStore.storeServerDek(user.id, user.currentTeamId, dek)
+        }
+      }
     }
 
     return response.ok({
