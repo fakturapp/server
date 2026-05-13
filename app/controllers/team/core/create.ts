@@ -8,28 +8,45 @@ import keyStore from '#services/crypto/key_store'
 import RecoveryKeyGenerated from '#events/recovery_key_generated'
 import recoveryKeyService from '#services/crypto/recovery_key_service'
 import sessionKekResolver from '#services/crypto/session_kek_resolver'
+import teamEncryptionService from '#services/crypto/team_encryption_service'
 
 export default class Create {
   async handle({ auth, request, response }: HttpContext) {
     const user = auth.user!
     const payload = await request.validateUsing(createTeamValidator)
+    const encryptionMode = payload.encryptionMode ?? 'standard'
 
-    const kek = await sessionKekResolver.resolvePrimary(user, request)
-    if (!kek) {
-      return response.unauthorized({
-        code: 'SESSION_EXPIRED',
-        message: 'Session expired. Please log in again.',
-      })
+    if (encryptionMode === 'private') {
+      if (!payload.ackDataLoss || !payload.ackNotResponsible) {
+        return response.unprocessableEntity({
+          message: 'Vous devez accepter les avertissements pour activer le mode Privé.',
+        })
+      }
+    }
+
+    let kek: Buffer | null = null
+    if (encryptionMode === 'private') {
+      kek = await sessionKekResolver.resolvePrimary(user, request)
+      if (!kek) {
+        return response.unauthorized({
+          code: 'SESSION_EXPIRED',
+          message: 'Session expired. Please log in again.',
+        })
+      }
     }
 
     const team = await Team.create({
       name: payload.name,
       iconUrl: payload.iconUrl ?? null,
       ownerId: user.id,
+      encryptionMode,
+      encryptionModeConfirmedAt: DateTime.now(),
     })
 
     const teamDek = zeroAccessCryptoService.generateDEK()
-    const encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
+    const encryptedTeamDek = teamEncryptionService.wrapDekForTeam(team, teamDek, {
+      userKek: kek ?? undefined,
+    })
 
     await TeamMember.create({
       teamId: team.id,
@@ -41,14 +58,29 @@ export default class Create {
       dekVersion: 1,
     })
 
-    keyStore.storeDEK(user.id, team.id, teamDek)
-    const rotation = await recoveryKeyService.rotateForUser(user, kek)
-
     user.currentTeamId = team.id
     user.onboardingCompleted = false
     await user.save()
 
-    RecoveryKeyGenerated.dispatch(user.email, rotation.recoveryKey, user.fullName ?? undefined)
+    if (encryptionMode === 'private' && kek) {
+      keyStore.storeDEK(user.id, team.id, teamDek)
+      const rotation = await recoveryKeyService.rotateForUser(user, kek)
+
+      RecoveryKeyGenerated.dispatch(user.email, rotation.recoveryKey, user.fullName ?? undefined)
+
+      return response.created({
+        message: 'Team created successfully',
+        team: {
+          id: team.id,
+          name: team.name,
+          iconUrl: team.iconUrl,
+          encryptionMode: team.encryptionMode,
+        },
+        recoveryKey: rotation.formattedRecoveryKey,
+      })
+    }
+
+    keyStore.storeServerDek(user.id, team.id, teamDek)
 
     return response.created({
       message: 'Team created successfully',
@@ -56,8 +88,8 @@ export default class Create {
         id: team.id,
         name: team.name,
         iconUrl: team.iconUrl,
+        encryptionMode: team.encryptionMode,
       },
-      recoveryKey: rotation.formattedRecoveryKey,
     })
   }
 }
