@@ -23,8 +23,18 @@ const RevokeInvite = () => import('#controllers/team/invitations/revoke_invite')
 const UploadIcon = () => import('#controllers/team/media/upload_icon')
 const ServeIcon = () => import('#controllers/team/media/serve_icon')
 const SearchUsers = () => import('#controllers/team/members/search_users')
+const ConfirmPrivate = () => import('#controllers/team/encryption/confirm_private')
+const MigrateToStandard = () => import('#controllers/team/encryption/migrate_to_standard')
 
 router.get(API_PREFIX + '/team-icons/:filename', [ServeIcon, 'handle'])
+
+router
+  .group(() => {
+    router.post('/encryption/confirm-private', [ConfirmPrivate, 'handle'])
+    router.post('/encryption/migrate-to-standard', [MigrateToStandard, 'handle'])
+  })
+  .prefix(API_PREFIX + '/team')
+  .use(middleware.auth())
 
 router
   .group(() => {
