@@ -1,7 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { DateTime } from 'luxon'
 import vine from '@vinejs/vine'
 import InvoiceSetting from '#models/team/invoice_setting'
 import Company from '#models/team/company'
+import Team from '#models/team/team'
 import { buildDefaultInvoiceSettings } from '#services/settings/default_invoice_settings'
 
 const personalizeValidator = vine.compile(
@@ -84,6 +86,12 @@ export default class CompletePersonalization {
 
     user.onboardingCompleted = true
     await user.save()
+
+    const team = await Team.find(user.currentTeamId)
+    if (team && !team.onboardingCompletedAt) {
+      team.onboardingCompletedAt = DateTime.now()
+      await team.save()
+    }
 
     return response.ok({ message: 'Onboarding completed' })
   }
