@@ -151,6 +151,7 @@ export default class Import {
           ownerId: user.id,
           encryptionMode,
           encryptionModeConfirmedAt: DateTime.now(),
+          onboardingCompletedAt: DateTime.now(),
         },
         { client: trx }
       )
