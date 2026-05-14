@@ -26,6 +26,9 @@ export default class Team extends BaseModel {
   @column.dateTime()
   declare encryptionModeConfirmedAt: DateTime | null
 
+  @column.dateTime()
+  declare onboardingCompletedAt: DateTime | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 
