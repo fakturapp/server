@@ -1739,7 +1739,7 @@ export class TeamMemberSchema extends BaseModel {
 }
 
 export class TeamSchema extends BaseModel {
-  static $columns = ['b2BAccountId', 'createdAt', 'encryptionMode', 'encryptionModeConfirmedAt', 'iconUrl', 'id', 'name', 'ownerId', 'updatedAt'] as const
+  static $columns = ['b2BAccountId', 'createdAt', 'encryptionMode', 'encryptionModeConfirmedAt', 'iconUrl', 'id', 'name', 'onboardingCompletedAt', 'ownerId', 'updatedAt'] as const
   $columns = TeamSchema.$columns
   @column()
   declare b2BAccountId: string | null
@@ -1755,6 +1755,8 @@ export class TeamSchema extends BaseModel {
   declare id: string
   @column()
   declare name: string
+  @column.dateTime()
+  declare onboardingCompletedAt: DateTime | null
   @column()
   declare ownerId: string
   @column.dateTime({ autoCreate: true, autoUpdate: true })
