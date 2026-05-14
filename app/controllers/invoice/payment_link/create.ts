@@ -165,6 +165,13 @@ export default class Create {
 
     const paymentLink = await PaymentLink.create(linkData)
 
+    // A draft invoice with a live payment link is effectively out in the wild —
+    // promote it to "sent" so its status reflects reality.
+    if (invoice.status === 'draft') {
+      invoice.status = 'sent'
+      await invoice.save()
+    }
+
     const includePdf = payload.includePdf !== false
     if (includePdf) {
       try {
