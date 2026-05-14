@@ -58,6 +58,7 @@ export default class Create {
       ownerId: user.id,
       encryptionMode,
       encryptionModeConfirmedAt: DateTime.now(),
+      onboardingCompletedAt: payload.skipOnboarding ? DateTime.now() : null,
     })
 
     const teamDek = zeroAccessCryptoService.generateDEK()
@@ -91,6 +92,9 @@ export default class Create {
           name: team.name,
           iconUrl: team.iconUrl,
           encryptionMode: team.encryptionMode,
+          onboardingCompletedAt: team.onboardingCompletedAt
+            ? team.onboardingCompletedAt.toISO()
+            : null,
         },
         recoveryKey: rotation.formattedRecoveryKey,
       })
@@ -105,6 +109,9 @@ export default class Create {
         name: team.name,
         iconUrl: team.iconUrl,
         encryptionMode: team.encryptionMode,
+        onboardingCompletedAt: team.onboardingCompletedAt
+          ? team.onboardingCompletedAt.toISO()
+          : null,
       },
     })
   }

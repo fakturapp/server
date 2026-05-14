@@ -8,6 +8,7 @@ export const createTeamValidator = vine.compile(
     ackDataLoss: vine.boolean().optional(),
     ackNotResponsible: vine.boolean().optional(),
     confirmPassword: vine.string().minLength(1).optional(),
+    skipOnboarding: vine.boolean().optional(),
   })
 )
 
