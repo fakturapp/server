@@ -105,6 +105,9 @@ class PasskeyService {
         expectedChallenge: challengeRecord.challenge,
         expectedOrigin: this.origin,
         expectedRPID: this.rpID,
+        // Options request userVerification 'preferred', so verification must
+        // not hard-require it (the library defaults requireUserVerification to true).
+        requireUserVerification: false,
       })
     } finally {
       await challengeRecord.delete()
@@ -118,7 +121,9 @@ class PasskeyService {
 
     const passkey = await PasskeyCredential.create({
       userId,
-      credentialId: Buffer.from(credential.id).toString('base64url'),
+      // credential.id is already a Base64URLString — storing it verbatim. Wrapping
+      // it in Buffer.from(...) would utf8-encode the string and mangle the id.
+      credentialId: credential.id,
       publicKey: Buffer.from(credential.publicKey).toString('base64url'),
       counter: credential.counter,
       transports: credential.transports
@@ -220,6 +225,9 @@ class PasskeyService {
           expectedChallenge: challenge.challenge,
           expectedOrigin: this.origin,
           expectedRPID: this.rpID,
+          // Auth options request userVerification 'preferred' — keep the
+          // verification consistent (library defaults this to true).
+          requireUserVerification: false,
           credential: {
             id: credential.credentialId,
             publicKey: Buffer.from(credential.publicKey, 'base64url'),
