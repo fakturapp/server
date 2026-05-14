@@ -68,6 +68,7 @@ export default class Me {
       encryptionModeConfirmedAt: t.encryptionModeConfirmedAt
         ? t.encryptionModeConfirmedAt.toISO()
         : null,
+      onboardingCompletedAt: t.onboardingCompletedAt ? t.onboardingCompletedAt.toISO() : null,
     }))
 
     return response.ok({
