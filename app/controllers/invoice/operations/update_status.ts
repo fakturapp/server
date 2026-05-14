@@ -1,6 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Invoice from '#models/invoice/invoice'
+import PaymentLink from '#models/invoice/payment_link'
 import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
 import { recordAuditEvent } from '#services/audit/audit_log_service'
 
@@ -35,6 +36,20 @@ export default class UpdateStatus {
 
     if (!invoice) {
       return response.notFound({ message: 'Invoice not found' })
+    }
+
+    // An invoice with a live payment link can't go back to draft — the link is
+    // already shared with the client. It must be deleted first.
+    if (status === 'draft') {
+      const activeLink = await PaymentLink.query()
+        .where('invoice_id', invoice.id)
+        .where('is_active', true)
+        .first()
+      if (activeLink) {
+        return response.unprocessableEntity({
+          message: 'Supprimez le lien de paiement avant de repasser la facture en brouillon.',
+        })
+      }
     }
 
     invoice.status = status
