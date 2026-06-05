@@ -16,6 +16,7 @@ import teamEncryptionService from '#services/crypto/team_encryption_service'
 import Team from '#models/team/team'
 import UserTransformer from '#transformers/user_transformer'
 import { realClientIp } from '#services/http/real_client_ip'
+import { setAuthTokenCookie } from '#services/auth/auth_cookie'
 
 export default class Login {
   async handle(ctx: HttpContext) {
@@ -142,6 +143,9 @@ export default class Login {
         user_agent: (request.header('user-agent') || '').slice(0, 512),
       })
 
+    const tokenValue = token.value!.release()
+    setAuthTokenCookie(response, tokenValue)
+
     await this.recordLoginAttempt(request, user.id, 'success', null, String(token.identifier), clientIp)
 
     await AuditLog.create({
@@ -216,7 +220,7 @@ export default class Login {
       return response.ok({
         message: 'Login successful',
         user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
-        token: token.value!.release(),
+        token: tokenValue,
         vaultKey: sessionKey.toString('hex'),
       })
     }
