@@ -101,5 +101,8 @@
   "prettier": "@adonisjs/prettier-config",
   "overrides": {
     "knex": "3.1.0"
+  },
+  "engines": {
+    "node": ">=24.0.0"
   }
 }
