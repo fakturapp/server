@@ -9,7 +9,9 @@ import GoogleAuthService from '#services/auth/google_auth_service'
 import EncryptionService from '#services/encryption/encryption_service'
 import env from '#start/env'
 import { realClientIp } from '#services/http/real_client_ip'
-import { setAuthTokenCookie } from '#services/auth/auth_cookie'
+import { setAuthTokenCookie, TRUSTED_DEVICE_COOKIE_NAME } from '#services/auth/auth_cookie'
+import TrustedDeviceService from '#services/auth/trusted_device_service'
+import { encodePending } from '#services/auth/two_factor_pending'
 
 export default class GoogleCallback {
   async handle(ctx: HttpContext) {
@@ -123,6 +125,18 @@ export default class GoogleCallback {
       const user = await User.find(existingProvider.userId)
       if (!user || user.status !== 'active') {
         return response.redirect(`${accountUrl}/login?error=account_inactive`)
+      }
+
+      if (user.twoFactorEnabled) {
+        const trustedDeviceToken = request.cookie(TRUSTED_DEVICE_COOKIE_NAME)
+        const trustedDevice = trustedDeviceToken
+          ? await TrustedDeviceService.verify(user.id, trustedDeviceToken)
+          : false
+
+        if (!trustedDevice) {
+          const twofa = encodePending(user.id)
+          return response.redirect(`${accountUrl}/login?twofa=${encodeURIComponent(twofa)}`)
+        }
       }
 
       user.lastLoginAt = DateTime.now()
