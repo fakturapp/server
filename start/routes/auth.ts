@@ -70,3 +70,4 @@ router
       .use(middleware.auth())
   })
   .prefix(API_PREFIX + '/auth')
+  .use(() => import('#middleware/auth/auth_session_cookie_middleware'))
