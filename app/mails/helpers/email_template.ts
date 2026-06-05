@@ -2,8 +2,14 @@ import env from '#start/env'
 
 const frontendUrl = env.get('FRONTEND_URL') || 'http://localhost:3000'
 
+const accountUrl = env.get('ACCOUNT_URL') || frontendUrl
+
 export function getFrontendUrl(): string {
   return frontendUrl
+}
+
+export function getAccountUrl(): string {
+  return accountUrl
 }
 
 export function ctaButton(url: string, label: string): string {
