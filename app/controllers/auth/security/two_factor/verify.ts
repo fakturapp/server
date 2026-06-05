@@ -7,6 +7,7 @@ import TwoFactorService from '#services/auth/two_factor_service'
 import { twoFactorVerifyValidator } from '#validators/auth/auth_validators'
 import UserTransformer from '#transformers/user_transformer'
 import { realClientIp } from '#services/http/real_client_ip'
+import { setAuthTokenCookie } from '#services/auth/auth_cookie'
 
 export default class Verify {
   async handle(ctx: HttpContext) {
@@ -78,10 +79,13 @@ export default class Verify {
       severity: 'info',
     })
 
+    const tokenValue = token.value!.release()
+    setAuthTokenCookie(response, tokenValue)
+
     return response.ok({
       message: 'Login successful',
       user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
-      token: token.value!.release(),
+      token: tokenValue,
     })
   }
 }

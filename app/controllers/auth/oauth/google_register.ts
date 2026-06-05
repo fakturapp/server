@@ -10,6 +10,7 @@ import GoogleAuthService from '#services/auth/google_auth_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 import securityConfig from '#config/security'
+import { setAuthTokenCookie } from '#services/auth/auth_cookie'
 import UserTransformer from '#transformers/user_transformer'
 import { realClientIp } from '#services/http/real_client_ip'
 
@@ -108,10 +109,13 @@ export default class GoogleRegister {
     const kek = await zeroAccessCryptoService.deriveKEK(data.password, salt)
     keyStore.storeKeys(user.id, kek, '', Buffer.alloc(0))
 
+    const tokenValue = token.value!.release()
+    setAuthTokenCookie(response, tokenValue)
+
     return response.created({
       message: 'Registration successful',
       user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
-      token: token.value!.release(),
+      token: tokenValue,
     })
   }
 }

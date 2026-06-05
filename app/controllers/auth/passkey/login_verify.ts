@@ -10,6 +10,7 @@ import passkeyService from '#services/auth/passkey_service'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import encryptionService from '#services/encryption/encryption_service'
 import keyStore from '#services/crypto/key_store'
+import { setAuthTokenCookie } from '#services/auth/auth_cookie'
 import UserTransformer from '#transformers/user_transformer'
 import { realClientIp } from '#services/http/real_client_ip'
 
@@ -84,6 +85,8 @@ export default class LoginVerify {
       const token = await User.accessTokens.create(user, ['*'], {
         expiresIn: '15 days',
       })
+      const tokenValue = token.value!.release()
+      setAuthTokenCookie(response, tokenValue)
 
       // Store IP and user agent on the token
       await db
@@ -151,7 +154,7 @@ export default class LoginVerify {
           return response.ok({
             message: 'Login successful',
             user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
-            token: token.value!.release(),
+            token: tokenValue,
             vaultKey: sessionKey.toString('hex'),
           })
         } catch {
@@ -163,7 +166,7 @@ export default class LoginVerify {
       return response.ok({
         message: 'Login successful',
         user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
-        token: token.value!.release(),
+        token: tokenValue,
       })
     } catch {
       await this.recordLoginAttempt(request, null, 'failed', 'Passkey error', undefined, clientIp)
