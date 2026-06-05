@@ -9,6 +9,7 @@ import GoogleAuthService from '#services/auth/google_auth_service'
 import EncryptionService from '#services/encryption/encryption_service'
 import env from '#start/env'
 import { realClientIp } from '#services/http/real_client_ip'
+import { setAuthTokenCookie } from '#services/auth/auth_cookie'
 
 export default class GoogleCallback {
   async handle(ctx: HttpContext) {
@@ -164,6 +165,7 @@ export default class GoogleCallback {
       })
 
       const tokenValue = token.value!.release()
+      setAuthTokenCookie(response, tokenValue)
       return response.redirect(`${frontendUrl}/login?token=${encodeURIComponent(tokenValue)}`)
     }
 
