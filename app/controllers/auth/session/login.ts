@@ -16,7 +16,16 @@ import teamEncryptionService from '#services/crypto/team_encryption_service'
 import Team from '#models/team/team'
 import UserTransformer from '#transformers/user_transformer'
 import { realClientIp } from '#services/http/real_client_ip'
-import { setAuthTokenCookie } from '#services/auth/auth_cookie'
+import { setAuthTokenCookie, TRUSTED_DEVICE_COOKIE_NAME } from '#services/auth/auth_cookie'
+import TrustedDeviceService from '#services/auth/trusted_device_service'
+
+function maskLoginEmail(email: string): string {
+  const [local, domain] = email.split('@')
+  if (!local || !domain) {
+    return email
+  }
+  return `${local.slice(0, 1)}****@${domain}`
+}
 
 export default class Login {
   async handle(ctx: HttpContext) {
@@ -86,14 +95,21 @@ export default class Login {
 
     if (user.twoFactorEnabled) {
       if (!code) {
-        return response.ok({
-          requiresTwoFactor: true,
-          userId: user.id,
-          message: 'Two-factor authentication required',
-        })
-      }
+        const trustedDeviceToken = request.cookie(TRUSTED_DEVICE_COOKIE_NAME)
+        const trustedDevice = trustedDeviceToken
+          ? await TrustedDeviceService.verify(user.id, trustedDeviceToken)
+          : false
 
-      if (code.includes('-') && user.recoveryCodesEncrypted) {
+        if (!trustedDevice) {
+          return response.ok({
+            requiresTwoFactor: true,
+            userId: user.id,
+            availableMethods: ['totp', 'email', 'recovery'],
+            email: maskLoginEmail(user.email),
+            message: 'Two-factor authentication required',
+          })
+        }
+      } else if (code.includes('-') && user.recoveryCodesEncrypted) {
         const result = TwoFactorService.verifyRecoveryCode(code, user.recoveryCodesEncrypted)
         if (result.valid) {
           user.recoveryCodesEncrypted = TwoFactorService.encryptRecoveryCodes(result.remainingCodes)
