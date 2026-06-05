@@ -22,6 +22,9 @@ const PasswordReset = () => import('#controllers/auth/security/password_reset/re
 const VerifyEmail = () => import('#controllers/auth/security/email/verify')
 const ResendVerification = () => import('#controllers/auth/security/email/resend')
 const TwoFactorVerify = () => import('#controllers/auth/security/two_factor/verify')
+const TwoFactorSendEmailCode = () =>
+  import('#controllers/auth/security/two_factor/send_email_code')
+const TwoFactorLostCode = () => import('#controllers/auth/security/two_factor/lost_code')
 const CryptoRecover = () => import('#controllers/auth/security/crypto_recover')
 const CryptoWipe = () => import('#controllers/auth/security/crypto_wipe')
 const SetupRecoveryKey = () => import('#controllers/auth/security/setup_recovery_key')
@@ -45,6 +48,10 @@ router
 
     router.post('/login', [Login, 'handle']).use(loginLimiter)
     router.post('/login/2fa', [TwoFactorVerify, 'handle']).use(twoFactorLimiter)
+    router
+      .post('/login/2fa/send-email', [TwoFactorSendEmailCode, 'handle'])
+      .use(twoFactorLimiter)
+    router.post('/login/2fa/lost', [TwoFactorLostCode, 'handle']).use(twoFactorLimiter)
     router.post('/check-email', [CheckEmail, 'handle']).use(checkEmailLimiter)
 
     router.post('/passkey/login-options', [PasskeyLoginOptions, 'handle']).use(passkeyLimiter)
