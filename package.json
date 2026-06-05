@@ -9,7 +9,7 @@
     "./registry": "./.adonisjs/client/registry/index.ts"
   },
   "scripts": {
-    "start": "node bin/server.js",
+    "start": "node build/bin/server.js",
     "clean": "node -e \"const fs=require('fs');if(fs.existsSync('build'))fs.rmSync('build',{recursive:true,force:true})\"",
     "build": "npm run clean && node ace build --ignore-ts-errors",
     "dev": "node ace serve --hmr",
