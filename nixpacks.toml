@@ -5,3 +5,6 @@ nixPkgs = ["nodejs_24", "chromium"]
 PUPPETEER_SKIP_DOWNLOAD = "true"
 PUPPETEER_SKIP_CHROMIUM_DOWNLOAD = "true"
 PUPPETEER_EXECUTABLE_PATH = "/root/.nix-profile/bin/chromium"
+
+[start]
+cmd = "node build/ace.js migration:run --force && node build/bin/server.js"
