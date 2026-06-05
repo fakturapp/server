@@ -51,6 +51,12 @@ export default class User extends compose(BaseModel, AuthFinder) {
   declare recoveryCodesEncrypted: string | null
 
   @column({ serializeAs: null })
+  declare twoFactorEmailCodeHash: string | null
+
+  @column.dateTime({ serializeAs: null })
+  declare twoFactorEmailCodeExpiresAt: DateTime | null
+
+  @column({ serializeAs: null })
   declare passwordResetToken: string | null
 
   @column.dateTime()
