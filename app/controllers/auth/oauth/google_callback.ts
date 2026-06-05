@@ -20,16 +20,17 @@ export default class GoogleCallback {
     const error = request.input('error')
 
     const frontendUrl = env.get('FRONTEND_URL', 'http://localhost:3000')
+    const accountUrl = env.get('ACCOUNT_URL') || frontendUrl
 
     if (error || !code || !stateParam) {
-      return response.redirect(`${frontendUrl}/login?error=oauth_cancelled`)
+      return response.redirect(`${accountUrl}/login?error=oauth_cancelled`)
     }
 
     let state: { intent: string; userId?: string; returnTo?: string; ts: number }
     try {
       state = JSON.parse(EncryptionService.decrypt(stateParam))
     } catch {
-      return response.redirect(`${frontendUrl}/login?error=invalid_state`)
+      return response.redirect(`${accountUrl}/login?error=invalid_state`)
     }
 
     let profile
@@ -38,34 +39,31 @@ export default class GoogleCallback {
     } catch {
       const errorRedirect =
         state.intent === 'link'
-          ? `${frontendUrl}/oauth/callback?error=oauth_failed`
-          : `${frontendUrl}/login?error=oauth_failed`
+          ? `${accountUrl}/oauth/callback?error=oauth_failed`
+          : `${accountUrl}/login?error=oauth_failed`
       return response.redirect(errorRedirect)
     }
 
-    // Handle "link" intent — link Google to existing account
     if (state.intent === 'link' && state.userId) {
-      return this.handleLink(request, response, frontendUrl, state.userId, profile, clientIp)
+      return this.handleLink(request, response, accountUrl, state.userId, profile, clientIp)
     }
 
-    // Handle "login" intent — login or register
-    return this.handleLogin(request, response, frontendUrl, profile, clientIp)
+    return this.handleLogin(request, response, accountUrl, profile, clientIp)
   }
 
   private async handleLink(
     request: HttpContext['request'],
     response: HttpContext['response'],
-    frontendUrl: string,
+    accountUrl: string,
     userId: string,
     profile: { sub: string; email: string; name: string | null; picture: string | null },
     clientIp: string
   ) {
     const user = await User.find(userId)
     if (!user) {
-      return response.redirect(`${frontendUrl}/oauth/callback?error=user_not_found`)
+      return response.redirect(`${accountUrl}/oauth/callback?error=user_not_found`)
     }
 
-    // Check if this Google account is already linked to another user
     const existingProvider = await AuthProvider.query()
       .where('provider', 'google')
       .where('providerUserId', profile.sub)
@@ -73,19 +71,18 @@ export default class GoogleCallback {
 
     if (existingProvider) {
       if (existingProvider.userId === userId) {
-        return response.redirect(`${frontendUrl}/oauth/callback?success=true`)
+        return response.redirect(`${accountUrl}/oauth/callback?success=true`)
       }
-      return response.redirect(`${frontendUrl}/oauth/callback?error=already_linked`)
+      return response.redirect(`${accountUrl}/oauth/callback?error=already_linked`)
     }
 
-    // Check if user already has a Google provider
     const userProvider = await AuthProvider.query()
       .where('userId', userId)
       .where('provider', 'google')
       .first()
 
     if (userProvider) {
-      return response.redirect(`${frontendUrl}/oauth/callback?error=provider_exists`)
+      return response.redirect(`${accountUrl}/oauth/callback?error=provider_exists`)
     }
 
     await AuthProvider.create({
@@ -107,27 +104,25 @@ export default class GoogleCallback {
       severity: 'info',
     })
 
-    return response.redirect(`${frontendUrl}/oauth/callback?success=true`)
+    return response.redirect(`${accountUrl}/oauth/callback?success=true`)
   }
 
   private async handleLogin(
     request: HttpContext['request'],
     response: HttpContext['response'],
-    frontendUrl: string,
+    accountUrl: string,
     profile: { sub: string; email: string; name: string | null; picture: string | null },
     clientIp: string
   ) {
-    // Check if this Google account is already linked
     const existingProvider = await AuthProvider.query()
       .where('provider', 'google')
       .where('providerUserId', profile.sub)
       .first()
 
     if (existingProvider) {
-      // User has Google linked — log them in
       const user = await User.find(existingProvider.userId)
       if (!user || user.status !== 'active') {
-        return response.redirect(`${frontendUrl}/login?error=account_inactive`)
+        return response.redirect(`${accountUrl}/login?error=account_inactive`)
       }
 
       user.lastLoginAt = DateTime.now()
@@ -166,19 +161,17 @@ export default class GoogleCallback {
 
       const tokenValue = token.value!.release()
       setAuthTokenCookie(response, tokenValue)
-      return response.redirect(`${frontendUrl}/login?token=${encodeURIComponent(tokenValue)}`)
+      return response.redirect(`${accountUrl}/login?token=${encodeURIComponent(tokenValue)}`)
     }
 
-    // Check if a user exists with this email but without Google linked
     const existingUser = await User.findBy('email', profile.email)
     if (existingUser) {
-      return response.redirect(`${frontendUrl}/login?error=email_exists`)
+      return response.redirect(`${accountUrl}/login?error=email_exists`)
     }
 
-    // New user — redirect to register with encrypted profile
     const encryptedProfile = GoogleAuthService.encryptProfileData(profile)
     return response.redirect(
-      `${frontendUrl}/register?google_data=${encodeURIComponent(encryptedProfile)}`
+      `${accountUrl}/register?google_data=${encodeURIComponent(encryptedProfile)}`
     )
   }
 }
