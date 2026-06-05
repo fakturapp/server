@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 
-const COOKIE_NAME = 'faktur_token'
+const COOKIE_NAME = '__Secure-faktur_token'
 const MAX_AGE_SECONDS = 60 * 60 * 24 * 15
 
 function cookieDomain(): string | undefined {
