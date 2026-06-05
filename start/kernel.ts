@@ -10,6 +10,7 @@ server.use([
   () => import('#middleware/core/api_error_response_middleware'),
   () => import('#middleware/security/helmet_middleware'),
   () => import('@adonisjs/cors/cors_middleware'),
+  () => import('#middleware/auth/cookie_token_middleware'),
 ])
 
 router.use([
