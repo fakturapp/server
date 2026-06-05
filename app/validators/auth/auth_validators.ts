@@ -57,6 +57,9 @@ export const twoFactorSetupValidator = vine.compile(
 export const twoFactorVerifyValidator = vine.compile(
   vine.object({
     code: vine.string().minLength(6).maxLength(11),
-    userId: vine.string(),
+    userId: vine.string().optional(),
+    twofaToken: vine.string().optional(),
+    method: vine.enum(['totp', 'email', 'recovery']).optional(),
+    trustDevice: vine.boolean().optional(),
   })
 )
