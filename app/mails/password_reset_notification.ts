@@ -4,7 +4,7 @@ import {
   validityTag,
   linkFallback,
   wrapHtml,
-  getFrontendUrl,
+  getAccountUrl,
 } from './helpers/email_template.js'
 
 export default class PasswordResetNotification extends BaseMail {
@@ -20,7 +20,7 @@ export default class PasswordResetNotification extends BaseMail {
   }
 
   prepare() {
-    const resetUrl = `${getFrontendUrl()}/reset-password?token=${this.token}`
+    const resetUrl = `${getAccountUrl()}/reset-password?token=${this.token}`
 
     const content = `
       <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 8px; text-align: center;">R&eacute;initialisez votre mot de passe</h2>

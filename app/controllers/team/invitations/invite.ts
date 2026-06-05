@@ -89,8 +89,9 @@ export default class Invite {
       dekVersion: 1,
     })
 
-    const frontendUrl = env.get('FRONTEND_URL') || 'http://localhost:3000'
-    const inviteUrl = `${frontendUrl}/invite/${token}`
+    const accountUrl =
+      env.get('ACCOUNT_URL') || env.get('FRONTEND_URL') || 'http://localhost:3000'
+    const inviteUrl = `${accountUrl}/invite/${token}`
 
     // Send invitation email
     TeamMemberInvited.dispatch(payload.email, user.fullName || user.email, inviteUrl)

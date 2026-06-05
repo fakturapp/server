@@ -4,7 +4,7 @@ import {
   validityTag,
   linkFallback,
   wrapHtml,
-  getFrontendUrl,
+  getAccountUrl,
 } from './helpers/email_template.js'
 
 export default class VerifyEmailNotification extends BaseMail {
@@ -20,7 +20,7 @@ export default class VerifyEmailNotification extends BaseMail {
   }
 
   prepare() {
-    const verifyUrl = `${getFrontendUrl()}/verify-email?token=${this.token}`
+    const verifyUrl = `${getAccountUrl()}/verify-email?token=${this.token}`
 
     const content = `
       <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 8px; text-align: center;">V&eacute;rifiez votre adresse email</h2>
