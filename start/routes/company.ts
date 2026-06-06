@@ -4,6 +4,8 @@ import { API_PREFIX } from '#start/routes/_prefix'
 
 const CompanyShow = () => import('#controllers/company/core/show')
 const CompanyUpdate = () => import('#controllers/company/core/update')
+const CompanyDelete = () => import('#controllers/company/core/delete')
+const CompanyLookup = () => import('#controllers/company/lookup/search')
 const CompanyBank = () => import('#controllers/company/finance/bank')
 const BankAccounts = () => import('#controllers/company/finance/bank_accounts')
 const UploadLogo = () => import('#controllers/company/media/upload_logo')
@@ -15,6 +17,8 @@ router
   .group(() => {
     router.get('/', [CompanyShow, 'handle'])
     router.put('/', [CompanyUpdate, 'handle'])
+    router.delete('/', [CompanyDelete, 'handle'])
+    router.get('/lookup', [CompanyLookup, 'handle'])
     router.put('/bank', [CompanyBank, 'handle'])
     router.post('/logo', [UploadLogo, 'handle']).use(middleware.storageQuota())
 
