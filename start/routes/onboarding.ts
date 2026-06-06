@@ -5,7 +5,7 @@ import { API_PREFIX } from '#start/routes/_prefix'
 const CreateTeam = () => import('#controllers/onboarding/team/create_team')
 const CreateCompany = () => import('#controllers/onboarding/company/create_company')
 const SkipCompany = () => import('#controllers/onboarding/company/skip_company')
-const SearchCompany = () => import('#controllers/onboarding/company/search_company')
+const CompanyLookup = () => import('#controllers/company/lookup/search')
 const CompletePersonalization = () =>
   import('#controllers/onboarding/personalization/complete_personalization')
 
@@ -14,7 +14,7 @@ router
     router.post('/team', [CreateTeam, 'handle'])
     router.post('/company', [CreateCompany, 'handle'])
     router.post('/skip', [SkipCompany, 'handle'])
-    router.get('/company/search', [SearchCompany, 'handle'])
+    router.get('/company/search', [CompanyLookup, 'handle'])
     router.post('/personalization', [CompletePersonalization, 'handle'])
   })
   .prefix(API_PREFIX + '/onboarding')

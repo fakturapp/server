@@ -7,7 +7,7 @@ const ClientShow = () => import('#controllers/client/crud/show')
 const ClientCreate = () => import('#controllers/client/crud/create')
 const ClientUpdate = () => import('#controllers/client/crud/update')
 const ClientDelete = () => import('#controllers/client/crud/delete')
-const SearchSiren = () => import('#controllers/client/lookup/search_siren')
+const CompanyLookup = () => import('#controllers/company/lookup/search')
 const ClientContactIndex = () => import('#controllers/client/contacts/index')
 const ClientContactStore = () => import('#controllers/client/contacts/store')
 const ClientContactUpdate = () => import('#controllers/client/contacts/update')
@@ -15,7 +15,7 @@ const ClientContactDestroy = () => import('#controllers/client/contacts/destroy'
 
 router
   .group(() => {
-    router.get('/search-siren', [SearchSiren, 'handle'])
+    router.get('/search-siren', [CompanyLookup, 'handle'])
     router.get('/', [ClientList, 'handle'])
     router.get('/:id', [ClientShow, 'handle']).use(middleware.storageQuota())
     router.post('/', [ClientCreate, 'handle']).use(middleware.storageQuota())

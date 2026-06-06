@@ -37,6 +37,21 @@ export default class SirenService {
     return this.searchBySiren(siren)
   }
 
+  static async search(query: string): Promise<SirenResult[]> {
+    const raw = (query || '').trim()
+    if (raw.length < 2) return []
+    const stripped = raw.replace(/\s/g, '')
+    if (/^\d{14}$/.test(stripped)) {
+      const result = await this.searchBySiret(stripped)
+      return result ? [result] : []
+    }
+    if (/^\d{9}$/.test(stripped)) {
+      const result = await this.searchBySiren(stripped)
+      return result ? [result] : []
+    }
+    return this.searchByName(raw)
+  }
+
   private static buildStreetAddress(siege: any): string | null {
     const parts: string[] = []
 
