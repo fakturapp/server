@@ -338,6 +338,12 @@ export const controllers = {
     Mine: () => import('#controllers/feedback/mine'),
   },
   invoice: {
+    attachments: {
+      Destroy: () => import('#controllers/invoice/attachments/destroy'),
+      Download: () => import('#controllers/invoice/attachments/download'),
+      Index: () => import('#controllers/invoice/attachments/index'),
+      Upload: () => import('#controllers/invoice/attachments/upload'),
+    },
     crud: {
       Create: () => import('#controllers/invoice/crud/create'),
       Delete: () => import('#controllers/invoice/crud/delete'),
