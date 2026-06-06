@@ -69,6 +69,9 @@ export default class Team extends BaseModel {
   declare encryptionModeConfirmedAt: DateTime | null
 
   @column.dateTime()
+  declare collaborationGraceEndsAt: DateTime | null
+
+  @column.dateTime()
   declare onboardingCompletedAt: DateTime | null
 
   @column.dateTime({ autoCreate: true })
@@ -104,6 +107,18 @@ export default class Team extends BaseModel {
     } else if ((team.plan === 'pro' || team.plan === 'team') && previousPlan === 'free') {
       const mod = await import('#services/settings/invoice_customization_snapshot_service')
       await mod.restoreInvoiceCustomizationOnUpgrade(team.id)
+    }
+  }
+
+  @beforeSave()
+  static async handleCollaborationOnPlanChange(team: Team) {
+    const previousPlan = team.$original.plan as string | undefined
+    if (!previousPlan || previousPlan === team.plan) return
+    const mod = await import('#services/team/collaboration_enforcer')
+    if (previousPlan === 'team' && team.plan !== 'team') {
+      await mod.startCollaborationGrace(team)
+    } else if (team.plan === 'team' && previousPlan !== 'team') {
+      await mod.clearCollaborationGraceAndReactivate(team)
     }
   }
 }
