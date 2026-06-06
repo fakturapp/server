@@ -4,10 +4,11 @@ import {
   DeleteObjectCommand,
   ListObjectsV2Command,
   HeadObjectCommand,
+  GetObjectCommand,
 } from '@aws-sdk/client-s3'
 import env from '#start/env'
 import app from '@adonisjs/core/services/app'
-import { existsSync, mkdirSync, writeFileSync, unlinkSync } from 'node:fs'
+import { existsSync, mkdirSync, writeFileSync, unlinkSync, readFileSync } from 'node:fs'
 import { join } from 'node:path'
 
 const ALLOWED_CONTENT_TYPES = new Set([
@@ -18,6 +19,13 @@ const ALLOWED_CONTENT_TYPES = new Set([
   'image/gif',
   'image/svg+xml',
   'application/pdf',
+  'text/plain',
+  'text/csv',
+  'application/zip',
+  'application/msword',
+  'application/vnd.openxmlformats-officedocument.wordprocessingml.document',
+  'application/vnd.ms-excel',
+  'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet',
 ])
 
 const MAX_KEY_LENGTH = 1024
@@ -94,7 +102,6 @@ class R2StorageService {
       return `${this.publicUrl}/${key}`
     }
 
-    // Fallback: local filesystem
     const uploadsDir = join(app.tmpPath(), 'uploads', folder)
     if (!existsSync(uploadsDir)) {
       mkdirSync(uploadsDir, { recursive: true })
@@ -117,11 +124,38 @@ class R2StorageService {
       return
     }
 
-    // Fallback: local filesystem
     const filePath = join(app.tmpPath(), 'uploads', key)
     if (existsSync(filePath)) {
       unlinkSync(filePath)
     }
+  }
+
+  async getObject(
+    urlOrKey: string
+  ): Promise<{ body: Buffer; contentType: string; size: number } | null> {
+    const key = this.keyFromUrl(urlOrKey)
+    if (!key) return null
+
+    if (this.isConfigured()) {
+      try {
+        const result = await this.client!.send(
+          new GetObjectCommand({ Bucket: this.bucket!, Key: key })
+        )
+        const bytes = await result.Body!.transformToByteArray()
+        return {
+          body: Buffer.from(bytes),
+          contentType: result.ContentType || 'application/octet-stream',
+          size: Number(result.ContentLength ?? bytes.length),
+        }
+      } catch {
+        return null
+      }
+    }
+
+    const filePath = join(app.tmpPath(), 'uploads', key)
+    if (!existsSync(filePath)) return null
+    const body = readFileSync(filePath)
+    return { body, contentType: 'application/octet-stream', size: body.length }
   }
 
   async listObjects(
@@ -154,9 +188,7 @@ class R2StorageService {
     return objects
   }
 
-  async headObject(
-    urlOrKey: string
-  ): Promise<{ size: number; contentType?: string } | null> {
+  async headObject(urlOrKey: string): Promise<{ size: number; contentType?: string } | null> {
     if (!this.isConfigured()) {
       return null
     }
