@@ -1,12 +1,17 @@
 import type Team from '#models/team/team'
 import { BaseTransformer } from '@adonisjs/core/transformers'
 import TeamMemberTransformer from '#transformers/team_member_transformer'
+import { memberLimit } from '#services/billing/plan_entitlements'
 
 export default class TeamTransformer extends BaseTransformer<Team> {
   toObject() {
     return {
       ...this.pick(this.resource, ['id', 'name', 'iconUrl', 'ownerId', 'createdAt']),
       plan: this.resource.plan,
+      memberLimit: memberLimit(this.resource),
+      collaborationGraceEndsAt: this.resource.collaborationGraceEndsAt
+        ? this.resource.collaborationGraceEndsAt.toISO()
+        : null,
       subscriptionStatus: this.resource.subscriptionStatus,
       planPeriod: this.resource.planPeriod,
       pendingPlan: this.resource.pendingPlan,
