@@ -19,6 +19,10 @@ const InvoiceUpdateComment = () => import('#controllers/invoice/operations/updat
 const InvoicePaymentIndex = () => import('#controllers/invoice/payments/index')
 const InvoicePaymentStore = () => import('#controllers/invoice/payments/store')
 const InvoicePaymentDestroy = () => import('#controllers/invoice/payments/destroy')
+const InvoiceAttachmentIndex = () => import('#controllers/invoice/attachments/index')
+const InvoiceAttachmentUpload = () => import('#controllers/invoice/attachments/upload')
+const InvoiceAttachmentDownload = () => import('#controllers/invoice/attachments/download')
+const InvoiceAttachmentDestroy = () => import('#controllers/invoice/attachments/destroy')
 
 router
   .group(() => {
@@ -44,6 +48,16 @@ router
       .post('/:invoiceId/payments', [InvoicePaymentStore, 'handle'])
       .use(middleware.storageQuota())
     router.delete('/:invoiceId/payments/:id', [InvoicePaymentDestroy, 'handle'])
+
+    router.get('/:invoiceId/attachments', [InvoiceAttachmentIndex, 'handle'])
+    router
+      .post('/:invoiceId/attachments', [InvoiceAttachmentUpload, 'handle'])
+      .use(middleware.storageQuota())
+    router.get('/:invoiceId/attachments/:attachmentId/download', [
+      InvoiceAttachmentDownload,
+      'handle',
+    ])
+    router.delete('/:invoiceId/attachments/:attachmentId', [InvoiceAttachmentDestroy, 'handle'])
   })
   .prefix(API_PREFIX + '/invoices')
   .use(middleware.authOrApiKey())
