@@ -14,7 +14,7 @@ router
     router.post('/team', [CreateTeam, 'handle'])
     router.post('/company', [CreateCompany, 'handle'])
     router.post('/skip', [SkipCompany, 'handle'])
-    router.get('/company/search', [CompanyLookup, 'handle'])
+    router.get('/company/search', [CompanyLookup, 'handle']).as('onboardingCompanyLookup')
     router.post('/personalization', [CompletePersonalization, 'handle'])
   })
   .prefix(API_PREFIX + '/onboarding')

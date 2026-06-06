@@ -18,7 +18,7 @@ router
     router.get('/', [CompanyShow, 'handle'])
     router.put('/', [CompanyUpdate, 'handle'])
     router.delete('/', [CompanyDelete, 'handle'])
-    router.get('/lookup', [CompanyLookup, 'handle'])
+    router.get('/lookup', [CompanyLookup, 'handle']).as('companyLookup')
     router.put('/bank', [CompanyBank, 'handle'])
     router.post('/logo', [UploadLogo, 'handle']).use(middleware.storageQuota())
 

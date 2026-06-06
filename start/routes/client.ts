@@ -15,7 +15,7 @@ const ClientContactDestroy = () => import('#controllers/client/contacts/destroy'
 
 router
   .group(() => {
-    router.get('/search-siren', [CompanyLookup, 'handle'])
+    router.get('/search-siren', [CompanyLookup, 'handle']).as('clientCompanyLookup')
     router.get('/', [ClientList, 'handle'])
     router.get('/:id', [ClientShow, 'handle']).use(middleware.storageQuota())
     router.post('/', [ClientCreate, 'handle']).use(middleware.storageQuota())
