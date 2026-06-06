@@ -93,6 +93,8 @@ export default class ConvertQuote {
       deliveryAddress: quote.deliveryAddress,
       clientSiren: quote.clientSiren,
       clientVatNumber: quote.clientVatNumber,
+      clientSnapshot: quote.clientSnapshot,
+      companySnapshot: quote.companySnapshot,
       showQuantityColumn: quote.showQuantityColumn,
       showUnitColumn: quote.showUnitColumn,
       showUnitPriceColumn: quote.showUnitPriceColumn,
