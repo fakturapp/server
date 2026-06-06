@@ -38,11 +38,11 @@ router
       .use(middleware.requirePro())
       .use(middleware.teamSettings())
 
-    router.post('/send', [SendEmail, 'handle'])
+    router.post('/send', [SendEmail, 'handle']).use(middleware.requirePro())
     router.get('/send', async ({ response }) =>
       response.status(405).send({ message: 'Method not allowed. Use POST.' })
     )
-    router.post('/test', [SendTestEmail, 'handle'])
+    router.post('/test', [SendTestEmail, 'handle']).use(middleware.requirePro())
 
     router.get('/templates', [EmailTemplateList, 'handle'])
     router.put('/templates', [EmailTemplateUpdate, 'handle'])
