@@ -8,6 +8,7 @@ import keyStore from '#services/crypto/key_store'
 import recoveryKeyService from '#services/crypto/recovery_key_service'
 import sessionKekResolver from '#services/crypto/session_kek_resolver'
 import teamEncryptionService from '#services/crypto/team_encryption_service'
+import { collaborationEnabled, memberLimit } from '#services/billing/plan_entitlements'
 
 const acceptInviteValidator = vine.compile(
   vine.object({
@@ -47,6 +48,26 @@ export default class AcceptInvite {
     }
 
     const team = await Team.findOrFail(invitation.teamId)
+
+    if (!collaborationEnabled(team)) {
+      await invitation.delete()
+      return response.forbidden({
+        message: "Le propriétaire de l'équipe n'a plus le plan requis pour vous accepter.",
+        code: 'TEAM_REQUIRED',
+      })
+    }
+
+    const activeCount = await TeamMember.query()
+      .where('teamId', invitation.teamId)
+      .where('status', 'active')
+      .count('* as total')
+      .first()
+    if (Number(activeCount?.$extras.total ?? 0) >= memberLimit(team)) {
+      return response.forbidden({
+        message: "L'équipe a atteint son nombre maximum de membres.",
+        code: 'MEMBER_LIMIT_REACHED',
+      })
+    }
 
     let encryptedTeamDek: string | null = invitation.encryptedTeamDek
     let teamDek: Buffer | null = null
