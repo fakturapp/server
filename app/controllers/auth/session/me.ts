@@ -22,8 +22,11 @@ export default class Me {
     const memberships = await TeamMember.query()
       .where('userId', user.id)
       .where('status', 'active')
-      .select(['team_id'])
+      .select(['team_id', 'role'])
     const teamIds = memberships.map((m) => m.teamId)
+    const currentTeamRole = user.currentTeamId
+      ? (memberships.find((m) => m.teamId === user.currentTeamId)?.role ?? null)
+      : null
     const teams = teamIds.length > 0 ? await Team.query().whereIn('id', teamIds) : []
 
     const currentTeam = user.currentTeamId
@@ -105,6 +108,7 @@ export default class Me {
         isAdmin,
         currentTeamEncryptionMode,
         currentTeamPlan,
+        currentTeamRole,
         currentTeamAccessRevoked,
         currentTeamName,
         teams: teamsSummary,
