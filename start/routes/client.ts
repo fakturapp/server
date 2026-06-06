@@ -34,3 +34,4 @@ router
   .prefix(API_PREFIX + '/clients')
   .use(middleware.authOrApiKey())
   .use(middleware.vault())
+  .use(middleware.teamWrite())

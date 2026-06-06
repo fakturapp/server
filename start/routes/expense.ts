@@ -27,3 +27,4 @@ router
   .prefix(API_PREFIX + '/expenses')
   .use(middleware.authOrApiKey())
   .use(middleware.vault())
+  .use(middleware.teamWrite())

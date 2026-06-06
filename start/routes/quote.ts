@@ -36,3 +36,4 @@ router
   .prefix(API_PREFIX + '/quotes')
   .use(middleware.authOrApiKey())
   .use(middleware.vault())
+  .use(middleware.teamWrite())

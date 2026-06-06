@@ -33,3 +33,4 @@ router
   .prefix(API_PREFIX + '/credit-notes')
   .use(middleware.authOrApiKey())
   .use(middleware.vault())
+  .use(middleware.teamWrite())

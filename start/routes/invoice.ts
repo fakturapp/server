@@ -62,3 +62,4 @@ router
   .prefix(API_PREFIX + '/invoices')
   .use(middleware.authOrApiKey())
   .use(middleware.vault())
+  .use(middleware.teamWrite())
