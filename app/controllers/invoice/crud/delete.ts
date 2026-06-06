@@ -1,5 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import Invoice from '#models/invoice/invoice'
+import StorageFile from '#models/storage/storage_file'
+import storageService from '#services/storage/storage_service'
 import { broadcastDocumentDeleted } from '#services/collaboration/websocket_service'
 
 export default class Delete {
@@ -15,6 +17,14 @@ export default class Delete {
 
     if (!invoice) {
       return response.notFound({ message: 'Invoice not found' })
+    }
+
+    const attachments = await StorageFile.query()
+      .where('teamId', teamId)
+      .where('category', 'invoice_attachment')
+      .where('referenceId', invoice.id)
+    for (const attachment of attachments) {
+      await storageService.deleteFile(teamId, attachment.id)
     }
 
     await invoice.delete()
