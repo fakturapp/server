@@ -12,7 +12,7 @@ router
     router.get('/settings', [ReminderSettingsGet, 'handle'])
     router.put('/settings', [ReminderSettingsUpdate, 'handle'])
 
-    router.post('/invoices/:id/send', [SendReminder, 'handle'])
+    router.post('/invoices/:id/send', [SendReminder, 'handle']).use(middleware.requirePro())
     router.get('/invoices/:id', [ListReminders, 'handle'])
   })
   .prefix(API_PREFIX + '/reminders')

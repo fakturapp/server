@@ -99,6 +99,8 @@ export default class Team extends BaseModel {
     if (team.plan === 'free' && previousPlan !== 'free') {
       const mod = await import('#services/settings/invoice_customization_snapshot_service')
       await mod.snapshotAndResetInvoiceCustomization(team.id)
+      const reminders = await import('#services/reminder/disable_reminders')
+      await reminders.disableRemindersForTeam(team.id)
     } else if ((team.plan === 'pro' || team.plan === 'team') && previousPlan === 'free') {
       const mod = await import('#services/settings/invoice_customization_snapshot_service')
       await mod.restoreInvoiceCustomizationOnUpgrade(team.id)

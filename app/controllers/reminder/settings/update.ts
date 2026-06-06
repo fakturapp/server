@@ -1,6 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import PaymentReminderSetting from '#models/reminder/payment_reminder_setting'
+import Team from '#models/team/team'
+import { isPro } from '#services/billing/plan_entitlements'
 
 const updateValidator = vine.compile(
   vine.object({
@@ -25,6 +27,12 @@ export default class Update {
     }
 
     const payload = await request.validateUsing(updateValidator)
+
+    const team = await Team.find(teamId)
+    if (!team || !isPro(team)) {
+      payload.enabled = false
+      payload.autoSend = false
+    }
 
     let settings = await PaymentReminderSetting.query().where('team_id', teamId).first()
 
