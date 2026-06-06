@@ -142,6 +142,8 @@ export const controllers = {
       },
       SetupRecoveryKey: () => import('#controllers/auth/security/setup_recovery_key'),
       twoFactor: {
+        LostCode: () => import('#controllers/auth/security/two_factor/lost_code'),
+        SendEmailCode: () => import('#controllers/auth/security/two_factor/send_email_code'),
         Verify: () => import('#controllers/auth/security/two_factor/verify'),
       },
     },
@@ -182,9 +184,6 @@ export const controllers = {
       Show: () => import('#controllers/client/crud/show'),
       Update: () => import('#controllers/client/crud/update'),
     },
-    lookup: {
-      SearchSiren: () => import('#controllers/client/lookup/search_siren'),
-    },
   },
   collaboration: {
     access: {
@@ -207,12 +206,16 @@ export const controllers = {
   },
   company: {
     core: {
+      Delete: () => import('#controllers/company/core/delete'),
       Show: () => import('#controllers/company/core/show'),
       Update: () => import('#controllers/company/core/update'),
     },
     finance: {
       BankAccounts: () => import('#controllers/company/finance/bank_accounts'),
       Bank: () => import('#controllers/company/finance/bank'),
+    },
+    lookup: {
+      Search: () => import('#controllers/company/lookup/search'),
     },
     media: {
       ServeLogo: () => import('#controllers/company/media/serve_logo'),
@@ -385,7 +388,6 @@ export const controllers = {
   onboarding: {
     company: {
       CreateCompany: () => import('#controllers/onboarding/company/create_company'),
-      SearchCompany: () => import('#controllers/onboarding/company/search_company'),
       SkipCompany: () => import('#controllers/onboarding/company/skip_company'),
     },
     personalization: {
@@ -449,6 +451,7 @@ export const controllers = {
   },
   settings: {
     invoice: {
+      InvoiceCustomizationSnapshots: () => import('#controllers/settings/invoice/invoice_customization_snapshots'),
       InvoiceLogoUpload: () => import('#controllers/settings/invoice/invoice_logo_upload'),
       InvoiceSettingsShow: () => import('#controllers/settings/invoice/invoice_settings_show'),
       InvoiceSettingsUpdate: () => import('#controllers/settings/invoice/invoice_settings_update'),

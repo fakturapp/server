@@ -9,6 +9,7 @@ export const listeners = {
   SendRecoveryKeyEmail: () => import('#listeners/send_recovery_key_email'),
   SendSecurityCodeEmail: () => import('#listeners/send_security_code_email'),
   SendTeamInviteEmail: () => import('#listeners/send_team_invite_email'),
+  SendTwoFactorCodeEmail: () => import('#listeners/send_two_factor_code_email'),
   SendTwoFactorEnabledEmail: () => import('#listeners/send_two_factor_enabled_email'),
   SendVerificationEmail: () => import('#listeners/send_verification_email'),
 }
