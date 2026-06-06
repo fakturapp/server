@@ -1,9 +1,12 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import InvoiceSetting from '#models/team/invoice_setting'
+import Team from '#models/team/team'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import storageService from '#services/storage/storage_service'
 import { buildDefaultInvoiceSettings } from '#services/settings/default_invoice_settings'
 import { serializeInvoiceSettings } from '#services/settings/serialize_invoice_settings'
+import { isPro } from '#services/billing/plan_entitlements'
+import { APPEARANCE_DEFAULTS } from '#services/settings/invoice_appearance'
 import { updateInvoiceSettingsValidator } from '#validators/invoice_settings_validator'
 
 export default class InvoiceSettingsUpdate {
@@ -20,6 +23,16 @@ export default class InvoiceSettingsUpdate {
 
     if (payload.footerMode && !['custom', 'company_info'].includes(payload.footerMode)) {
       payload.footerMode = 'company_info'
+    }
+
+    const team = await Team.find(user.currentTeamId)
+    if (!team || !isPro(team)) {
+      payload.template = APPEARANCE_DEFAULTS.template
+      payload.darkMode = APPEARANCE_DEFAULTS.darkMode
+      payload.accentColor = APPEARANCE_DEFAULTS.accentColor
+      payload.documentFont = APPEARANCE_DEFAULTS.documentFont
+      payload.logoBorderRadius = APPEARANCE_DEFAULTS.logoBorderRadius
+      payload.aiEnabled = false
     }
 
     let pdpApiKeyToStore: string | null = null
