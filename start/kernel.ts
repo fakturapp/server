@@ -27,6 +27,7 @@ export const middleware = router.named({
   onboardingCompleted: () => import('#middleware/auth/onboarding_completed_middleware'),
   vault: () => import('#middleware/crypto/vault_middleware'),
   storageQuota: () => import('#middleware/storage_quota_middleware'),
+  requirePro: () => import('#middleware/billing/require_pro_middleware'),
   admin: () => import('#middleware/auth/admin_middleware'),
   apiKey: () => import('#middleware/api_platform/api_key_middleware'),
   apiScope: () => import('#middleware/api_platform/api_scope_middleware'),
