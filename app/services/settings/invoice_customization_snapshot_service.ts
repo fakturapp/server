@@ -3,32 +3,45 @@ import InvoiceCustomizationSnapshot from '#models/team/invoice_customization_sna
 import {
   extractAppearance,
   resetAppearance,
+  applyAppearance,
   isCustomized,
   type InvoiceAppearance,
 } from '#services/settings/invoice_appearance'
 
-const MAX_SNAPSHOTS = 20
-
 export async function snapshotAndResetInvoiceCustomization(teamId: string): Promise<void> {
   const settings = await InvoiceSetting.findBy('teamId', teamId)
-  if (!settings || !isCustomized(settings)) return
+  if (!settings) return
 
-  await InvoiceCustomizationSnapshot.create({
-    teamId,
-    snapshot: JSON.stringify(extractAppearance(settings)),
-  })
+  if (isCustomized(settings)) {
+    await InvoiceCustomizationSnapshot.query().where('teamId', teamId).delete()
+    await InvoiceCustomizationSnapshot.create({
+      teamId,
+      snapshot: JSON.stringify(extractAppearance(settings)),
+    })
+    resetAppearance(settings)
+  }
 
-  resetAppearance(settings)
+  settings.aiEnabled = false
   await settings.save()
+}
 
-  const all = await InvoiceCustomizationSnapshot.query()
+export async function restoreInvoiceCustomizationOnUpgrade(teamId: string): Promise<void> {
+  const snapshot = await InvoiceCustomizationSnapshot.query()
     .where('teamId', teamId)
     .orderBy('createdAt', 'desc')
-  if (all.length > MAX_SNAPSHOTS) {
-    for (const stale of all.slice(MAX_SNAPSHOTS)) {
-      await stale.delete()
+    .first()
+  if (!snapshot) return
+
+  const appearance = parseAppearance(snapshot)
+  if (appearance) {
+    const settings = await InvoiceSetting.findBy('teamId', teamId)
+    if (settings) {
+      applyAppearance(settings, appearance)
+      await settings.save()
     }
   }
+
+  await InvoiceCustomizationSnapshot.query().where('teamId', teamId).delete()
 }
 
 export function parseAppearance(snapshot: InvoiceCustomizationSnapshot): InvoiceAppearance | null {

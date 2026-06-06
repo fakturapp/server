@@ -93,13 +93,15 @@ export default class Team extends BaseModel {
   declare emailAccounts: HasMany<typeof EmailAccount>
 
   @beforeSave()
-  static async snapshotInvoiceCustomizationOnDowngrade(team: Team) {
-    if (team.plan !== 'free') return
+  static async handleInvoiceCustomizationOnPlanChange(team: Team) {
     const previousPlan = team.$original.plan as string | undefined
-    if (!previousPlan || previousPlan === 'free') return
-    const { snapshotAndResetInvoiceCustomization } = await import(
-      '#services/settings/invoice_customization_snapshot_service'
-    )
-    await snapshotAndResetInvoiceCustomization(team.id)
+    if (!previousPlan) return
+    if (team.plan === 'free' && previousPlan !== 'free') {
+      const mod = await import('#services/settings/invoice_customization_snapshot_service')
+      await mod.snapshotAndResetInvoiceCustomization(team.id)
+    } else if ((team.plan === 'pro' || team.plan === 'team') && previousPlan === 'free') {
+      const mod = await import('#services/settings/invoice_customization_snapshot_service')
+      await mod.restoreInvoiceCustomizationOnUpgrade(team.id)
+    }
   }
 }
