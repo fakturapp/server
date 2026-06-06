@@ -26,6 +26,20 @@ export default class Update {
 
     const payload = await request.validateUsing(createInvoiceValidator)
 
+    if (payload.invoiceNumber && payload.invoiceNumber !== invoice.invoiceNumber) {
+      const duplicate = await Invoice.query()
+        .where('team_id', teamId)
+        .where('invoice_number', payload.invoiceNumber)
+        .whereNot('id', invoice.id)
+        .first()
+      if (duplicate) {
+        return response.conflict({
+          message: 'Ce numéro de facture est déjà utilisé par une autre facture.',
+          code: 'resource_conflict',
+        })
+      }
+    }
+
     let subtotal = 0
     let taxAmount = 0
     const linesData = payload.lines.map((line, index) => {
@@ -58,6 +72,7 @@ export default class Update {
 
     const invoiceUpdateData: Record<string, any> = {
       clientId: payload.clientId || null,
+      invoiceNumber: payload.invoiceNumber || invoice.invoiceNumber,
       subject: payload.subject || null,
       issueDate: payload.issueDate,
       dueDate: payload.dueDate || null,

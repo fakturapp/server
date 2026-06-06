@@ -5,6 +5,7 @@ const OPERATION_CATEGORIES = ['service', 'goods', 'mixed'] as const
 export const createInvoiceValidator = vine.compile(
   vine.object({
     clientId: vine.string().trim().optional(),
+    invoiceNumber: vine.string().trim().maxLength(50).optional(),
     subject: vine.string().trim().maxLength(255).optional(),
     issueDate: vine.string().trim(),
     dueDate: vine.string().trim().optional(),
