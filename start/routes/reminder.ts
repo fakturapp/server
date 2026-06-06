@@ -10,7 +10,7 @@ const ListReminders = () => import('#controllers/reminder/operations/list_remind
 router
   .group(() => {
     router.get('/settings', [ReminderSettingsGet, 'handle'])
-    router.put('/settings', [ReminderSettingsUpdate, 'handle'])
+    router.put('/settings', [ReminderSettingsUpdate, 'handle']).use(middleware.teamSettings())
 
     router.post('/invoices/:id/send', [SendReminder, 'handle']).use(middleware.requirePro())
     router.get('/invoices/:id', [ListReminders, 'handle'])

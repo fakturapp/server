@@ -21,14 +21,22 @@ router.get(API_PREFIX + '/email/oauth/gmail/callback', [GmailCallback, 'handle']
 router
   .group(() => {
     router.get('/accounts', [EmailAccountsList, 'handle'])
-    router.delete('/accounts/:id', [EmailAccountsDelete, 'handle'])
-    router.patch('/accounts/:id/default', [EmailAccountsSetDefault, 'handle'])
+    router.delete('/accounts/:id', [EmailAccountsDelete, 'handle']).use(middleware.teamSettings())
+    router
+      .patch('/accounts/:id/default', [EmailAccountsSetDefault, 'handle'])
+      .use(middleware.teamSettings())
 
     router.get('/oauth/gmail/url', [GmailAuthUrl, 'handle']).use(middleware.requirePro())
 
-    router.post('/resend/configure', [ConfigureResend, 'handle']).use(middleware.requirePro())
+    router
+      .post('/resend/configure', [ConfigureResend, 'handle'])
+      .use(middleware.requirePro())
+      .use(middleware.teamSettings())
 
-    router.post('/smtp/configure', [ConfigureSmtp, 'handle']).use(middleware.requirePro())
+    router
+      .post('/smtp/configure', [ConfigureSmtp, 'handle'])
+      .use(middleware.requirePro())
+      .use(middleware.teamSettings())
 
     router.post('/send', [SendEmail, 'handle'])
     router.get('/send', async ({ response }) =>

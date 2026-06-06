@@ -31,3 +31,4 @@ router
   .prefix(API_PREFIX + '/company')
   .use(middleware.authOrApiKey())
   .use(middleware.vault())
+  .use(middleware.teamSettings())
