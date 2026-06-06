@@ -32,21 +32,21 @@ router
   .group(() => {
     router.post('/encryption/confirm-private', [ConfirmPrivate, 'handle'])
     router.post('/encryption/migrate-to-standard', [MigrateToStandard, 'handle'])
+    router.get('/all', [TeamList, 'handle'])
+    router.post('/switch', [TeamSwitch, 'handle'])
+    router.post('/leave', [TeamLeave, 'handle'])
   })
   .prefix(API_PREFIX + '/team')
   .use(middleware.auth())
 
 router
   .group(() => {
-    router.get('/all', [TeamList, 'handle'])
     router.post('/create', [TeamCreate, 'handle'])
     router.get('/', [TeamShow, 'handle'])
     router.get('/recovery-key', [TeamShowRecoveryKey, 'handle'])
     router.put('/', [TeamUpdate, 'handle'])
     router.delete('/', [TeamDelete, 'handle'])
-    router.post('/leave', [TeamLeave, 'handle'])
     router.post('/icon', [UploadIcon, 'handle']).use(middleware.storageQuota())
-    router.post('/switch', [TeamSwitch, 'handle'])
     router.post('/export', [TeamExport, 'handle'])
     router.post('/import', [TeamImport, 'handle']).use(middleware.storageQuota())
     router.get('/members', [TeamMembers, 'handle'])

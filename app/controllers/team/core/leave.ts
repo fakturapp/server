@@ -14,7 +14,7 @@ export default class Leave {
     const membership = await TeamMember.query()
       .where('teamId', teamId)
       .where('userId', user.id)
-      .where('status', 'active')
+      .whereIn('status', ['active', 'inactive'])
       .first()
 
     if (!membership) {
