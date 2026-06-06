@@ -1,5 +1,7 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import PaymentReminderSetting from '#models/reminder/payment_reminder_setting'
+import Team from '#models/team/team'
+import { isPro } from '#services/billing/plan_entitlements'
 
 export default class Get {
   async handle({ auth, response }: HttpContext) {
@@ -9,6 +11,9 @@ export default class Get {
     if (!teamId) {
       return response.badRequest({ message: 'No team selected' })
     }
+
+    const team = await Team.find(teamId)
+    const teamIsPro = team ? isPro(team) : false
 
     let settings = await PaymentReminderSetting.query().where('team_id', teamId).first()
 
@@ -30,13 +35,13 @@ export default class Get {
 
     return response.ok({
       reminderSettings: {
-        enabled: settings.enabled,
+        enabled: teamIsPro && settings.enabled,
         daysBeforeDue: settings.daysBeforeDue,
         daysAfterDue: settings.daysAfterDue,
         repeatIntervalDays: settings.repeatIntervalDays,
         emailSubjectTemplate: settings.emailSubjectTemplate,
         emailBodyTemplate: settings.emailBodyTemplate,
-        autoSend: settings.autoSend,
+        autoSend: teamIsPro && settings.autoSend,
         emailAccountId: settings.emailAccountId,
       },
     })
