@@ -38,6 +38,13 @@ export default class BillingGraceProvider {
       if (downgraded > 0) {
         logger.info({ downgraded }, '[billing] downgraded teams past 7-day grace')
       }
+
+      const { enforceExpiredCollaborationGrace } =
+        await import('#services/team/collaboration_enforcer')
+      const deactivated = await enforceExpiredCollaborationGrace()
+      if (deactivated > 0) {
+        logger.info({ deactivated }, '[billing] deactivated members past collaboration grace')
+      }
     } catch (err) {
       logger.error({ err }, '[billing] grace enforcement worker crashed')
     } finally {
