@@ -1,5 +1,5 @@
 import { DateTime } from 'luxon'
-import { BaseModel, column, belongsTo, hasMany, hasOne } from '@adonisjs/lucid/orm'
+import { BaseModel, column, belongsTo, hasMany, hasOne, beforeSave } from '@adonisjs/lucid/orm'
 import type { BelongsTo, HasMany, HasOne } from '@adonisjs/lucid/types/relations'
 import User from '#models/account/user'
 import TeamMember from '#models/team/team_member'
@@ -91,4 +91,15 @@ export default class Team extends BaseModel {
 
   @hasMany(() => EmailAccount)
   declare emailAccounts: HasMany<typeof EmailAccount>
+
+  @beforeSave()
+  static async snapshotInvoiceCustomizationOnDowngrade(team: Team) {
+    if (team.plan !== 'free') return
+    const previousPlan = team.$original.plan as string | undefined
+    if (!previousPlan || previousPlan === 'free') return
+    const { snapshotAndResetInvoiceCustomization } = await import(
+      '#services/settings/invoice_customization_snapshot_service'
+    )
+    await snapshotAndResetInvoiceCustomization(team.id)
+  }
 }
