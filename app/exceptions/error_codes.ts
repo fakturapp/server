@@ -116,6 +116,13 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: 'Team not found',
   },
+  team_access_revoked: {
+    type: 'permission_error',
+    status: 403,
+    visibility: 'user_facing',
+    defaultMessage:
+      "Le propriétaire de l'équipe n'a plus le plan requis pour vous garder dans l'équipe.",
+  },
   validation_failed: {
     type: 'validation_error',
     status: 422,

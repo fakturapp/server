@@ -27,6 +27,21 @@ export default class VaultMiddleware {
     }
     ctx.team = team
 
+    const currentMembership = await TeamMember.query()
+      .where('teamId', team.id)
+      .where('userId', user.id)
+      .first()
+
+    if (currentMembership && currentMembership.status === 'inactive') {
+      return ctx.response.status(403).send(
+        buildStructuredErrorResponse(ctx, {
+          errorCode: 'team_access_revoked',
+          message:
+            "Le propriétaire de l'équipe n'a plus le plan requis pour vous garder dans l'équipe.",
+        })
+      )
+    }
+
     if (team.encryptionMode === 'standard') {
       const membership = await TeamMember.query()
         .where('teamId', team.id)
