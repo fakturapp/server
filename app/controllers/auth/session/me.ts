@@ -7,6 +7,7 @@ import keyStore from '#services/crypto/key_store'
 import keyStoreWarmer from '#services/crypto/key_store_warmer'
 import UserTransformer from '#transformers/user_transformer'
 import { isAdminEmail } from '#services/auth/is_admin'
+import { memberLimit } from '#services/billing/plan_entitlements'
 
 export default class Me {
   async handle(ctx: HttpContext) {
@@ -52,6 +53,21 @@ export default class Me {
 
     const isAdmin = isAdminEmail(user.email)
 
+    let currentTeamAccessRevoked = false
+    let currentTeamName: string | null = currentTeam?.name ?? null
+    if (user.currentTeamId && !currentTeam) {
+      const inactiveMembership = await TeamMember.query()
+        .where('userId', user.id)
+        .where('teamId', user.currentTeamId)
+        .where('status', 'inactive')
+        .first()
+      if (inactiveMembership) {
+        currentTeamAccessRevoked = true
+        const revokedTeam = await Team.find(user.currentTeamId)
+        currentTeamName = revokedTeam?.name ?? null
+      }
+    }
+
     const teamsSummary = teams.map((t) => ({
       id: t.id,
       name: t.name,
@@ -63,9 +79,7 @@ export default class Me {
       subscriptionCurrentPeriodEnd: t.subscriptionCurrentPeriodEnd
         ? t.subscriptionCurrentPeriodEnd.toISO()
         : null,
-      subscriptionGraceEndsAt: t.subscriptionGraceEndsAt
-        ? t.subscriptionGraceEndsAt.toISO()
-        : null,
+      subscriptionGraceEndsAt: t.subscriptionGraceEndsAt ? t.subscriptionGraceEndsAt.toISO() : null,
       subscriptionCancelAtPeriodEnd: t.subscriptionCancelAtPeriodEnd,
       subscriptionCancelExternal: t.subscriptionCancelExternal,
       subscriptionPaused: t.subscriptionPaused,
@@ -76,6 +90,10 @@ export default class Me {
         ? t.encryptionModeConfirmedAt.toISO()
         : null,
       onboardingCompletedAt: t.onboardingCompletedAt ? t.onboardingCompletedAt.toISO() : null,
+      memberLimit: memberLimit(t),
+      collaborationGraceEndsAt: t.collaborationGraceEndsAt
+        ? t.collaborationGraceEndsAt.toISO()
+        : null,
     }))
 
     return response.ok({
@@ -87,6 +105,8 @@ export default class Me {
         isAdmin,
         currentTeamEncryptionMode,
         currentTeamPlan,
+        currentTeamAccessRevoked,
+        currentTeamName,
         teams: teamsSummary,
       },
     })
