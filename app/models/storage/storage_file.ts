@@ -8,6 +8,7 @@ export type StorageCategory =
   | 'invoice_logo'
   | 'team_icon'
   | 'payment_link_pdf'
+  | 'invoice_attachment'
 
 export default class StorageFile extends BaseModel {
   static table = 'storage_files'
@@ -36,6 +37,9 @@ export default class StorageFile extends BaseModel {
 
   @column()
   declare originalName: string | null
+
+  @column()
+  declare referenceId: string | null
 
   @column()
   declare isOrphaned: boolean

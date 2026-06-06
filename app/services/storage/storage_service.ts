@@ -83,7 +83,8 @@ class StorageService {
     publicUrl: string,
     sizeBytes: number,
     contentType?: string | null,
-    originalName?: string | null
+    originalName?: string | null,
+    referenceId?: string | null
   ): Promise<StorageFile> {
     if (SINGLETON_CATEGORIES.includes(category)) {
       await StorageFile.query()
@@ -102,6 +103,7 @@ class StorageService {
       sizeBytes,
       contentType: contentType ?? null,
       originalName: originalName ?? null,
+      referenceId: referenceId ?? null,
       isOrphaned: false,
     })
   }
