@@ -9,6 +9,7 @@ import env from '#start/env'
 import zeroAccessCryptoService from '#services/crypto/zero_access_crypto_service'
 import keyStore from '#services/crypto/key_store'
 import teamEncryptionService from '#services/crypto/team_encryption_service'
+import { collaborationEnabled, memberLimit } from '#services/billing/plan_entitlements'
 import { inviteValidator } from '#validators/team_validator'
 
 export default class Invite {
@@ -32,6 +33,25 @@ export default class Invite {
 
     if (!currentMember || !['super_admin', 'admin'].includes(currentMember.role)) {
       return response.forbidden({ message: 'Only admins can invite members' })
+    }
+
+    if (!collaborationEnabled(team)) {
+      return response.forbidden({
+        message: 'La collaboration en équipe est réservée au plan Team.',
+        code: 'TEAM_REQUIRED',
+      })
+    }
+
+    const activeCount = await TeamMember.query()
+      .where('teamId', user.currentTeamId)
+      .where('status', 'active')
+      .count('* as total')
+      .first()
+    if (Number(activeCount?.$extras.total ?? 0) >= memberLimit(team)) {
+      return response.forbidden({
+        message: `Votre plan permet au maximum ${memberLimit(team)} membres.`,
+        code: 'MEMBER_LIMIT_REACHED',
+      })
     }
 
     const payload = await request.validateUsing(inviteValidator)
@@ -89,8 +109,7 @@ export default class Invite {
       dekVersion: 1,
     })
 
-    const accountUrl =
-      env.get('ACCOUNT_URL') || env.get('FRONTEND_URL') || 'http://localhost:3000'
+    const accountUrl = env.get('ACCOUNT_URL') || env.get('FRONTEND_URL') || 'http://localhost:3000'
     const inviteUrl = `${accountUrl}/invite/${token}`
 
     // Send invitation email
