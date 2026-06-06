@@ -5,6 +5,7 @@ import InvoiceSetting from '#models/team/invoice_setting'
 import Company from '#models/team/company'
 import Team from '#models/team/team'
 import { buildDefaultInvoiceSettings } from '#services/settings/default_invoice_settings'
+import { isPro } from '#services/billing/plan_entitlements'
 
 const personalizeValidator = vine.compile(
   vine.object({
@@ -36,6 +37,12 @@ export default class CompletePersonalization {
     }
 
     const payload = await request.validateUsing(personalizeValidator)
+
+    const onboardingTeam = await Team.find(user.currentTeamId)
+    if (!onboardingTeam || !isPro(onboardingTeam)) {
+      payload.template = undefined
+      payload.accentColor = undefined
+    }
 
     const quotePattern = payload.quotePrefix ? `${payload.quotePrefix}{annee}-{numero}` : undefined
     const invoicePattern = payload.invoicePrefix
