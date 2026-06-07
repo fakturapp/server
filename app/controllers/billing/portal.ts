@@ -3,9 +3,10 @@ import env from '#start/env'
 import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import billingService from '#services/billing/billing_service'
+import { resolveAppBaseUrl } from '#services/http/resolve_app_base'
 
 export default class Portal {
-  async handle({ auth, response }: HttpContext) {
+  async handle({ auth, request, response }: HttpContext) {
     const user = auth.user!
 
     if (!billingService.isConfigured()) {
@@ -29,7 +30,10 @@ export default class Portal {
       return response.badRequest({ message: 'Aucun abonnement à gérer.' })
     }
 
-    const frontendUrl = env.get('FRONTEND_URL') ?? 'http://localhost:3000'
+    const frontendUrl = resolveAppBaseUrl(
+      request,
+      env.get('FRONTEND_URL') ?? 'http://localhost:3000'
+    )
     try {
       const portal = await billingService.createPortalSession(
         team.stripeCustomerId,

@@ -4,6 +4,7 @@ import env from '#start/env'
 import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
 import billingService from '#services/billing/billing_service'
+import { resolveAppBaseUrl } from '#services/http/resolve_app_base'
 
 const checkoutValidator = vine.compile(
   vine.object({
@@ -38,7 +39,10 @@ export default class Checkout {
     const payload = await request.validateUsing(checkoutValidator)
 
     const customerId = await billingService.ensureCustomer(team, user.email)
-    const frontendUrl = env.get('FRONTEND_URL') ?? 'http://localhost:3000'
+    const frontendUrl = resolveAppBaseUrl(
+      request,
+      env.get('FRONTEND_URL') ?? 'http://localhost:3000'
+    )
 
     let couponId: string | undefined
     if (
