@@ -6,6 +6,7 @@ import { ApiError } from '#exceptions/api_error'
 import { clearAuthSessionCookies } from '#services/auth/auth_cookie_service'
 import { buildStructuredErrorResponse } from '#services/http/error_response_service'
 import { logRequestError } from '#services/http/request_error_log_service'
+import { isAdminEmail } from '#services/auth/is_admin'
 import type { ErrorCode } from '#exceptions/error_codes'
 
 export default class HttpExceptionHandler extends ExceptionHandler {
@@ -162,14 +163,23 @@ export default class HttpExceptionHandler extends ExceptionHandler {
       }
     }
 
-    const message = app.inProduction
+    let isAdmin = false
+    try {
+      const email = ctx.auth?.user?.email
+      isAdmin = typeof email === 'string' && isAdminEmail(email)
+    } catch {
+      isAdmin = false
+    }
+    const hideError = app.inProduction && !isAdmin
+
+    const message = hideError
       ? 'An unexpected error occurred'
       : error instanceof Error
         ? error.message
         : String(error)
 
     const details =
-      app.inProduction || !(error instanceof Error)
+      hideError || !(error instanceof Error)
         ? null
         : {
             name: error.name,
