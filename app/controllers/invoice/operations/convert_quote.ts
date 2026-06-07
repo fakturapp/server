@@ -30,51 +30,56 @@ export default class ConvertQuote {
     }
 
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
-    let invoiceNumber: string
 
-    if (settings?.nextInvoiceNumber) {
-      invoiceNumber = documentNumberingService.normalizePattern(
-        settings.nextInvoiceNumber,
-        'FAC-{annee}-{numero}'
-      )
-      settings.nextInvoiceNumber = null
-      await settings.save()
-    } else {
-      const currentYear = new Date().getFullYear().toString()
-      const fallbackPattern = 'FAC-{annee}-{numero}'
-      const prefix = documentNumberingService.buildSequencePrefix(
-        settings?.invoiceNumberPattern || settings?.invoiceFilenamePattern,
-        fallbackPattern,
-        currentYear
-      )
+    const currentYear = new Date().getFullYear().toString()
+    const fallbackPattern = 'FAC-{annee}-{numero}'
+    const numberPattern = settings?.invoiceNumberPattern || settings?.invoiceFilenamePattern
+    const prefix = documentNumberingService.buildSequencePrefix(
+      numberPattern,
+      fallbackPattern,
+      currentYear
+    )
 
-      const lastInvoice = await Invoice.query()
+    let manualNumber: string | null = settings?.nextInvoiceNumber
+      ? documentNumberingService.normalizePattern(settings.nextInvoiceNumber, fallbackPattern)
+      : null
+
+    const resolveInvoiceNumber = async (): Promise<{ number: string; fromManual: boolean }> => {
+      if (manualNumber) {
+        const taken = await Invoice.query()
+          .where('team_id', teamId)
+          .where('invoice_number', manualNumber)
+          .first()
+        if (!taken) return { number: manualNumber, fromManual: true }
+        manualNumber = null
+      }
+
+      const existing = await Invoice.query()
         .where('team_id', teamId)
         .where('invoice_number', 'like', `${prefix}%`)
-        .orderBy('created_at', 'desc')
-        .first()
+        .select('invoice_number')
 
-      invoiceNumber = documentNumberingService.buildNextSequentialNumber({
-        pattern: settings?.invoiceNumberPattern || settings?.invoiceFilenamePattern,
-        fallbackPattern,
-        currentYear,
-        lastNumber: lastInvoice?.invoiceNumber,
-      })
+      let maxNumber = 0
+      for (const row of existing) {
+        const parsed = Number.parseInt(row.invoiceNumber.slice(prefix.length), 10)
+        if (Number.isFinite(parsed) && parsed > maxNumber) maxNumber = parsed
+      }
+
+      return {
+        number: `${prefix}${(maxNumber + 1).toString().padStart(3, '0')}`,
+        fromManual: false,
+      }
     }
 
-    // Calculate due date: issue date + 30 days
     const today = new Date()
     const dueDate = new Date(today)
     dueDate.setDate(dueDate.getDate() + 30)
     const dueDateStr = dueDate.toISOString().slice(0, 10)
     const issueDateStr = today.toISOString().slice(0, 10)
 
-    // Build invoice data — encrypted fields from quote are already encrypted,
-    // but hardcoded plaintext fields (documentTitle, paymentTerms) need encryption.
     const invoiceData: Record<string, any> = {
       teamId,
       clientId: quote.clientId,
-      invoiceNumber,
       status: 'draft',
       subject: quote.subject,
       issueDate: issueDateStr,
@@ -106,32 +111,55 @@ export default class ConvertQuote {
       paymentTerms: '30 jours net',
     }
 
-    // Only encrypt the hardcoded plaintext fields — the rest are already encrypted from quote
     encryptModelFields(invoiceData, ['documentTitle', 'paymentTerms'], dek)
 
-    const invoice = await db.transaction(async (trx) => {
-      const inv = await Invoice.create(invoiceData, { client: trx })
+    let invoice: Invoice | null = null
+    let usedManual = false
 
-      // Lines are already encrypted in the DB, copy as-is
-      for (const line of quote.lines) {
-        await InvoiceLine.create(
-          {
-            invoiceId: inv.id,
-            position: line.position,
-            description: line.description,
-            saleType: line.saleType,
-            quantity: line.quantity,
-            unit: line.unit,
-            unitPrice: line.unitPrice,
-            vatRate: line.vatRate,
-            total: line.total,
-          },
-          { client: trx }
-        )
+    for (let attempt = 0; attempt < 6; attempt++) {
+      const resolved = await resolveInvoiceNumber()
+      invoiceData.invoiceNumber = resolved.number
+
+      try {
+        invoice = await db.transaction(async (trx) => {
+          const inv = await Invoice.create(invoiceData, { client: trx })
+          for (const line of quote.lines) {
+            await InvoiceLine.create(
+              {
+                invoiceId: inv.id,
+                position: line.position,
+                description: line.description,
+                saleType: line.saleType,
+                quantity: line.quantity,
+                unit: line.unit,
+                unitPrice: line.unitPrice,
+                vatRate: line.vatRate,
+                total: line.total,
+              },
+              { client: trx }
+            )
+          }
+          return inv
+        })
+        usedManual = resolved.fromManual
+        break
+      } catch (err: any) {
+        const isDuplicate =
+          err?.code === '23505' ||
+          (typeof err?.message === 'string' && err.message.includes('duplicate key'))
+        if (!isDuplicate) throw err
+        manualNumber = null
       }
+    }
 
-      return inv
-    })
+    if (!invoice) {
+      return response.conflict({ message: 'Impossible de générer un numéro de facture unique' })
+    }
+
+    if (usedManual && settings) {
+      settings.nextInvoiceNumber = null
+      await settings.save()
+    }
 
     return response.created({
       message: 'Invoice created from quote',
