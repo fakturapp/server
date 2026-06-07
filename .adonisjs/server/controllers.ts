@@ -154,6 +154,7 @@ export const controllers = {
       Me: () => import('#controllers/auth/session/me'),
     },
     vault: {
+      Lock: () => import('#controllers/auth/vault/lock'),
       Unlock: () => import('#controllers/auth/vault/unlock'),
     },
   },

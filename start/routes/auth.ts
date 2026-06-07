@@ -22,13 +22,13 @@ const PasswordReset = () => import('#controllers/auth/security/password_reset/re
 const VerifyEmail = () => import('#controllers/auth/security/email/verify')
 const ResendVerification = () => import('#controllers/auth/security/email/resend')
 const TwoFactorVerify = () => import('#controllers/auth/security/two_factor/verify')
-const TwoFactorSendEmailCode = () =>
-  import('#controllers/auth/security/two_factor/send_email_code')
+const TwoFactorSendEmailCode = () => import('#controllers/auth/security/two_factor/send_email_code')
 const TwoFactorLostCode = () => import('#controllers/auth/security/two_factor/lost_code')
 const CryptoRecover = () => import('#controllers/auth/security/crypto_recover')
 const CryptoWipe = () => import('#controllers/auth/security/crypto_wipe')
 const SetupRecoveryKey = () => import('#controllers/auth/security/setup_recovery_key')
 const VaultUnlock = () => import('#controllers/auth/vault/unlock')
+const VaultLock = () => import('#controllers/auth/vault/lock')
 
 const PasskeyLoginOptions = () => import('#controllers/auth/passkey/login_options')
 const PasskeyLoginVerify = () => import('#controllers/auth/passkey/login_verify')
@@ -48,9 +48,7 @@ router
 
     router.post('/login', [Login, 'handle']).use(loginLimiter)
     router.post('/login/2fa', [TwoFactorVerify, 'handle']).use(twoFactorLimiter)
-    router
-      .post('/login/2fa/send-email', [TwoFactorSendEmailCode, 'handle'])
-      .use(twoFactorLimiter)
+    router.post('/login/2fa/send-email', [TwoFactorSendEmailCode, 'handle']).use(twoFactorLimiter)
     router.post('/login/2fa/lost', [TwoFactorLostCode, 'handle']).use(twoFactorLimiter)
     router.post('/check-email', [CheckEmail, 'handle']).use(checkEmailLimiter)
 
@@ -73,6 +71,7 @@ router
         router.post('/crypto/wipe', [CryptoWipe, 'handle'])
         router.post('/crypto/setup-recovery-key', [SetupRecoveryKey, 'handle'])
         router.post('/vault/unlock', [VaultUnlock, 'handle'])
+        router.post('/vault/lock', [VaultLock, 'handle'])
       })
       .use(middleware.auth())
   })
