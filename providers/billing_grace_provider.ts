@@ -45,6 +45,12 @@ export default class BillingGraceProvider {
       if (deactivated > 0) {
         logger.info({ deactivated }, '[billing] deactivated members past collaboration grace')
       }
+
+      const { enforceExpiredApiGrace } = await import('#services/team/api_resource_enforcer')
+      const suspended = await enforceExpiredApiGrace()
+      if (suspended.keys > 0 || suspended.projects > 0) {
+        logger.info(suspended, '[billing] suspended API resources past grace')
+      }
     } catch (err) {
       logger.error({ err }, '[billing] grace enforcement worker crashed')
     } finally {
