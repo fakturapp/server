@@ -52,6 +52,7 @@ router
     router
       .post('/api-projects/:id/explorer-events', [ProjectsExplorerEvent, 'handle'])
       .as('dashboard.apiProjects.explorerEvent')
+      .use(middleware.requirePro())
 
     router.get('/api-keys', [KeysList, 'handle']).as('dashboard.apiKeys.list')
     router
