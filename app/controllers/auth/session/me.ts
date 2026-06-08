@@ -97,6 +97,7 @@ export default class Me {
       collaborationGraceEndsAt: t.collaborationGraceEndsAt
         ? t.collaborationGraceEndsAt.toISO()
         : null,
+      apiGraceEndsAt: t.apiGraceEndsAt ? t.apiGraceEndsAt.toISO() : null,
     }))
 
     return response.ok({

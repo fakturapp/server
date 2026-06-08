@@ -17,9 +17,10 @@ export interface ApiKeyAdminShape {
   last_used_at: string | null
   last_ip: string | null
   usage_count: number
-  status: 'active' | 'expired' | 'revoked' | 'rotating'
+  status: 'active' | 'expired' | 'revoked' | 'rotating' | 'suspended'
   revoked_at: string | null
   revoked_reason: string | null
+  suspended_at: string | null
   rotation_grace_until: string | null
   created_at: string
   updated_at: string | null
@@ -27,6 +28,7 @@ export interface ApiKeyAdminShape {
 
 function statusOf(key: ApiKey): ApiKeyAdminShape['status'] {
   if (key.revokedAt) return 'revoked'
+  if (key.suspendedAt) return 'suspended'
   if (key.expiresAt && key.isExpired) return 'expired'
   if (key.rotatingToId) return 'rotating'
   return 'active'
@@ -50,6 +52,7 @@ class ApiKeyAdminTransformer {
       status: statusOf(key),
       revoked_at: key.revokedAt?.toISO() ?? null,
       revoked_reason: key.revokedReason,
+      suspended_at: key.suspendedAt?.toISO() ?? null,
       rotation_grace_until: key.rotationGraceUntil?.toISO() ?? null,
       created_at: key.createdAt.toISO() ?? '',
       updated_at: key.updatedAt?.toISO() ?? null,

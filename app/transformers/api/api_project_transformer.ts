@@ -7,6 +7,7 @@ interface ProjectShape {
   color: string | null
   is_default: boolean
   is_archived: boolean
+  is_suspended: boolean
   keys_count?: number
   created_at: string
   updated_at: string | null
@@ -21,6 +22,7 @@ class ApiProjectTransformer {
       color: project.color,
       is_default: project.isDefault,
       is_archived: project.isArchived,
+      is_suspended: project.suspendedAt !== null,
       keys_count: keysCount,
       created_at: project.createdAt.toISO()!,
       updated_at: project.updatedAt?.toISO() ?? null,
