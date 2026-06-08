@@ -5,7 +5,7 @@ import apiCreditService from '#services/api/api_credit_service'
 export default class Session {
   async handle(ctx: HttpContext) {
     const apiKey = ctx.apiKey!
-    const usage = await apiCreditService.getUsage(apiKey.teamId)
+    const usage = await apiCreditService.getUsage(apiKey.teamId, ctx.team?.plan)
     return apiResponse.ok(ctx.response, {
       session: usage.session,
       weekly: usage.weekly,
