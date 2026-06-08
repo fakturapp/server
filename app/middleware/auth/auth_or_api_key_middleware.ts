@@ -2,9 +2,11 @@ import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
 import type { Authenticators } from '@adonisjs/auth/types'
 import apiKeyService from '#services/api/api_key_service'
-import apiCreditService, { CREDIT_LIMITS } from '#services/api/api_credit_service'
+import apiCreditService, { creditLimitsFor } from '#services/api/api_credit_service'
+import { creditCostFor } from '#services/api/api_credit_cost'
 import apiResponse from '#services/api/api_response'
 import User from '#models/account/user'
+import Team from '#models/team/team'
 import env from '#start/env'
 import { isAdminEmail } from '#services/auth/is_admin'
 
@@ -71,11 +73,17 @@ export default class AuthOrApiKeyMiddleware {
       })
       ctx.apiKey = apiKey
 
-      const check = await apiCreditService.check(apiKey.teamId, user.id)
-      ctx.response.header('X-Credits-Session-Limit', String(CREDIT_LIMITS.PER_SESSION))
-      ctx.response.header('X-Credits-Session-Window-Hours', String(CREDIT_LIMITS.SESSION_HOURS))
-      ctx.response.header('X-Credits-Weekly-Limit', String(CREDIT_LIMITS.PER_WEEK))
-      ctx.response.header('X-Credits-Per-Minute-Limit', String(CREDIT_LIMITS.PER_MINUTE))
+      const team = await Team.find(apiKey.teamId)
+      const plan = team?.plan ?? 'free'
+      const limits = creditLimitsFor(plan)
+      const cost = creditCostFor(ctx.request.method(), ctx.request.url())
+
+      const check = await apiCreditService.check(apiKey.teamId, user.id, plan, cost)
+      ctx.response.header('X-Credits-Cost', String(cost))
+      ctx.response.header('X-Credits-Session-Limit', String(limits.PER_SESSION))
+      ctx.response.header('X-Credits-Session-Window-Hours', String(limits.SESSION_HOURS))
+      ctx.response.header('X-Credits-Weekly-Limit', String(limits.PER_WEEK))
+      ctx.response.header('X-Credits-Per-Minute-Limit', String(limits.PER_MINUTE))
 
       if (!check.ok) {
         ctx.response.header('Retry-After', String(check.retry_after_seconds))
@@ -85,11 +93,12 @@ export default class AuthOrApiKeyMiddleware {
           {
             reason: check.reason,
             retry_after_seconds: check.retry_after_seconds,
+            cost,
             limits: {
-              per_minute: CREDIT_LIMITS.PER_MINUTE,
-              per_session: CREDIT_LIMITS.PER_SESSION,
-              session_hours: CREDIT_LIMITS.SESSION_HOURS,
-              per_week: CREDIT_LIMITS.PER_WEEK,
+              per_minute: limits.PER_MINUTE,
+              per_session: limits.PER_SESSION,
+              session_hours: limits.SESSION_HOURS,
+              per_week: limits.PER_WEEK,
             },
           },
           ctx.requestId
@@ -100,7 +109,7 @@ export default class AuthOrApiKeyMiddleware {
       ctx.response.header('X-Credits-Weekly-Remaining', String(check.weekly_remaining))
       ctx.response.header('X-Credits-Minute-Remaining', String(check.minute_remaining))
 
-      await apiCreditService.charge(apiKey.teamId, user.id, 1)
+      await apiCreditService.charge(apiKey.teamId, user.id, cost)
       return next()
     }
 
