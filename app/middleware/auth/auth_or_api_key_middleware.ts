@@ -32,6 +32,14 @@ export default class AuthOrApiKeyMiddleware {
         })
       }
 
+      if (apiKey.suspendedAt) {
+        return ctx.response.forbidden({
+          message:
+            'This API key is suspended because the team plan was downgraded. Upgrade the plan to reactivate it.',
+          code: 'key_suspended',
+        })
+      }
+
       const userId =
         (apiKey as unknown as { createdByUserId?: string | null }).createdByUserId ?? null
       const user = userId ? await User.find(userId) : null

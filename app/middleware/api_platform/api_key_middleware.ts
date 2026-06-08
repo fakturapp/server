@@ -47,6 +47,15 @@ export default class ApiKeyMiddleware {
       )
     }
 
+    if (apiKey.suspendedAt) {
+      return apiResponse.forbidden(
+        ctx.response,
+        'key_suspended',
+        'This API key is suspended because the team plan was downgraded. Upgrade the plan to reactivate it.',
+        ctx.requestId
+      )
+    }
+
     if (!apiKeyService.isAllowedIp(apiKey, clientIp)) {
       return apiResponse.forbidden(
         ctx.response,
