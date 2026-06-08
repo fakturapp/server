@@ -458,7 +458,6 @@ export const controllers = {
   },
   settings: {
     invoice: {
-      InvoiceCustomizationSnapshots: () => import('#controllers/settings/invoice/invoice_customization_snapshots'),
       InvoiceLogoUpload: () => import('#controllers/settings/invoice/invoice_logo_upload'),
       InvoiceSettingsShow: () => import('#controllers/settings/invoice/invoice_settings_show'),
       InvoiceSettingsUpdate: () => import('#controllers/settings/invoice/invoice_settings_update'),

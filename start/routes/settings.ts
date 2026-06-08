@@ -6,8 +6,6 @@ const InvoiceSettingsShow = () => import('#controllers/settings/invoice/invoice_
 const InvoiceSettingsUpdate = () => import('#controllers/settings/invoice/invoice_settings_update')
 const InvoiceLogoUpload = () => import('#controllers/settings/invoice/invoice_logo_upload')
 const ServeInvoiceLogo = () => import('#controllers/settings/invoice/serve_invoice_logo')
-const InvoiceCustomizationSnapshots = () =>
-  import('#controllers/settings/invoice/invoice_customization_snapshots')
 const StripeSettingsShow = () => import('#controllers/settings/stripe/stripe_settings_show')
 const StripeSettingsSave = () => import('#controllers/settings/stripe/stripe_settings_save')
 const StripeSettingsDelete = () => import('#controllers/settings/stripe/stripe_settings_delete')
@@ -19,9 +17,6 @@ router
     router.get('/invoices', [InvoiceSettingsShow, 'handle'])
     router.put('/invoices', [InvoiceSettingsUpdate, 'handle'])
     router.post('/invoices/logo', [InvoiceLogoUpload, 'handle']).use(middleware.storageQuota())
-    router.get('/invoices/snapshots', [InvoiceCustomizationSnapshots, 'index'])
-    router.post('/invoices/snapshots/:id/restore', [InvoiceCustomizationSnapshots, 'restore'])
-    router.delete('/invoices/snapshots/:id', [InvoiceCustomizationSnapshots, 'destroy'])
 
     router.get('/stripe', [StripeSettingsShow, 'handle'])
     router.put('/stripe', [StripeSettingsSave, 'handle'])
