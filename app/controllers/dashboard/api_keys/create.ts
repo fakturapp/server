@@ -1,7 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import Team from '#models/team/team'
+import ApiKey from '#models/api/api_key'
 import ApiProject from '#models/api/api_project'
+import { apiKeyLimit } from '#services/billing/plan_entitlements'
 import apiKeyService from '#services/api/api_key_service'
 import scopeChecker from '#services/api/scope_checker'
 import auditLog from '#services/api/audit_log_service'
@@ -23,6 +25,20 @@ export default class Create {
         code: 'team_mode_private',
         message:
           'API keys require Standard encryption mode. Migrate your team from Private to Standard to enable the public API.',
+      })
+    }
+
+    const limit = apiKeyLimit(team)
+    const activeKeys = await ApiKey.query()
+      .where('teamId', team.id)
+      .whereNull('revokedAt')
+      .count('* as total')
+      .first()
+    if (Number(activeKeys?.$extras.total ?? 0) >= limit) {
+      return response.status(403).send({
+        code: 'api_key_limit_reached',
+        message: `Votre plan permet au maximum ${limit} clé(s) API. Passez à un plan supérieur pour en créer davantage.`,
+        limit,
       })
     }
 
