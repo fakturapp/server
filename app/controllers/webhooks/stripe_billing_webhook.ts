@@ -8,6 +8,10 @@ import billingService from '#services/billing/billing_service'
 import StripeWebhookEvent from '#models/billing/stripe_webhook_event'
 import { applyStripeSubscription } from '#services/billing/subscription_state'
 import { PaymentFailedNotification } from '#mails/payment_failed_notification'
+import { SubscriptionConfirmedNotification } from '#mails/subscription_confirmed_notification'
+import { SubscriptionEndedNotification } from '#mails/subscription_ended_notification'
+import { PaymentRecoveredNotification } from '#mails/payment_recovered_notification'
+import { planLabel, periodLabel } from '#services/billing/plan_labels'
 
 export default class StripeBillingWebhook {
   async handle({ request, response }: HttpContext) {
@@ -24,8 +28,7 @@ export default class StripeBillingWebhook {
     }
     if (!event) {
       const allowUnverified =
-        env.get('NODE_ENV') !== 'production' &&
-        env.get('STRIPE_ALLOW_UNVERIFIED_WEBHOOK') === true
+        env.get('NODE_ENV') !== 'production' && env.get('STRIPE_ALLOW_UNVERIFIED_WEBHOOK') === true
       if (!allowUnverified) {
         return response.badRequest({ message: 'Invalid signature' })
       }
@@ -67,7 +70,10 @@ export default class StripeBillingWebhook {
       }
     } catch {
       if (event.id) {
-        await StripeWebhookEvent.query().where('id', String(event.id)).delete().catch(() => {})
+        await StripeWebhookEvent.query()
+          .where('id', String(event.id))
+          .delete()
+          .catch(() => {})
       }
       return response.internalServerError({ received: false })
     }
@@ -106,7 +112,11 @@ export default class StripeBillingWebhook {
   }
 
   private async onCheckoutCompleted(session: any) {
-    const team = await this.findTeam(session.metadata?.team_id, session.customer, session.subscription)
+    const team = await this.findTeam(
+      session.metadata?.team_id,
+      session.customer,
+      session.subscription
+    )
     if (!team) return
     const newSubId = session.subscription ? String(session.subscription) : null
     if (newSubId && team.stripeSubscriptionId && team.stripeSubscriptionId !== newSubId) {
@@ -129,6 +139,25 @@ export default class StripeBillingWebhook {
     team.pendingPlanPeriod = null
     if (!team.subscriptionStartedAt) team.subscriptionStartedAt = DateTime.now()
     await team.save()
+    if (team.plan === 'pro' || team.plan === 'team') {
+      await this.notifySubscriptionConfirmed(team)
+    }
+  }
+
+  private async notifySubscriptionConfirmed(team: Team) {
+    try {
+      const owner = await User.find(team.ownerId)
+      if (!owner?.email) return
+      await mail.send(
+        new SubscriptionConfirmedNotification(
+          owner.email,
+          team.name,
+          planLabel(team.plan),
+          periodLabel(team.planPeriod),
+          owner.fullName ?? undefined
+        )
+      )
+    } catch {}
   }
 
   private async onSubscriptionUpdated(sub: any) {
@@ -160,7 +189,12 @@ export default class StripeBillingWebhook {
         ? team.subscriptionGraceEndsAt.setLocale('fr').toLocaleString(DateTime.DATE_FULL)
         : ''
       await mail.send(
-        new PaymentFailedNotification(owner.email, team.name, graceDate, owner.fullName ?? undefined)
+        new PaymentFailedNotification(
+          owner.email,
+          team.name,
+          graceDate,
+          owner.fullName ?? undefined
+        )
       )
       team.subscriptionDunningNotifiedAt = DateTime.now()
       await team.save()
@@ -171,6 +205,7 @@ export default class StripeBillingWebhook {
     const team = await this.findTeam(sub.metadata?.team_id, sub.customer, sub.id)
     if (!team) return
     if (team.stripeSubscriptionId && team.stripeSubscriptionId !== sub.id) return
+    const wasPaid = team.plan === 'pro' || team.plan === 'team'
     team.plan = 'free'
     team.subscriptionStatus = 'canceled'
     team.stripeSubscriptionId = null
@@ -182,10 +217,24 @@ export default class StripeBillingWebhook {
     team.pendingPlan = null
     team.pendingPlanPeriod = null
     await team.save()
+    if (wasPaid) {
+      try {
+        const owner = await User.find(team.ownerId)
+        if (owner?.email) {
+          await mail.send(
+            new SubscriptionEndedNotification(owner.email, team.name, owner.fullName ?? undefined)
+          )
+        }
+      } catch {}
+    }
   }
 
   private async onInvoiceFailed(invoice: any) {
-    const team = await this.findTeam(invoice.metadata?.team_id, invoice.customer, this.invoiceSubId(invoice))
+    const team = await this.findTeam(
+      invoice.metadata?.team_id,
+      invoice.customer,
+      this.invoiceSubId(invoice)
+    )
     if (!team) return
     team.subscriptionStatus = 'past_due'
     if (!team.subscriptionGraceEndsAt) {
@@ -196,13 +245,34 @@ export default class StripeBillingWebhook {
   }
 
   private async onInvoicePaid(invoice: any) {
-    const team = await this.findTeam(invoice.metadata?.team_id, invoice.customer, this.invoiceSubId(invoice))
+    const team = await this.findTeam(
+      invoice.metadata?.team_id,
+      invoice.customer,
+      this.invoiceSubId(invoice)
+    )
     if (!team) return
-    if (team.subscriptionStatus === 'past_due' || team.subscriptionStatus === 'unpaid') {
+    const wasPastDue =
+      team.subscriptionStatus === 'past_due' || team.subscriptionStatus === 'unpaid'
+    if (wasPastDue) {
       team.subscriptionStatus = 'active'
     }
     team.subscriptionGraceEndsAt = null
     team.subscriptionDunningNotifiedAt = null
     await team.save()
+    if (wasPastDue && (team.plan === 'pro' || team.plan === 'team')) {
+      try {
+        const owner = await User.find(team.ownerId)
+        if (owner?.email) {
+          await mail.send(
+            new PaymentRecoveredNotification(
+              owner.email,
+              team.name,
+              planLabel(team.plan),
+              owner.fullName ?? undefined
+            )
+          )
+        }
+      } catch {}
+    }
   }
 }
