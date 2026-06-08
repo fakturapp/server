@@ -19,7 +19,7 @@ router
     router.post('/invoices/logo', [InvoiceLogoUpload, 'handle']).use(middleware.storageQuota())
 
     router.get('/stripe', [StripeSettingsShow, 'handle'])
-    router.put('/stripe', [StripeSettingsSave, 'handle'])
+    router.put('/stripe', [StripeSettingsSave, 'handle']).use(middleware.requirePro())
     router.delete('/stripe', [StripeSettingsDelete, 'handle'])
   })
   .prefix(API_PREFIX + '/settings')
