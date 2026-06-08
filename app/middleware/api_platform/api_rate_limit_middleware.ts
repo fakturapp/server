@@ -1,6 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import type { NextFn } from '@adonisjs/core/types/http'
-import apiRateLimiter, { tierFor } from '#services/api/api_rate_limiter'
+import apiRateLimiter, { tierForPlan } from '#services/api/api_rate_limiter'
 import apiResponse from '#services/api/api_response'
 
 export default class ApiRateLimitMiddleware {
@@ -8,8 +8,9 @@ export default class ApiRateLimitMiddleware {
     const apiKey = ctx.apiKey
     if (!apiKey) return next()
 
-    const outcome = await apiRateLimiter.consume(apiKey.id, apiKey.rateLimitTier)
-    const tier = tierFor(apiKey.rateLimitTier)
+    const plan = ctx.team?.plan ?? 'free'
+    const outcome = await apiRateLimiter.consume(apiKey.id, plan)
+    const tier = tierForPlan(plan)
 
     ctx.response.header('X-RateLimit-Limit', String(outcome.limit))
     ctx.response.header('X-RateLimit-Remaining', String(Math.max(0, outcome.remaining)))

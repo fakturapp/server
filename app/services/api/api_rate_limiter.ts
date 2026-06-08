@@ -16,6 +16,18 @@ export function tierFor(name: string | null | undefined): RateLimitTier {
   return RATE_LIMIT_TIERS[name ?? 'default'] ?? RATE_LIMIT_TIERS.default
 }
 
+export const PLAN_RATE_LIMIT_TIERS: Record<string, RateLimitTier> = {
+  free: { perMinute: 3, perHour: 200 },
+  pro: { perMinute: 60, perHour: 5000 },
+  team: { perMinute: 120, perHour: 30000 },
+}
+
+export function tierForPlan(plan: string | null | undefined): RateLimitTier {
+  if (plan === 'pro') return PLAN_RATE_LIMIT_TIERS.pro
+  if (plan === 'team') return PLAN_RATE_LIMIT_TIERS.team
+  return PLAN_RATE_LIMIT_TIERS.free
+}
+
 export interface ConsumeOutcome {
   allowed: boolean
   remaining: number
@@ -30,8 +42,8 @@ const HOUR_SECONDS = 3600
 const memoryStore: Map<string, { count: number; resetAt: number }> = new Map()
 
 class ApiRateLimiter {
-  async consume(apiKeyId: string, tierName: string): Promise<ConsumeOutcome> {
-    const tier = tierFor(tierName)
+  async consume(apiKeyId: string, plan: string | null | undefined): Promise<ConsumeOutcome> {
+    const tier = tierForPlan(plan)
     const nowSeconds = Math.floor(Date.now() / 1000)
 
     const minute = await this.tickWindow(
