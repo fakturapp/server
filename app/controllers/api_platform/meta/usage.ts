@@ -14,6 +14,7 @@ export default class Usage {
       team: {
         id: publicIdCodec.encode('team', team.id),
         name: team.name,
+        plan: team.plan,
       },
       api_key: {
         id: publicIdCodec.encode('api_key', apiKey.id),

@@ -12,6 +12,7 @@ export default class Ping {
       team: {
         id: publicIdCodec.encode('team', team.id),
         name: team.name,
+        plan: team.plan,
         encryption_mode: team.encryptionMode,
       },
       api_key: {
