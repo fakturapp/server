@@ -72,6 +72,9 @@ export default class Team extends BaseModel {
   declare collaborationGraceEndsAt: DateTime | null
 
   @column.dateTime()
+  declare apiGraceEndsAt: DateTime | null
+
+  @column.dateTime()
   declare onboardingCompletedAt: DateTime | null
 
   @column.dateTime({ autoCreate: true })
@@ -119,6 +122,21 @@ export default class Team extends BaseModel {
       await mod.startCollaborationGrace(team)
     } else if (team.plan === 'team' && previousPlan !== 'team') {
       await mod.clearCollaborationGraceAndReactivate(team)
+    }
+  }
+
+  @beforeSave()
+  static async handleApiResourcesOnPlanChange(team: Team) {
+    const previousPlan = team.$original.plan as string | undefined
+    if (!previousPlan || previousPlan === team.plan) return
+    const RANK: Record<string, number> = { free: 0, pro: 1, team: 2 }
+    const next = RANK[team.plan] ?? 0
+    const prev = RANK[previousPlan] ?? 0
+    const mod = await import('#services/team/api_resource_enforcer')
+    if (next < prev) {
+      await mod.startApiGrace(team)
+    } else if (next > prev) {
+      await mod.restoreApiResources(team)
     }
   }
 }
