@@ -1,9 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
 import vine from '@vinejs/vine'
+import mail from '@adonisjs/mail/services/main'
 import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
+import User from '#models/account/user'
 import billingService from '#services/billing/billing_service'
+import { planLabel, periodLabel } from '#services/billing/plan_labels'
+import { SubscriptionScheduledChangeNotification } from '#mails/subscription_scheduled_change_notification'
 
 const scheduleValidator = vine.compile(
   vine.object({
@@ -46,7 +50,9 @@ export default class ScheduleChange {
       try {
         await billingService.releaseScheduledChange(team.stripeSubscriptionId)
       } catch (err: any) {
-        return response.badRequest({ message: err?.message || 'Impossible d’annuler le changement' })
+        return response.badRequest({
+          message: err?.message || 'Impossible d’annuler le changement',
+        })
       }
       team.pendingPlan = null
       team.pendingPlanPeriod = null
@@ -70,6 +76,8 @@ export default class ScheduleChange {
       })
     }
 
+    const fromPlan = team.plan
+
     try {
       const result = await billingService.scheduleChangeAtPeriodEnd({
         subscriptionId: team.stripeSubscriptionId,
@@ -87,6 +95,8 @@ export default class ScheduleChange {
       }
       await team.save()
 
+      await this.notifyScheduledChange(team, fromPlan, payload.plan, payload.period)
+
       return response.ok({
         message: 'Changement programmé',
         pendingPlan: payload.plan,
@@ -97,5 +107,31 @@ export default class ScheduleChange {
         message: err?.message || 'Impossible de programmer le changement de forfait',
       })
     }
+  }
+
+  private async notifyScheduledChange(
+    team: Team,
+    fromPlan: string,
+    toPlan: 'pro' | 'team',
+    toPeriod: 'monthly' | 'annual'
+  ) {
+    try {
+      const owner = await User.find(team.ownerId)
+      if (!owner?.email) return
+      const effectiveDate = team.subscriptionCurrentPeriodEnd
+        ? team.subscriptionCurrentPeriodEnd.setLocale('fr').toLocaleString(DateTime.DATE_FULL)
+        : 'la fin de la période en cours'
+      await mail.sendLater(
+        new SubscriptionScheduledChangeNotification(
+          owner.email,
+          team.name,
+          planLabel(fromPlan),
+          planLabel(toPlan),
+          periodLabel(toPeriod),
+          effectiveDate,
+          owner.fullName ?? undefined
+        )
+      )
+    } catch {}
   }
 }

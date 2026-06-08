@@ -1,8 +1,13 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import { DateTime } from 'luxon'
 import vine from '@vinejs/vine'
+import mail from '@adonisjs/mail/services/main'
 import Team from '#models/team/team'
 import TeamMember from '#models/team/team_member'
+import User from '#models/account/user'
 import billingService from '#services/billing/billing_service'
+import { planLabel } from '#services/billing/plan_labels'
+import { SubscriptionCanceledNotification } from '#mails/subscription_canceled_notification'
 
 const cancelValidator = vine.compile(
   vine.object({
@@ -43,6 +48,9 @@ export default class Cancel {
       team.subscriptionCancelAtPeriodEnd = !resume
       team.subscriptionCancelExternal = false
       await team.save()
+      if (!resume) {
+        await this.notifyCanceled(team)
+      }
       return response.ok({
         message: resume ? 'Abonnement réactivé' : 'Abonnement programmé pour annulation',
         cancelAtPeriodEnd: !resume,
@@ -54,5 +62,24 @@ export default class Cancel {
           : 'Impossible de résilier l’abonnement pour le moment. Réessayez plus tard.',
       })
     }
+  }
+
+  private async notifyCanceled(team: Team) {
+    try {
+      const owner = await User.find(team.ownerId)
+      if (!owner?.email) return
+      const endDate = team.subscriptionCurrentPeriodEnd
+        ? team.subscriptionCurrentPeriodEnd.setLocale('fr').toLocaleString(DateTime.DATE_FULL)
+        : 'la fin de la période en cours'
+      await mail.sendLater(
+        new SubscriptionCanceledNotification(
+          owner.email,
+          team.name,
+          planLabel(team.plan),
+          endDate,
+          owner.fullName ?? undefined
+        )
+      )
+    } catch {}
   }
 }
