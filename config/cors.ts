@@ -48,7 +48,23 @@ const corsConfig = defineConfig({
   /**
    * Response headers exposed to the browser.
    */
-  exposeHeaders: ['Content-Disposition'],
+  exposeHeaders: [
+    'Content-Disposition',
+    'Retry-After',
+    'X-Credits-Cost',
+    'X-Credits-Session-Limit',
+    'X-Credits-Session-Window-Hours',
+    'X-Credits-Session-Remaining',
+    'X-Credits-Weekly-Limit',
+    'X-Credits-Weekly-Remaining',
+    'X-Credits-Per-Minute-Limit',
+    'X-Credits-Minute-Remaining',
+    'X-RateLimit-Limit',
+    'X-RateLimit-Remaining',
+    'X-RateLimit-Reset',
+    'X-RateLimit-Policy',
+    'X-Request-Id',
+  ],
 
   /**
    * Allow cookies/authorization headers on cross-origin requests.
