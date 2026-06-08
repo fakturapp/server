@@ -32,6 +32,9 @@ export default class ApiProject extends BaseModel {
   @column()
   declare isArchived: boolean
 
+  @column.dateTime()
+  declare suspendedAt: DateTime | null
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

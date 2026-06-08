@@ -61,6 +61,9 @@ export default class ApiKey extends BaseModel {
   @column()
   declare revokedReason: string | null
 
+  @column.dateTime()
+  declare suspendedAt: DateTime | null
+
   @column()
   declare rotatingToId: string | null
 
