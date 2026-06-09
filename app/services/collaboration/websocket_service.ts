@@ -1,10 +1,29 @@
 import { Server as SocketServer, type Socket } from 'socket.io'
 import type { Server as HttpServer } from 'node:http'
 import { Secret } from '@adonisjs/core/helpers'
+import { CookieParser } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
+import encryption from '@adonisjs/core/services/encryption'
 import env from '#start/env'
 import User from '#models/account/user'
 import type { SharePermission } from '#models/collaboration/document_share'
+
+const AUTH_COOKIE_NAME = '__Secure-faktur_token'
+
+function extractHandshakeToken(socket: Socket): string | null {
+  const authToken = socket.handshake.auth?.token
+  if (typeof authToken === 'string' && authToken.length > 0) return authToken
+
+  const cookieHeader = socket.handshake.headers.cookie
+  if (!cookieHeader) return null
+  try {
+    const parser = new CookieParser(cookieHeader, encryption.use())
+    const value = parser.unsign(AUTH_COOKIE_NAME)
+    return typeof value === 'string' && value.length > 0 ? value : null
+  } catch {
+    return null
+  }
+}
 
 export interface CollaboratorInfo {
   userId: string
@@ -137,7 +156,7 @@ export function initWebSocket(httpServer: HttpServer) {
 
   collabNs.use(async (socket, next) => {
     try {
-      const token = socket.handshake.auth?.token as string
+      const token = extractHandshakeToken(socket)
       if (!token) {
         return next(new Error('Authentication required'))
       }
