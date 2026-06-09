@@ -16,6 +16,7 @@ const LinkDestroy = () => import('#controllers/collaboration/links/destroy')
 const ValidateLink = () => import('#controllers/collaboration/access/validate_link')
 const CheckAccess = () => import('#controllers/collaboration/access/check_access')
 const ActiveEditors = () => import('#controllers/collaboration/access/active_editors')
+const SharedDocumentShow = () => import('#controllers/collaboration/documents/show')
 
 const collabGroup = router
   .group(() => {
@@ -30,6 +31,8 @@ const collabGroup = router
     router.delete('/share-links/:linkId', [LinkDestroy, 'handle'])
 
     router.get('/access/:documentType/:documentId', [CheckAccess, 'handle'])
+
+    router.get('/documents/:documentType/:documentId', [SharedDocumentShow, 'handle'])
 
     router.get('/active-editors/:documentType', [ActiveEditors, 'handle'])
   })

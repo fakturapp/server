@@ -192,6 +192,9 @@ export const controllers = {
       CheckAccess: () => import('#controllers/collaboration/access/check_access'),
       ValidateLink: () => import('#controllers/collaboration/access/validate_link'),
     },
+    documents: {
+      Show: () => import('#controllers/collaboration/documents/show'),
+    },
     links: {
       Create: () => import('#controllers/collaboration/links/create'),
       Destroy: () => import('#controllers/collaboration/links/destroy'),
