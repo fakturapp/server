@@ -1,6 +1,7 @@
 import { Server as SocketServer, type Socket } from 'socket.io'
 import type { Server as HttpServer } from 'node:http'
 import { Secret } from '@adonisjs/core/helpers'
+import app from '@adonisjs/core/services/app'
 import env from '#start/env'
 import User from '#models/account/user'
 import type { SharePermission } from '#models/collaboration/document_share'
@@ -42,9 +43,17 @@ const CURSOR_COLORS = [
   '#f43f5e',
 ]
 
+function colorForUser(userId: string): string {
+  let hash = 0
+  for (let i = 0; i < userId.length; i++) {
+    hash = (hash * 31 + userId.charCodeAt(i)) >>> 0
+  }
+  return CURSOR_COLORS[hash % CURSOR_COLORS.length]
+}
+
 interface RoomPresence {
+  teamId: string | null
   collaborators: Map<string, CollaboratorInfo & { socketId: string }>
-  colorIndex: number
 }
 
 const rooms = new Map<string, RoomPresence>()
@@ -53,19 +62,20 @@ function getRoomKey(documentType: string, documentId: string): string {
   return `${documentType}:${documentId}`
 }
 
-function getOrCreateRoom(roomKey: string): RoomPresence {
-  if (!rooms.has(roomKey)) {
-    rooms.set(roomKey, { collaborators: new Map(), colorIndex: 0 })
+function getOrCreateRoom(roomKey: string, teamId: string | null): RoomPresence {
+  let room = rooms.get(roomKey)
+  if (!room) {
+    room = { teamId, collaborators: new Map() }
+    rooms.set(roomKey, room)
+  } else if (!room.teamId && teamId) {
+    room.teamId = teamId
   }
-  return rooms.get(roomKey)!
+  return room
 }
 
-/**
- * Returns a map of documentId → list of active editors for a given type + team.
- */
 export function getActiveEditors(
   documentType: string,
-  _teamId: string
+  teamId: string
 ): Record<
   string,
   {
@@ -80,10 +90,10 @@ export function getActiveEditors(
   for (const [roomKey, room] of rooms) {
     const [type, docId] = roomKey.split(':')
     if (type !== documentType) continue
-    // Only include rooms where at least one collaborator belongs to this team
+    if (room.teamId && room.teamId !== teamId) continue
     const collabs = Array.from(room.collaborators.values())
     if (collabs.length === 0) continue
-    result[docId] = collabs.map(({ socketId: _, ...c }) => ({
+    result[docId] = collabs.map((c) => ({
       userId: c.userId,
       fullName: c.fullName,
       email: c.email,
@@ -94,21 +104,28 @@ export function getActiveEditors(
   return result
 }
 
-// ── Singleton ─────────────────────────────────────────────────────────────
-
 let io: SocketServer | null = null
 
 export function getSocketServer(): SocketServer | null {
   return io
 }
 
-/**
- * Initialize the Socket.io server and attach it to the Node.js HTTP server.
- */
+function resolveAllowedOrigins(): true | string[] {
+  if (app.inDev) return true
+  const raw = env.get('CORS_ORIGIN', '')
+  const origins = raw
+    .split(',')
+    .map((o) => o.trim())
+    .filter(Boolean)
+  const frontend = env.get('FRONTEND_URL', '')
+  if (frontend && !origins.includes(frontend)) origins.push(frontend)
+  return origins.length > 0 ? origins : true
+}
+
 export function initWebSocket(httpServer: HttpServer) {
   io = new SocketServer(httpServer, {
     cors: {
-      origin: env.get('FRONTEND_URL', 'http://localhost:3000'),
+      origin: resolveAllowedOrigins(),
       methods: ['GET', 'POST'],
       credentials: true,
     },
@@ -118,8 +135,6 @@ export function initWebSocket(httpServer: HttpServer) {
 
   const collabNs = io.of('/collaboration')
 
-  // ── Authentication middleware ─────────────────────────────────────────
-
   collabNs.use(async (socket, next) => {
     try {
       const token = socket.handshake.auth?.token as string
@@ -127,7 +142,6 @@ export function initWebSocket(httpServer: HttpServer) {
         return next(new Error('Authentication required'))
       }
 
-      // Verify the Bearer token via AdonisJS DbAccessTokensProvider
       const accessToken = await User.accessTokens.verify(new Secret(token))
       if (!accessToken) {
         return next(new Error('Invalid token'))
@@ -138,7 +152,6 @@ export function initWebSocket(httpServer: HttpServer) {
         return next(new Error('User not found'))
       }
 
-      // Attach user info to socket
       ;(socket as any).userId = user.id
       ;(socket as any).user = {
         id: user.id,
@@ -154,9 +167,6 @@ export function initWebSocket(httpServer: HttpServer) {
     }
   })
 
-  // ── Connection handler ────────────────────────────────────────────────
-
-  // Track connected sockets per user to prevent connection flooding
   const userSocketCount = new Map<string, number>()
   const MAX_SOCKETS_PER_USER = 5
 
@@ -164,7 +174,6 @@ export function initWebSocket(httpServer: HttpServer) {
     const userData = (socket as any).user
     const userId = (socket as any).userId as string
 
-    // Limit concurrent connections per user
     const count = userSocketCount.get(userId) || 0
     if (count >= MAX_SOCKETS_PER_USER) {
       socket.emit('error', { message: 'Too many concurrent connections' })
@@ -178,12 +187,9 @@ export function initWebSocket(httpServer: HttpServer) {
       else userSocketCount.set(userId, c - 1)
     })
 
-    // ── Join a document room ──────────────────────────────────────────
-
     socket.on('join-document', async (data: { documentType: string; documentId: string }) => {
       const { documentType, documentId } = data
 
-      // Validate input
       const validTypes = ['invoice', 'quote', 'credit_note']
       if (!documentType || !validTypes.includes(documentType)) {
         socket.emit('error', { message: 'Invalid document type' })
@@ -196,46 +202,59 @@ export function initWebSocket(httpServer: HttpServer) {
 
       const roomKey = getRoomKey(documentType, documentId)
 
-      // Check access: team member or shared user
       let permission: SharePermission = 'viewer'
       let isOwner = false
+      let documentTeamId: string | null = null
 
-      // Import dynamically to avoid circular dependencies
       const { default: DocumentAccessService } =
         await import('#services/collaboration/document_access_service')
+      const { default: DocumentShare } = await import('#models/collaboration/document_share')
       const accessService = new DocumentAccessService()
 
-      // Check if user is team owner
-      const document = await accessService.getDocument(
-        documentType as any,
-        documentId,
-        userData.currentTeamId
-      )
+      const document = userData.currentTeamId
+        ? await accessService.getDocument(documentType as any, documentId, userData.currentTeamId)
+        : null
 
       if (document) {
         permission = 'editor'
         isOwner = true
+        documentTeamId = userData.currentTeamId
       } else {
-        // Check shared access
-        const sharePermission = await accessService.getSharePermission(
-          documentType as any,
-          documentId,
-          userId
-        )
-        if (!sharePermission) {
+        let share = await DocumentShare.query()
+          .where('document_type', documentType)
+          .where('document_id', documentId)
+          .where('shared_with_user_id', userId)
+          .where('status', 'active')
+          .first()
+
+        if (!share) {
+          const pending = await DocumentShare.query()
+            .where('document_type', documentType)
+            .where('document_id', documentId)
+            .where('status', 'pending')
+            .whereRaw('LOWER(shared_with_email) = ?', [userData.email.toLowerCase()])
+            .first()
+          if (pending) {
+            pending.sharedWithUserId = userId
+            pending.status = 'active'
+            await pending.save()
+            share = pending
+          }
+        }
+
+        if (!share) {
           socket.emit('access-denied', { message: 'You do not have access to this document' })
           return
         }
-        permission = sharePermission
+        permission = share.permission
+        documentTeamId = share.teamId
       }
 
-      // Join the Socket.io room
       socket.join(roomKey)
 
-      // Add to presence
-      const room = getOrCreateRoom(roomKey)
-      const color = CURSOR_COLORS[room.colorIndex % CURSOR_COLORS.length]
-      room.colorIndex++
+      const room = getOrCreateRoom(roomKey, documentTeamId)
+      const existing = room.collaborators.get(userId)
+      const color = existing?.color ?? colorForUser(userId)
 
       const collaboratorInfo: CollaboratorInfo & { socketId: string } = {
         userId,
@@ -249,11 +268,8 @@ export function initWebSocket(httpServer: HttpServer) {
       }
 
       room.collaborators.set(userId, collaboratorInfo)
-
-      // Store room key on socket for cleanup
       ;(socket as any).currentRoom = roomKey
 
-      // Send current collaborators to the joining user
       const collaborators = Array.from(room.collaborators.values()).map(
         ({ socketId: _, ...c }) => c
       )
@@ -264,7 +280,6 @@ export function initWebSocket(httpServer: HttpServer) {
         collaborators,
       })
 
-      // Notify others that someone joined
       socket.to(roomKey).emit('collaborator-joined', {
         userId,
         fullName: userData.fullName,
@@ -276,29 +291,25 @@ export function initWebSocket(httpServer: HttpServer) {
       })
     })
 
-    // ── Cursor movement ───────────────────────────────────────────────
-
     socket.on('cursor-move', (data: { x: number; y: number; fieldId?: string }) => {
       const roomKey = (socket as any).currentRoom
       if (!roomKey) return
       if (typeof data?.x !== 'number' || typeof data?.y !== 'number') return
+      if (!Number.isFinite(data.x) || !Number.isFinite(data.y)) return
 
       socket.to(roomKey).emit('cursor-moved', {
         userId,
-        x: Math.round(data.x),
-        y: Math.round(data.y),
+        x: data.x,
+        y: data.y,
         fieldId: typeof data.fieldId === 'string' ? data.fieldId.slice(0, 100) : undefined,
       })
     })
-
-    // ── Document changes ──────────────────────────────────────────────
 
     socket.on('document-change', (data: { path: string; value: any }) => {
       const roomKey = (socket as any).currentRoom
       if (!roomKey) return
       if (typeof data?.path !== 'string' || data.path.length > 200) return
 
-      // Check editor permission
       const room = rooms.get(roomKey)
       const collaborator = room?.collaborators.get(userId)
       if (!collaborator || collaborator.permission !== 'editor') {
@@ -306,7 +317,6 @@ export function initWebSocket(httpServer: HttpServer) {
         return
       }
 
-      // Broadcast to all others in the room (last-write-wins for V1)
       socket.to(roomKey).emit('document-changed', {
         userId,
         path: data.path,
@@ -315,11 +325,10 @@ export function initWebSocket(httpServer: HttpServer) {
       })
     })
 
-    // ── Field focus (show who is editing what) ────────────────────────
-
     socket.on('field-focus', (data: { fieldId: string }) => {
       const roomKey = (socket as any).currentRoom
       if (!roomKey) return
+      if (typeof data?.fieldId !== 'string' || data.fieldId.length > 300) return
 
       socket.to(roomKey).emit('field-focused', {
         userId,
@@ -330,6 +339,7 @@ export function initWebSocket(httpServer: HttpServer) {
     socket.on('field-blur', (data: { fieldId: string }) => {
       const roomKey = (socket as any).currentRoom
       if (!roomKey) return
+      if (typeof data?.fieldId !== 'string' || data.fieldId.length > 300) return
 
       socket.to(roomKey).emit('field-blurred', {
         userId,
@@ -337,13 +347,9 @@ export function initWebSocket(httpServer: HttpServer) {
       })
     })
 
-    // ── Leave document room ───────────────────────────────────────────
-
     socket.on('leave-document', () => {
       handleLeaveRoom(socket, userId)
     })
-
-    // ── Disconnect ────────────────────────────────────────────────────
 
     socket.on('disconnect', () => {
       handleLeaveRoom(socket, userId)
@@ -364,8 +370,6 @@ async function handleLeaveRoom(socket: Socket, userId: string) {
   const room = rooms.get(roomKey)
   if (!room) return
 
-  // Check if the user has other active sockets in this room
-  // (handles multiple browser tabs for the same user)
   if (io) {
     const collabNs = io.of('/collaboration')
     const socketsInRoom = await collabNs.in(roomKey).fetchSockets()
@@ -377,7 +381,6 @@ async function handleLeaveRoom(socket: Socket, userId: string) {
       room.collaborators.delete(userId)
       socket.to(roomKey).emit('collaborator-left', { userId })
 
-      // Auto-expire share links created by this user
       const [docType, docId] = roomKey.split(':')
       if (docType && docId) {
         import('#models/collaboration/document_share_link').then(
@@ -401,9 +404,28 @@ async function handleLeaveRoom(socket: Socket, userId: string) {
   }
 }
 
-/**
- * Broadcast that a document was deleted — all collaborators should leave.
- */
+export async function updateCollaboratorPermission(
+  documentType: string,
+  documentId: string,
+  userId: string,
+  permission: SharePermission
+) {
+  if (!io) return
+
+  const roomKey = getRoomKey(documentType, documentId)
+  const room = rooms.get(roomKey)
+  const collaborator = room?.collaborators.get(userId)
+  if (collaborator) collaborator.permission = permission
+
+  const collabNs = io.of('/collaboration')
+  const sockets = await collabNs.in(roomKey).fetchSockets()
+  for (const s of sockets) {
+    if ((s as any).userId === userId) {
+      s.emit('permission-changed', { permission })
+    }
+  }
+}
+
 export function broadcastDocumentDeleted(documentType: string, documentId: string) {
   if (!io) return
 
@@ -413,13 +435,9 @@ export function broadcastDocumentDeleted(documentType: string, documentId: strin
     message: 'This document has been deleted',
   })
 
-  // Clean up the room
   rooms.delete(roomKey)
 }
 
-/**
- * Broadcast that a document was saved, so other collaborators can refresh.
- */
 export function broadcastDocumentSaved(
   documentType: string,
   documentId: string,
@@ -435,10 +453,6 @@ export function broadcastDocumentSaved(
   })
 }
 
-/**
- * Forcefully disconnect a user from a document room.
- * Called when access is revoked.
- */
 export async function disconnectUserFromDocument(
   documentType: string,
   documentId: string,
@@ -453,7 +467,6 @@ export async function disconnectUserFromDocument(
   const collaborator = room.collaborators.get(userId)
   if (!collaborator) return
 
-  // Find and disconnect the socket
   const collabNs = io.of('/collaboration')
   const sockets = await collabNs.in(roomKey).fetchSockets()
 
@@ -467,7 +480,6 @@ export async function disconnectUserFromDocument(
     }
   }
 
-  // Remove from presence
   room.collaborators.delete(userId)
   collabNs.to(roomKey).emit('collaborator-left', { userId })
 
