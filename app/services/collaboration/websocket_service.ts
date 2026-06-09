@@ -73,6 +73,7 @@ function colorForUser(userId: string): string {
 interface RoomPresence {
   teamId: string | null
   collaborators: Map<string, CollaboratorInfo & { socketId: string }>
+  banned: Set<string>
 }
 
 const rooms = new Map<string, RoomPresence>()
@@ -84,12 +85,70 @@ function getRoomKey(documentType: string, documentId: string): string {
 function getOrCreateRoom(roomKey: string, teamId: string | null): RoomPresence {
   let room = rooms.get(roomKey)
   if (!room) {
-    room = { teamId, collaborators: new Map() }
+    room = { teamId, collaborators: new Map(), banned: new Set() }
     rooms.set(roomKey, room)
   } else if (!room.teamId && teamId) {
     room.teamId = teamId
   }
   return room
+}
+
+export function clearRoomBan(documentType: string, documentId: string, userId: string) {
+  rooms.get(getRoomKey(documentType, documentId))?.banned.delete(userId)
+}
+
+async function moderateCollaborator(
+  socket: Socket,
+  requesterId: string,
+  targetUserId: unknown,
+  ban: boolean
+) {
+  const roomKey = (socket as any).currentRoom
+  if (!roomKey || !io) return
+  if (typeof targetUserId !== 'string' || !targetUserId || targetUserId === requesterId) return
+
+  const room = rooms.get(roomKey)
+  if (!room) return
+
+  const requester = room.collaborators.get(requesterId)
+  if (!requester?.isOwner) {
+    socket.emit('error', { message: 'Seul le propriétaire du document peut faire cela' })
+    return
+  }
+
+  const target = room.collaborators.get(targetUserId)
+  if (!target) return
+
+  if (ban && target.isOwner) {
+    socket.emit('error', { message: "Impossible de bannir un membre de l'équipe" })
+    return
+  }
+
+  const [docType, docId] = roomKey.split(':')
+
+  if (ban) {
+    room.banned.add(targetUserId)
+    const { default: DocumentShare } = await import('#models/collaboration/document_share')
+    await DocumentShare.query()
+      .where('document_type', docType)
+      .where('document_id', docId)
+      .where('shared_with_user_id', targetUserId)
+      .whereNot('status', 'revoked')
+      .update({ status: 'revoked' })
+  }
+
+  const collabNs = io.of('/collaboration')
+  const sockets = await collabNs.in(roomKey).fetchSockets()
+  for (const s of sockets) {
+    if ((s as any).userId === targetUserId) {
+      s.emit('kicked', { banned: ban })
+      s.leave(roomKey)
+      ;(s as any).currentRoom = null
+    }
+  }
+
+  room.collaborators.delete(targetUserId)
+  collabNs.to(roomKey).emit('collaborator-left', { userId: targetUserId })
 }
 
 export function getActiveEditors(
@@ -221,6 +280,11 @@ export function initWebSocket(httpServer: HttpServer) {
 
       const roomKey = getRoomKey(documentType, documentId)
 
+      if (rooms.get(roomKey)?.banned.has(userId)) {
+        socket.emit('access-denied', { message: 'Votre accès à ce document a été révoqué' })
+        return
+      }
+
       let permission: SharePermission = 'viewer'
       let isOwner = false
       let documentTeamId: string | null = null
@@ -293,6 +357,7 @@ export function initWebSocket(httpServer: HttpServer) {
         ({ socketId: _, ...c }) => c
       )
       socket.emit('room-joined', {
+        userId,
         permission,
         isOwner,
         color,
@@ -364,6 +429,49 @@ export function initWebSocket(httpServer: HttpServer) {
         userId,
         fieldId: data.fieldId,
       })
+    })
+
+    socket.on('field-selection', (data: { fieldId: string; text: string }) => {
+      const roomKey = (socket as any).currentRoom
+      if (!roomKey) return
+      if (typeof data?.fieldId !== 'string' || data.fieldId.length > 300) return
+      if (typeof data?.text !== 'string' || data.text.length > 200) return
+
+      const room = rooms.get(roomKey)
+      const collaborator = room?.collaborators.get(userId)
+      if (!collaborator || collaborator.permission !== 'editor') return
+
+      socket.to(roomKey).emit('field-selection-changed', {
+        userId,
+        fieldId: data.fieldId,
+        text: data.text,
+      })
+    })
+
+    socket.on('ping-check', (cb: unknown) => {
+      if (typeof cb === 'function') cb()
+    })
+
+    socket.on('latency-report', (data: { ms: number }) => {
+      const roomKey = (socket as any).currentRoom
+      if (!roomKey) return
+      const ms = Number(data?.ms)
+      if (!Number.isFinite(ms) || ms < 0 || ms > 60000) return
+      const room = rooms.get(roomKey)
+      if (!room?.collaborators.has(userId)) return
+
+      collabNs.to(roomKey).emit('collaborator-latency', {
+        userId,
+        latencyMs: Math.round(ms),
+      })
+    })
+
+    socket.on('kick-user', async (data: { userId: string }) => {
+      await moderateCollaborator(socket, userId, data?.userId, false)
+    })
+
+    socket.on('ban-user', async (data: { userId: string }) => {
+      await moderateCollaborator(socket, userId, data?.userId, true)
     })
 
     socket.on('leave-document', () => {

@@ -46,6 +46,16 @@ export default class ValidateLink {
       .first()
 
     if (!share) {
+      const revoked = await DocumentShare.query()
+        .where('document_type', link.documentType)
+        .where('document_id', link.documentId)
+        .where('shared_with_user_id', user.id)
+        .where('status', 'revoked')
+        .first()
+      if (revoked) {
+        return response.forbidden({ message: 'Votre accès à ce document a été révoqué' })
+      }
+
       share = await DocumentShare.create({
         teamId: link.teamId,
         documentType: link.documentType,

@@ -4,6 +4,7 @@ import DocumentShare from '#models/collaboration/document_share'
 import User from '#models/account/user'
 import { createShareValidator } from '#validators/collaboration_validator'
 import DocumentAccessService from '#services/collaboration/document_access_service'
+import { clearRoomBan } from '#services/collaboration/websocket_service'
 import { DocumentShareNotification } from '#mails/document_share_notification'
 
 export default class Create {
@@ -71,6 +72,10 @@ export default class Create {
       permission: payload.permission,
       status,
     })
+
+    if (sharedWithUserId) {
+      clearRoomBan(payload.documentType, payload.documentId, sharedWithUserId)
+    }
 
     await mail.sendLater(
       new DocumentShareNotification(
