@@ -1,9 +1,10 @@
 import type { HttpContext } from '@adonisjs/core/http'
+import mail from '@adonisjs/mail/services/main'
 import DocumentShare from '#models/collaboration/document_share'
 import User from '#models/account/user'
-import TeamMember from '#models/team/team_member'
 import { createShareValidator } from '#validators/collaboration_validator'
 import DocumentAccessService from '#services/collaboration/document_access_service'
+import { DocumentShareNotification } from '#mails/document_share_notification'
 
 export default class Create {
   async handle(ctx: HttpContext) {
@@ -33,21 +34,8 @@ export default class Create {
 
     const targetUser = await User.findBy('email', payload.email)
 
-    let sharedWithUserId: string | null = null
-    let status: 'active' | 'pending' = 'pending'
-
-    if (targetUser) {
-      const teamMember = await TeamMember.query()
-        .where('team_id', teamId)
-        .where('user_id', targetUser.id)
-        .where('status', 'active')
-        .first()
-
-      if (teamMember) {
-        sharedWithUserId = targetUser.id
-        status = 'active'
-      }
-    }
+    const sharedWithUserId = targetUser?.id ?? null
+    const status: 'active' | 'pending' = targetUser ? 'active' : 'pending'
 
     if (sharedWithUserId) {
       const existingShare = await DocumentShare.query()
@@ -59,6 +47,17 @@ export default class Create {
 
       if (existingShare) {
         return response.conflict({ message: 'This user already has access to this document' })
+      }
+    } else {
+      const existingPending = await DocumentShare.query()
+        .where('document_type', payload.documentType)
+        .where('document_id', payload.documentId)
+        .whereRaw('LOWER(shared_with_email) = ?', [payload.email.toLowerCase()])
+        .where('status', 'pending')
+        .first()
+
+      if (existingPending) {
+        return response.conflict({ message: 'This email has already been invited' })
       }
     }
 
@@ -72,6 +71,17 @@ export default class Create {
       permission: payload.permission,
       status,
     })
+
+    await mail.sendLater(
+      new DocumentShareNotification(
+        payload.email,
+        user.fullName ?? user.email,
+        payload.documentType,
+        payload.documentId,
+        payload.permission,
+        !!targetUser
+      )
+    )
 
     await share.load('sharedWith')
     await share.load('sharedBy')
