@@ -388,7 +388,7 @@ export function renderQuoteHtml(
 
   // Font: template-specific font takes priority, then user setting
   const fontName = T.font || settings.documentFont || 'Lexend'
-  const fontImport = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@300;400;500;600;700;800&display=swap`
+  const fontImport = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700&display=swap`
 
   return `<!DOCTYPE html>
 <html>
