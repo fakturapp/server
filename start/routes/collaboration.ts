@@ -7,6 +7,7 @@ const ShareList = () => import('#controllers/collaboration/shares/list')
 const ShareCreate = () => import('#controllers/collaboration/shares/create')
 const ShareUpdate = () => import('#controllers/collaboration/shares/update')
 const ShareRevoke = () => import('#controllers/collaboration/shares/revoke')
+const SharedWithMe = () => import('#controllers/collaboration/shares/shared_with_me')
 
 const LinkCreate = () => import('#controllers/collaboration/links/create')
 const LinkList = () => import('#controllers/collaboration/links/list')
@@ -20,6 +21,7 @@ const SharedDocumentShow = () => import('#controllers/collaboration/documents/sh
 
 const collabGroup = router
   .group(() => {
+    router.get('/shared-with-me', [SharedWithMe, 'handle'])
     router.get('/shares/:documentType/:documentId', [ShareList, 'handle'])
     router.post('/shares', [ShareCreate, 'handle']).use(collaborationShareLimiter)
     router.patch('/shares/:shareId', [ShareUpdate, 'handle'])
