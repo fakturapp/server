@@ -188,9 +188,9 @@ export default class StripeBillingWebhook {
     try {
       const owner = await User.find(team.ownerId)
       if (!owner?.email) return
-      const graceDate = team.subscriptionGraceEndsAt
-        ? team.subscriptionGraceEndsAt.setLocale('fr').toLocaleString(DateTime.DATE_FULL)
-        : ''
+      const graceDate = (team.subscriptionGraceEndsAt ?? DateTime.now().plus({ days: 7 }))
+        .setLocale('fr')
+        .toLocaleString(DateTime.DATE_FULL)
       await mail.send(
         new PaymentFailedNotification(
           owner.email,
