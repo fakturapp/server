@@ -4,6 +4,7 @@ import { API_PREFIX } from '#start/routes/_prefix'
 
 const ProfileShow = () => import('#controllers/account/profile/show')
 const ProfileUpdate = () => import('#controllers/account/profile/update')
+const UiThemeUpdate = () => import('#controllers/account/profile/update_ui_theme')
 const AccountDelete = () => import('#controllers/account/profile/delete')
 const DeletionStart = () => import('#controllers/account/delete/start')
 const DeletionTeams = () => import('#controllers/account/delete/teams')
@@ -49,6 +50,7 @@ router
   .group(() => {
     router.get('/profile', [ProfileShow, 'handle'])
     router.put('/profile', [ProfileUpdate, 'handle'])
+    router.put('/ui-theme', [UiThemeUpdate, 'handle'])
     router.put('/password', [PasswordChange, 'handle'])
     router.post('/avatar', [UploadAvatar, 'handle'])
     router.get('/sessions', [SessionsList, 'handle'])
