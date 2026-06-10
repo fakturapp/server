@@ -538,7 +538,7 @@ export function initWebSocket(httpServer: HttpServer) {
       })
     })
 
-    socket.on('field-selection', (data: { fieldId: string; text: string }) => {
+    socket.on('field-selection', (data: { fieldId: string; text: string; start?: number; end?: number }) => {
       const roomKey = (socket as any).currentRoom
       if (!roomKey) return
       if (typeof data?.fieldId !== 'string' || data.fieldId.length > 300) return
@@ -548,10 +548,17 @@ export function initWebSocket(httpServer: HttpServer) {
       const collaborator = room?.collaborators.get(userId)
       if (!collaborator || collaborator.permission !== 'editor') return
 
+      const validIndex = (v: unknown) =>
+        Number.isInteger(v) && (v as number) >= 0 && (v as number) <= 100000
+          ? (v as number)
+          : undefined
+
       socket.to(roomKey).emit('field-selection-changed', {
         userId,
         fieldId: data.fieldId,
         text: data.text,
+        start: validIndex(data?.start),
+        end: validIndex(data?.end),
       })
     })
 
@@ -625,8 +632,37 @@ export function initWebSocket(httpServer: HttpServer) {
     })
   })
 
+  const userNs = io.of('/user')
+
+  userNs.use(async (socket, next) => {
+    try {
+      const token = extractHandshakeToken(socket)
+      if (!token) {
+        return next(new Error('Authentication required'))
+      }
+      const accessToken = await User.accessTokens.verify(new Secret(token))
+      if (!accessToken) {
+        return next(new Error('Invalid token'))
+      }
+      ;(socket as any).userId = String(accessToken.tokenableId)
+      next()
+    } catch {
+      next(new Error('Authentication failed'))
+    }
+  })
+
+  userNs.on('connection', (socket: Socket) => {
+    socket.join(`user:${(socket as any).userId}`)
+  })
+
   console.log('[faktur] WebSocket server initialized on /ws')
   return io
+}
+
+export function notifyUser(userId: string, event: string, payload: Record<string, unknown>) {
+  io?.of('/user')
+    .to(`user:${userId}`)
+    .emit(event, payload)
 }
 
 async function handleLeaveRoom(socket: Socket, userId: string) {
