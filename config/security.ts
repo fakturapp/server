@@ -16,7 +16,7 @@ const securityConfig = {
 
   tokens: {
     passwordResetExpiry: 600,
-    emailVerificationExpiry: 600,
+    emailVerificationExpiry: 86400,
     hashAlgorithm: 'sha256' as const,
   },
 

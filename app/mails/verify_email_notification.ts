@@ -11,7 +11,7 @@ export default class VerifyEmailNotification extends BaseMail {
   subject = 'Vérifiez votre email - Faktur'
 
   constructor(
-    email: string,
+    private email: string,
     private token: string,
     private name?: string
   ) {
@@ -20,7 +20,7 @@ export default class VerifyEmailNotification extends BaseMail {
   }
 
   prepare() {
-    const verifyUrl = `${getAccountUrl()}/verify-email?token=${this.token}`
+    const verifyUrl = `${getAccountUrl()}/verify-email?token=${this.token}&email=${encodeURIComponent(this.email)}`
 
     const content = `
       <h2 style="font-size: 20px; font-weight: 600; color: #171717; letter-spacing: -0.02em; margin: 0 0 8px; text-align: center;">V&eacute;rifiez votre adresse email</h2>
@@ -31,7 +31,7 @@ export default class VerifyEmailNotification extends BaseMail {
         Merci d&rsquo;avoir rejoint Faktur&nbsp;! Pour finaliser la cr&eacute;ation de votre compte, veuillez confirmer votre adresse email.
       </p>
       ${ctaButton(verifyUrl, 'V&eacute;rifier mon email')}
-      ${validityTag('Valide 10 minutes')}
+      ${validityTag('Valide 24 heures')}
       ${linkFallback(verifyUrl)}
     `
 
