@@ -5,7 +5,12 @@ import Invoice from '#models/invoice/invoice'
 import InvoiceLine from '#models/invoice/invoice_line'
 import InvoiceSetting from '#models/team/invoice_setting'
 import documentNumberingService from '#services/documents/document_numbering_service'
-import { encryptModelFields } from '#services/crypto/field_encryption_helper'
+import {
+  decryptModelFields,
+  decryptModelFieldsArray,
+  encryptModelFields,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 
 export default class ConvertQuote {
   async handle(ctx: HttpContext) {
@@ -28,6 +33,9 @@ export default class ConvertQuote {
     if (!quote) {
       return response.notFound({ message: 'Quote not found' })
     }
+
+    decryptModelFields(quote, [...ENCRYPTED_FIELDS.quote], dek)
+    decryptModelFieldsArray(quote.lines, [...ENCRYPTED_FIELDS.quoteLine], dek)
 
     const settings = await InvoiceSetting.query().where('team_id', teamId).first()
 
@@ -111,7 +119,7 @@ export default class ConvertQuote {
       paymentTerms: '30 jours net',
     }
 
-    encryptModelFields(invoiceData, ['documentTitle', 'paymentTerms'], dek)
+    encryptModelFields(invoiceData, [...ENCRYPTED_FIELDS.invoice], dek)
 
     let invoice: Invoice | null = null
     let usedManual = false
@@ -124,20 +132,19 @@ export default class ConvertQuote {
         invoice = await db.transaction(async (trx) => {
           const inv = await Invoice.create(invoiceData, { client: trx })
           for (const line of quote.lines) {
-            await InvoiceLine.create(
-              {
-                invoiceId: inv.id,
-                position: line.position,
-                description: line.description,
-                saleType: line.saleType,
-                quantity: line.quantity,
-                unit: line.unit,
-                unitPrice: line.unitPrice,
-                vatRate: line.vatRate,
-                total: line.total,
-              },
-              { client: trx }
-            )
+            const lineRecord: Record<string, any> = {
+              invoiceId: inv.id,
+              position: line.position,
+              description: line.description,
+              saleType: line.saleType,
+              quantity: line.quantity,
+              unit: line.unit,
+              unitPrice: line.unitPrice,
+              vatRate: line.vatRate,
+              total: line.total,
+            }
+            encryptModelFields(lineRecord, [...ENCRYPTED_FIELDS.invoiceLine], dek)
+            await InvoiceLine.create(lineRecord, { client: trx })
           }
           return inv
         })

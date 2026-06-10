@@ -3,7 +3,12 @@ import db from '@adonisjs/lucid/services/db'
 import Invoice from '#models/invoice/invoice'
 import CreditNote from '#models/credit_note/credit_note'
 import CreditNoteLine from '#models/credit_note/credit_note_line'
-import { encryptModelFields } from '#services/crypto/field_encryption_helper'
+import {
+  decryptModelFields,
+  decryptModelFieldsArray,
+  encryptModelFields,
+  ENCRYPTED_FIELDS,
+} from '#services/crypto/field_encryption_helper'
 import documentNumberingService from '#services/documents/document_numbering_service'
 
 export default class ConvertInvoice {
@@ -27,6 +32,9 @@ export default class ConvertInvoice {
       return response.notFound({ message: 'Invoice not found' })
     }
 
+    decryptModelFields(invoice, [...ENCRYPTED_FIELDS.invoice], dek)
+    decryptModelFieldsArray(invoice.lines, [...ENCRYPTED_FIELDS.invoiceLine], dek)
+
     const currentYear = new Date().getFullYear().toString()
     const fallbackPattern = 'AV-{annee}-{numero}'
     const prefix = documentNumberingService.buildSequencePrefix(
@@ -49,8 +57,6 @@ export default class ConvertInvoice {
     })
     const today = new Date().toISOString().slice(0, 10)
 
-    // Build credit note data — encrypted fields from invoice are already encrypted,
-    // but hardcoded plaintext fields need encryption.
     const creditNoteData: Record<string, any> = {
       teamId,
       clientId: invoice.clientId,
@@ -80,28 +86,25 @@ export default class ConvertInvoice {
       vatExemptReason: invoice.vatExemptReason,
     }
 
-    // Only encrypt the hardcoded plaintext fields — the rest are already encrypted from invoice
-    encryptModelFields(creditNoteData, ['documentTitle'], dek)
+    encryptModelFields(creditNoteData, [...ENCRYPTED_FIELDS.creditNote], dek)
 
     const creditNote = await db.transaction(async (trx) => {
       const cn = await CreditNote.create(creditNoteData, { client: trx })
 
-      // Lines are already encrypted in the DB, copy as-is
       for (const line of invoice.lines) {
-        await CreditNoteLine.create(
-          {
-            creditNoteId: cn.id,
-            position: line.position,
-            description: line.description,
-            saleType: line.saleType,
-            quantity: line.quantity,
-            unit: line.unit,
-            unitPrice: line.unitPrice,
-            vatRate: line.vatRate,
-            total: line.total,
-          },
-          { client: trx }
-        )
+        const lineRecord: Record<string, any> = {
+          creditNoteId: cn.id,
+          position: line.position,
+          description: line.description,
+          saleType: line.saleType,
+          quantity: line.quantity,
+          unit: line.unit,
+          unitPrice: line.unitPrice,
+          vatRate: line.vatRate,
+          total: line.total,
+        }
+        encryptModelFields(lineRecord, [...ENCRYPTED_FIELDS.creditNoteLine], dek)
+        await CreditNoteLine.create(lineRecord, { client: trx })
       }
 
       return cn
