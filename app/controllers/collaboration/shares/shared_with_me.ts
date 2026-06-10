@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import DocumentShare from '#models/collaboration/document_share'
+import TeamMember from '#models/team/team_member'
 import DocumentAccessService from '#services/collaboration/document_access_service'
 import teamEncryption from '#services/crypto/team_encryption_service'
 import Invoice from '#models/invoice/invoice'
@@ -19,6 +20,13 @@ export default class SharedWithMe {
     const shares = await DocumentShare.query()
       .where('shared_with_user_id', user.id)
       .where('status', 'active')
+      .whereNotIn(
+        'team_id',
+        TeamMember.query()
+          .select('team_id')
+          .where('user_id', user.id)
+          .where('status', 'active')
+      )
       .preload('team')
       .preload('sharedBy')
       .orderBy('updated_at', 'desc')
