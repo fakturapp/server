@@ -45,12 +45,12 @@ export default class Checkout {
     )
 
     let couponId: string | undefined
-    if (
-      team.stripeSubscriptionId &&
-      (team.plan === 'pro' || team.plan === 'team') &&
-      (team.planPeriod === 'monthly' || team.planPeriod === 'annual')
-    ) {
-      const samePlan = team.plan === payload.plan && team.planPeriod === payload.period
+    if (team.stripeSubscriptionId && (team.plan === 'pro' || team.plan === 'team')) {
+      const currentPeriod =
+        team.planPeriod === 'monthly' || team.planPeriod === 'annual'
+          ? team.planPeriod
+          : payload.period
+      const samePlan = team.plan === payload.plan && currentPeriod === payload.period
       if (!samePlan) {
         try {
           const sub = await billingService.retrieveSubscription(team.stripeSubscriptionId)
@@ -58,7 +58,7 @@ export default class Checkout {
           if (status === 'active' || status === 'trialing' || status === 'past_due') {
             const credit = await billingService.createUnusedTimeCoupon({
               currentPlan: team.plan,
-              currentPeriod: team.planPeriod,
+              currentPeriod,
               targetPlan: payload.plan,
               targetPeriod: payload.period,
               subscription: sub,

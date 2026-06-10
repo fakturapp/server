@@ -10,6 +10,13 @@ function metaPeriod(meta: any): 'monthly' | 'annual' | null {
   return meta?.period === 'monthly' || meta?.period === 'annual' ? meta.period : null
 }
 
+function priceIntervalPeriod(sub: any): 'monthly' | 'annual' | null {
+  const interval = sub?.items?.data?.[0]?.price?.recurring?.interval
+  if (interval === 'year') return 'annual'
+  if (interval === 'month') return 'monthly'
+  return null
+}
+
 export function applyStripeSubscription(team: Team, sub: any, schedule?: any): void {
   const status = String(sub?.status ?? '')
 
@@ -22,7 +29,7 @@ export function applyStripeSubscription(team: Team, sub: any, schedule?: any): v
 
   const plan = metaPlan(sub.metadata)
   if (plan) team.plan = plan
-  const period = metaPeriod(sub.metadata)
+  const period = metaPeriod(sub.metadata) ?? priceIntervalPeriod(sub)
   if (period) team.planPeriod = period
 
   let scheduleSwitchTs: number | null = null
