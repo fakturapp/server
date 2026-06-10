@@ -17,7 +17,6 @@ export class PaymentLinkNotification {
   private clientName: string
 
   constructor(
-    _email: string,
     paymentUrl: string,
     invoiceNumber: string,
     amount: number,
@@ -32,7 +31,7 @@ export class PaymentLinkNotification {
   }
 
   getSubject(): string {
-    return `Facture ${this.invoiceNumber} — Lien de paiement`
+    return `Facture ${this.invoiceNumber} : lien de paiement`
   }
 
   getHtml(): string {

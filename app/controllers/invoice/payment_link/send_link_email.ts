@@ -90,7 +90,6 @@ export default class SendLinkEmail {
     // Build email content
     const clientName = invoice.client?.displayName || 'Client'
     const notification = new PaymentLinkNotification(
-      clientEmail,
       paymentUrl,
       invoice.invoiceNumber,
       Number(invoice.total),
