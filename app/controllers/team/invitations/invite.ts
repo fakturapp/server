@@ -56,7 +56,22 @@ export default class Invite {
 
     const payload = await request.validateUsing(inviteValidator)
 
-    const existingUser = await User.findBy('email', payload.email)
+    let existingUser: User | null = null
+    let inviteEmail = payload.email?.toLowerCase() ?? null
+    if (payload.userId) {
+      existingUser = await User.find(payload.userId)
+      if (!existingUser) {
+        return response.notFound({ message: 'Utilisateur introuvable' })
+      }
+      inviteEmail = existingUser.email.toLowerCase()
+    } else if (inviteEmail) {
+      existingUser = await User.findBy('email', inviteEmail)
+    }
+
+    if (!inviteEmail) {
+      return response.unprocessableEntity({ message: 'Une adresse email est requise' })
+    }
+
     if (existingUser) {
       const existingMember = await TeamMember.query()
         .where('teamId', user.currentTeamId)
@@ -70,7 +85,7 @@ export default class Invite {
 
     const existingInvite = await TeamMember.query()
       .where('teamId', user.currentTeamId)
-      .where('invitedEmail', payload.email)
+      .where('invitedEmail', inviteEmail)
       .where('status', 'pending')
       .first()
 
@@ -102,7 +117,7 @@ export default class Invite {
       role: payload.role,
       status: 'pending',
       invitationToken: token,
-      invitedEmail: payload.email,
+      invitedEmail: inviteEmail,
       invitedAt: DateTime.now(),
       encryptedInviteDek,
       encryptedTeamDek,
@@ -113,13 +128,13 @@ export default class Invite {
     const inviteUrl = `${accountUrl}/invite/${token}`
 
     // Send invitation email
-    TeamMemberInvited.dispatch(payload.email, user.fullName || user.email, inviteUrl)
+    TeamMemberInvited.dispatch(inviteEmail, user.fullName || user.email, inviteUrl)
 
     return response.created({
       message: 'Invitation sent',
       invitation: {
         id: member.id,
-        email: payload.email,
+        email: inviteEmail,
         role: payload.role,
         inviteUrl,
         token,
