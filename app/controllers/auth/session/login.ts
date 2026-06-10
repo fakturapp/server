@@ -255,7 +255,7 @@ export default class Login {
     return response.ok({
       message: 'Login successful',
       user: await ctx.serialize.withoutWrapping(UserTransformer.transform(user)),
-      token: token.value!.release(),
+      token: tokenValue,
     })
   }
 
