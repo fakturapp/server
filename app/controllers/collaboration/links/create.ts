@@ -36,6 +36,7 @@ export default class Create {
       permission: payload.permission,
       visibility: payload.visibility || 'team',
       autoExpire: payload.autoExpire ?? false,
+      allowAnonymous: payload.allowAnonymous ?? false,
       createdByUserId: user.id,
       isActive: true,
     })
@@ -48,6 +49,7 @@ export default class Create {
         permission: link.permission,
         visibility: link.visibility,
         autoExpire: link.autoExpire,
+        allowAnonymous: link.allowAnonymous,
         isActive: link.isActive,
         expiresAt: link.expiresAt?.toISO() ?? null,
         createdAt: link.createdAt.toISO(),

@@ -26,6 +26,7 @@ export const createShareLinkValidator = vine.compile(
     permission: vine.enum(SHARE_PERMISSIONS),
     visibility: vine.enum(SHARE_VISIBILITIES).optional(),
     autoExpire: vine.boolean().optional(),
+    allowAnonymous: vine.boolean().optional(),
   })
 )
 
@@ -34,5 +35,6 @@ export const updateShareLinkValidator = vine.compile(
     permission: vine.enum(SHARE_PERMISSIONS).optional(),
     visibility: vine.enum(SHARE_VISIBILITIES).optional(),
     isActive: vine.boolean().optional(),
+    allowAnonymous: vine.boolean().optional(),
   })
 )

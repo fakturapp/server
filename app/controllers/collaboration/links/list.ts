@@ -36,6 +36,7 @@ export default class List {
         permission: link.permission,
         visibility: link.visibility,
         autoExpire: link.autoExpire,
+        allowAnonymous: link.allowAnonymous,
         isActive: link.isActive,
         expiresAt: link.expiresAt?.toISO() ?? null,
         createdAt: link.createdAt.toISO(),
