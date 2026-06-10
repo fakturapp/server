@@ -1,5 +1,6 @@
 import { Server as SocketServer, type Socket } from 'socket.io'
 import type { Server as HttpServer } from 'node:http'
+import { randomUUID } from 'node:crypto'
 import { Secret } from '@adonisjs/core/helpers'
 import { CookieParser } from '@adonisjs/core/http'
 import app from '@adonisjs/core/services/app'
@@ -102,6 +103,59 @@ export function clearRoomBan(documentType: string, documentId: string, userId: s
 
 function canModerate(requester: CollaboratorInfo | undefined): requester is CollaboratorInfo {
   return !!requester && (requester.role === 'owner' || requester.role === 'admin')
+}
+
+function joinRoom(
+  socket: Socket,
+  roomKey: string,
+  userId: string,
+  userData: any,
+  permission: SharePermission,
+  isOwner: boolean,
+  role: CollabRole,
+  documentTeamId: string | null
+) {
+  socket.join(roomKey)
+
+  const room = getOrCreateRoom(roomKey, documentTeamId)
+  const existing = room.collaborators.get(userId)
+  const color = existing?.color ?? colorForUser(userId)
+
+  const collaboratorInfo: CollaboratorInfo & { socketId: string } = {
+    userId,
+    fullName: userData.fullName,
+    email: userData.email,
+    avatarUrl: userData.avatarUrl,
+    permission,
+    isOwner,
+    role,
+    color,
+    socketId: socket.id,
+  }
+
+  room.collaborators.set(userId, collaboratorInfo)
+  ;(socket as any).currentRoom = roomKey
+
+  const collaborators = Array.from(room.collaborators.values()).map(({ socketId: _, ...c }) => c)
+  socket.emit('room-joined', {
+    userId,
+    permission,
+    isOwner,
+    role,
+    color,
+    collaborators,
+  })
+
+  socket.to(roomKey).emit('collaborator-joined', {
+    userId,
+    fullName: userData.fullName,
+    email: userData.email,
+    avatarUrl: userData.avatarUrl,
+    permission,
+    isOwner,
+    role,
+    color,
+  })
 }
 
 async function moderateCollaborator(
@@ -232,6 +286,39 @@ export function initWebSocket(httpServer: HttpServer) {
 
   collabNs.use(async (socket, next) => {
     try {
+      const guestToken = socket.handshake.auth?.guestToken
+      if (typeof guestToken === 'string' && guestToken.length > 0 && guestToken.length <= 128) {
+        const { default: DocumentShareLink } = await import(
+          '#models/collaboration/document_share_link'
+        )
+        const { default: Team } = await import('#models/team/team')
+        const { collaborationEnabled } = await import('#services/billing/plan_entitlements')
+
+        const link = await DocumentShareLink.query()
+          .where('token', guestToken)
+          .where('is_active', true)
+          .first()
+        if (!link || link.isExpired || !link.allowAnonymous || link.visibility !== 'anyone') {
+          return next(new Error('Invalid guest link'))
+        }
+        const team = await Team.find(link.teamId)
+        if (!team || !collaborationEnabled(team)) {
+          return next(new Error('Invalid guest link'))
+        }
+
+        const guestId = `guest:${randomUUID().slice(0, 8)}`
+        ;(socket as any).userId = guestId
+        ;(socket as any).user = {
+          id: guestId,
+          fullName: 'Invité',
+          email: `${guestId.replace(':', '-')}@faktur.guest`,
+          avatarUrl: null,
+          currentTeamId: null,
+        }
+        ;(socket as any).guestRoom = getRoomKey(link.documentType, link.documentId)
+        return next()
+      }
+
       const token = extractHandshakeToken(socket)
       if (!token) {
         return next(new Error('Authentication required'))
@@ -307,6 +394,16 @@ export function initWebSocket(httpServer: HttpServer) {
       let role: CollabRole = 'guest'
       let documentTeamId: string | null = null
 
+      const guestRoom = (socket as any).guestRoom as string | undefined
+      if (guestRoom) {
+        if (guestRoom !== roomKey) {
+          socket.emit('access-denied', { message: 'You do not have access to this document' })
+          return
+        }
+        joinRoom(socket, roomKey, userId, userData, 'viewer', false, 'guest', null)
+        return
+      }
+
       const { default: DocumentAccessService } =
         await import('#services/collaboration/document_access_service')
       const { default: DocumentShare } = await import('#models/collaboration/document_share')
@@ -373,49 +470,7 @@ export function initWebSocket(httpServer: HttpServer) {
         role = 'guest'
       }
 
-      socket.join(roomKey)
-
-      const room = getOrCreateRoom(roomKey, documentTeamId)
-      const existing = room.collaborators.get(userId)
-      const color = existing?.color ?? colorForUser(userId)
-
-      const collaboratorInfo: CollaboratorInfo & { socketId: string } = {
-        userId,
-        fullName: userData.fullName,
-        email: userData.email,
-        avatarUrl: userData.avatarUrl,
-        permission,
-        isOwner,
-        role,
-        color,
-        socketId: socket.id,
-      }
-
-      room.collaborators.set(userId, collaboratorInfo)
-      ;(socket as any).currentRoom = roomKey
-
-      const collaborators = Array.from(room.collaborators.values()).map(
-        ({ socketId: _, ...c }) => c
-      )
-      socket.emit('room-joined', {
-        userId,
-        permission,
-        isOwner,
-        role,
-        color,
-        collaborators,
-      })
-
-      socket.to(roomKey).emit('collaborator-joined', {
-        userId,
-        fullName: userData.fullName,
-        email: userData.email,
-        avatarUrl: userData.avatarUrl,
-        permission,
-        isOwner,
-        role,
-        color,
-      })
+      joinRoom(socket, roomKey, userId, userData, permission, isOwner, role, documentTeamId)
     })
 
     socket.on('cursor-move', (data: { anchor?: string; fieldId?: string; x: number; y: number }) => {
