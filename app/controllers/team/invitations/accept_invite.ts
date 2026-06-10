@@ -82,22 +82,27 @@ export default class AcceptInvite {
     } else {
       const kek = await sessionKekResolver.resolvePrimary(user, request)
 
-      if (invitation.encryptedInviteDek && !kek) {
+      if (!invitation.encryptedInviteDek) {
+        return response.unprocessableEntity({
+          message:
+            "Cette invitation ne contient pas de clef d'accès à l'équipe. Demandez une nouvelle invitation.",
+        })
+      }
+
+      if (!kek) {
         return response.unauthorized({
           code: 'SESSION_EXPIRED',
           message: 'Session expired. Please log in again.',
         })
       }
 
-      if (invitation.encryptedInviteDek && kek) {
-        const inviteKey = zeroAccessCryptoService.deriveInviteKey(payload.token)
-        teamDek = zeroAccessCryptoService.decryptDEK(invitation.encryptedInviteDek, inviteKey)
-        encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
+      const inviteKey = zeroAccessCryptoService.deriveInviteKey(payload.token)
+      teamDek = zeroAccessCryptoService.decryptDEK(invitation.encryptedInviteDek, inviteKey)
+      encryptedTeamDek = zeroAccessCryptoService.encryptDEK(teamDek, kek)
 
-        const storedRecoveryKey = await recoveryKeyService.findStoredRecoveryKeyForUser(user.id)
-        if (storedRecoveryKey) {
-          recoveryKeyService.applyRecoveryKeyToMembership(invitation, teamDek, storedRecoveryKey)
-        }
+      const storedRecoveryKey = await recoveryKeyService.findStoredRecoveryKeyForUser(user.id)
+      if (storedRecoveryKey) {
+        recoveryKeyService.applyRecoveryKeyToMembership(invitation, teamDek, storedRecoveryKey)
       }
     }
 
