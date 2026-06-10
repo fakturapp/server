@@ -1,5 +1,6 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import { DateTime } from 'luxon'
+import logger from '@adonisjs/core/services/logger'
 import mail from '@adonisjs/mail/services/main'
 import env from '#start/env'
 import Team from '#models/team/team'
@@ -157,7 +158,9 @@ export default class StripeBillingWebhook {
           owner.fullName ?? undefined
         )
       )
-    } catch {}
+    } catch (error) {
+      logger.error({ err: error, teamId: team.id }, 'subscription confirmation email failed')
+    }
   }
 
   private async onSubscriptionUpdated(sub: any) {
@@ -198,7 +201,9 @@ export default class StripeBillingWebhook {
       )
       team.subscriptionDunningNotifiedAt = DateTime.now()
       await team.save()
-    } catch {}
+    } catch (error) {
+      logger.error({ err: error, teamId: team.id }, 'dunning email failed')
+    }
   }
 
   private async onSubscriptionDeleted(sub: any) {
@@ -225,7 +230,9 @@ export default class StripeBillingWebhook {
             new SubscriptionEndedNotification(owner.email, team.name, owner.fullName ?? undefined)
           )
         }
-      } catch {}
+      } catch (error) {
+        logger.error({ err: error, teamId: team.id }, 'subscription ended email failed')
+      }
     }
   }
 
@@ -272,7 +279,9 @@ export default class StripeBillingWebhook {
             )
           )
         }
-      } catch {}
+      } catch (error) {
+        logger.error({ err: error, teamId: team.id }, 'payment recovered email failed')
+      }
     }
   }
 }
