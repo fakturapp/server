@@ -44,7 +44,7 @@ export default class Invite {
 
     const activeCount = await TeamMember.query()
       .where('teamId', user.currentTeamId)
-      .where('status', 'active')
+      .whereIn('status', ['active', 'pending'])
       .count('* as total')
       .first()
     if (Number(activeCount?.$extras.total ?? 0) >= memberLimit(team)) {
@@ -55,6 +55,10 @@ export default class Invite {
     }
 
     const payload = await request.validateUsing(inviteValidator)
+
+    if (payload.role === 'super_admin') {
+      return response.forbidden({ message: 'Ce rôle ne peut pas être attribué par invitation' })
+    }
 
     let existingUser: User | null = null
     let inviteEmail = payload.email?.toLowerCase() ?? null
