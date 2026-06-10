@@ -1,6 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import vine from '@vinejs/vine'
 import TeamMember from '#models/team/team_member'
+import Team from '#models/team/team'
+import { notifyUser } from '#services/collaboration/websocket_service'
 
 const updateRoleValidator = vine.compile(
   vine.object({
@@ -48,6 +50,15 @@ export default class UpdateRole {
 
     targetMember.role = payload.role
     await targetMember.save()
+
+    if (targetMember.userId) {
+      const team = await Team.find(user.currentTeamId)
+      notifyUser(targetMember.userId, 'team-role-updated', {
+        role: targetMember.role,
+        teamId: user.currentTeamId,
+        teamName: team?.name ?? null,
+      })
+    }
 
     return response.ok({
       message: 'Role updated',
