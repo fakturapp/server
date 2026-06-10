@@ -376,7 +376,8 @@ export function buildFacturXFromQuote(
   const { vatBreakdown, seller, buyer, lines } = buildCommonFacturXParts(
     linesData,
     clientData,
-    companyData
+    companyData,
+    quoteData.billingType
   )
 
   return {
@@ -409,7 +410,8 @@ export function buildFacturXFromInvoice(
   const { vatBreakdown, seller, buyer, lines } = buildCommonFacturXParts(
     linesData,
     clientData,
-    companyData
+    companyData,
+    invoiceData.billingType
   )
 
   return {
@@ -440,12 +442,14 @@ export function buildFacturXFromInvoice(
 function buildCommonFacturXParts(
   linesData: any[],
   clientData: any | null,
-  companyData: any | null
+  companyData: any | null,
+  billingType?: string
 ) {
+  const isQuick = billingType === 'quick'
   const vatMap = new Map<number, { base: number; amount: number }>()
   for (const line of linesData) {
     if (line.saleType === 'section') continue
-    const ht = line.quantity * line.unitPrice
+    const ht = isQuick ? line.unitPrice : line.quantity * line.unitPrice
     const rate = line.vatRate || 0
     const existing = vatMap.get(rate) || { base: 0, amount: 0 }
     existing.base += ht
@@ -495,10 +499,10 @@ function buildCommonFacturXParts(
     .map((l, idx) => ({
       position: idx + 1,
       description: l.description || 'Article',
-      quantity: l.quantity || 1,
+      quantity: isQuick ? 1 : l.quantity || 1,
       unitPrice: l.unitPrice || 0,
       vatRate: l.vatRate || 0,
-      total: (l.quantity || 1) * (l.unitPrice || 0),
+      total: isQuick ? l.unitPrice || 0 : (l.quantity || 1) * (l.unitPrice || 0),
     }))
 
   return { vatBreakdown, seller, buyer, lines }
