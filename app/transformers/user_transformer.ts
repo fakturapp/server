@@ -13,6 +13,7 @@ export default class UserTransformer extends BaseTransformer<User> {
         'twoFactorEnabled',
         'onboardingCompleted',
         'currentTeamId',
+        'uiTheme',
         'lastLoginAt',
         'createdAt',
         'updatedAt',
