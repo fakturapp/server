@@ -15,6 +15,7 @@ const LinkUpdate = () => import('#controllers/collaboration/links/update')
 const LinkDestroy = () => import('#controllers/collaboration/links/destroy')
 
 const ValidateLink = () => import('#controllers/collaboration/access/validate_link')
+const GuestDocument = () => import('#controllers/collaboration/access/guest_document')
 const CheckAccess = () => import('#controllers/collaboration/access/check_access')
 const ActiveEditors = () => import('#controllers/collaboration/access/active_editors')
 const SharedDocumentShow = () => import('#controllers/collaboration/documents/show')
@@ -48,3 +49,8 @@ const validateGroup = router
   })
   .use(middleware.auth())
 if (API_PREFIX) validateGroup.prefix(API_PREFIX)
+
+const guestGroup = router.group(() => {
+  router.get('/share/guest/:token', [GuestDocument, 'handle']).use(shareLinkValidationLimiter)
+})
+if (API_PREFIX) guestGroup.prefix(API_PREFIX)
