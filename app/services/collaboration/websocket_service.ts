@@ -25,6 +25,8 @@ function extractHandshakeToken(socket: Socket): string | null {
   }
 }
 
+export type CollabRole = 'owner' | 'admin' | 'member' | 'viewer' | 'guest'
+
 export interface CollaboratorInfo {
   userId: string
   fullName: string | null
@@ -32,14 +34,15 @@ export interface CollaboratorInfo {
   avatarUrl: string | null
   permission: SharePermission
   isOwner: boolean
+  role: CollabRole
   color: string
 }
 
 export interface CursorPosition {
   userId: string
+  anchor: string
   x: number
   y: number
-  fieldId?: string
 }
 
 export interface DocumentChange {
@@ -97,6 +100,10 @@ export function clearRoomBan(documentType: string, documentId: string, userId: s
   rooms.get(getRoomKey(documentType, documentId))?.banned.delete(userId)
 }
 
+function canModerate(requester: CollaboratorInfo | undefined): requester is CollaboratorInfo {
+  return !!requester && (requester.role === 'owner' || requester.role === 'admin')
+}
+
 async function moderateCollaborator(
   socket: Socket,
   requesterId: string,
@@ -111,15 +118,25 @@ async function moderateCollaborator(
   if (!room) return
 
   const requester = room.collaborators.get(requesterId)
-  if (!requester?.isOwner) {
-    socket.emit('error', { message: 'Seul le propriétaire du document peut faire cela' })
+  if (!canModerate(requester)) {
+    socket.emit('error', { message: 'Seul le propriétaire ou un admin peut faire cela' })
     return
   }
 
   const target = room.collaborators.get(targetUserId)
   if (!target) return
 
-  if (ban && target.isOwner) {
+  if (target.role === 'owner') {
+    socket.emit('error', { message: 'Le propriétaire ne peut pas être expulsé' })
+    return
+  }
+
+  if (target.role === 'admin' && requester.role !== 'owner') {
+    socket.emit('error', { message: 'Seul le propriétaire peut expulser un admin' })
+    return
+  }
+
+  if (ban && target.role !== 'guest') {
     socket.emit('error', { message: "Impossible de bannir un membre de l'équipe" })
     return
   }
@@ -287,6 +304,7 @@ export function initWebSocket(httpServer: HttpServer) {
 
       let permission: SharePermission = 'viewer'
       let isOwner = false
+      let role: CollabRole = 'guest'
       let documentTeamId: string | null = null
 
       const { default: DocumentAccessService } =
@@ -299,9 +317,30 @@ export function initWebSocket(httpServer: HttpServer) {
         : null
 
       if (document) {
-        permission = 'editor'
-        isOwner = true
         documentTeamId = userData.currentTeamId
+        const { default: Team } = await import('#models/team/team')
+        const { default: TeamMember } = await import('#models/team/team_member')
+        const [team, membership] = await Promise.all([
+          Team.find(documentTeamId),
+          TeamMember.query()
+            .where('team_id', documentTeamId!)
+            .where('user_id', userId)
+            .where('status', 'active')
+            .first(),
+        ])
+
+        if (team && team.ownerId === userId) {
+          role = 'owner'
+        } else if (membership?.role === 'super_admin' || membership?.role === 'admin') {
+          role = 'admin'
+        } else if (membership?.role === 'viewer') {
+          role = 'viewer'
+        } else {
+          role = 'member'
+        }
+
+        permission = role === 'viewer' ? 'viewer' : 'editor'
+        isOwner = role === 'owner'
       } else {
         let share = await DocumentShare.query()
           .where('document_type', documentType)
@@ -331,6 +370,7 @@ export function initWebSocket(httpServer: HttpServer) {
         }
         permission = share.permission
         documentTeamId = share.teamId
+        role = 'guest'
       }
 
       socket.join(roomKey)
@@ -346,6 +386,7 @@ export function initWebSocket(httpServer: HttpServer) {
         avatarUrl: userData.avatarUrl,
         permission,
         isOwner,
+        role,
         color,
         socketId: socket.id,
       }
@@ -360,6 +401,7 @@ export function initWebSocket(httpServer: HttpServer) {
         userId,
         permission,
         isOwner,
+        role,
         color,
         collaborators,
       })
@@ -371,21 +413,23 @@ export function initWebSocket(httpServer: HttpServer) {
         avatarUrl: userData.avatarUrl,
         permission,
         isOwner,
+        role,
         color,
       })
     })
 
-    socket.on('cursor-move', (data: { x: number; y: number; fieldId?: string }) => {
+    socket.on('cursor-move', (data: { anchor?: string; x: number; y: number }) => {
       const roomKey = (socket as any).currentRoom
       if (!roomKey) return
       if (typeof data?.x !== 'number' || typeof data?.y !== 'number') return
       if (!Number.isFinite(data.x) || !Number.isFinite(data.y)) return
+      if (typeof data?.anchor !== 'string' || data.anchor.length > 300) return
 
       socket.to(roomKey).emit('cursor-moved', {
         userId,
+        anchor: data.anchor,
         x: data.x,
         y: data.y,
-        fieldId: typeof data.fieldId === 'string' ? data.fieldId.slice(0, 100) : undefined,
       })
     })
 
@@ -474,6 +518,41 @@ export function initWebSocket(httpServer: HttpServer) {
       await moderateCollaborator(socket, userId, data?.userId, true)
     })
 
+    socket.on(
+      'change-permission',
+      async (data: { userId: string; permission: SharePermission }) => {
+        const roomKey = (socket as any).currentRoom
+        if (!roomKey) return
+        const targetUserId = data?.userId
+        const permission = data?.permission
+        if (typeof targetUserId !== 'string' || !targetUserId) return
+        if (permission !== 'viewer' && permission !== 'editor') return
+
+        const room = rooms.get(roomKey)
+        if (!room) return
+
+        const requester = room.collaborators.get(userId)
+        if (!canModerate(requester)) {
+          socket.emit('error', { message: 'Seul le propriétaire ou un admin peut faire cela' })
+          return
+        }
+
+        const target = room.collaborators.get(targetUserId)
+        if (!target || target.role !== 'guest') return
+
+        const [docType, docId] = roomKey.split(':')
+        const { default: DocumentShare } = await import('#models/collaboration/document_share')
+        await DocumentShare.query()
+          .where('document_type', docType)
+          .where('document_id', docId)
+          .where('shared_with_user_id', targetUserId)
+          .where('status', 'active')
+          .update({ permission })
+
+        await updateCollaboratorPermission(docType, docId, targetUserId, permission)
+      }
+    )
+
     socket.on('leave-document', () => {
       handleLeaveRoom(socket, userId)
     })
@@ -550,6 +629,10 @@ export async function updateCollaboratorPermission(
     if ((s as any).userId === userId) {
       s.emit('permission-changed', { permission })
     }
+  }
+
+  if (collaborator) {
+    collabNs.to(roomKey).emit('collaborator-updated', { userId, permission })
   }
 }
 
