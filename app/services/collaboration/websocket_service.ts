@@ -418,18 +418,26 @@ export function initWebSocket(httpServer: HttpServer) {
       })
     })
 
-    socket.on('cursor-move', (data: { anchor?: string; x: number; y: number }) => {
+    socket.on('cursor-move', (data: { anchor?: string; fieldId?: string; x: number; y: number }) => {
       const roomKey = (socket as any).currentRoom
       if (!roomKey) return
       if (typeof data?.x !== 'number' || typeof data?.y !== 'number') return
       if (!Number.isFinite(data.x) || !Number.isFinite(data.y)) return
-      if (typeof data?.anchor !== 'string' || data.anchor.length > 300) return
+
+      const anchor =
+        typeof data?.anchor === 'string'
+          ? data.anchor
+          : typeof data?.fieldId === 'string'
+            ? data.fieldId
+            : ''
+      if (anchor.length > 300) return
 
       socket.to(roomKey).emit('cursor-moved', {
         userId,
-        anchor: data.anchor,
+        anchor,
         x: data.x,
         y: data.y,
+        fieldId: anchor.slice(0, 100) || undefined,
       })
     })
 
