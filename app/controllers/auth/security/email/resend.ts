@@ -12,7 +12,7 @@ export default class Resend {
       return response.badRequest({ message: 'Email is required' })
     }
 
-    const user = await User.findBy('email', email)
+    const user = await User.findBy('email', String(email).trim().toLowerCase())
 
     if (!user || user.emailVerified) {
       return response.ok({

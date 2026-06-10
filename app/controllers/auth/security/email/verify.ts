@@ -21,7 +21,14 @@ export default class Verify {
     const user = await User.findBy('emailVerificationToken', tokenHash)
 
     if (!user) {
-      return response.badRequest({ message: 'Invalid or expired verification token' })
+      const email = String(request.input('email', '') || '').toLowerCase()
+      if (email) {
+        const existing = await User.findBy('email', email)
+        if (existing?.emailVerified) {
+          return response.ok({ message: 'Email déjà vérifié', alreadyVerified: true })
+        }
+      }
+      return response.badRequest({ message: 'Lien de vérification invalide ou expiré' })
     }
 
     if (user.emailVerificationSentAt) {
@@ -29,7 +36,7 @@ export default class Verify {
         seconds: securityConfig.tokens.emailVerificationExpiry,
       })
       if (DateTime.now() > expiresAt) {
-        return response.badRequest({ message: 'Verification token has expired' })
+        return response.badRequest({ message: 'Le lien de vérification a expiré' })
       }
     }
 
