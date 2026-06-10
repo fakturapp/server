@@ -1,6 +1,8 @@
 import type { HttpContext } from '@adonisjs/core/http'
 import DocumentShareLink from '#models/collaboration/document_share_link'
 import DocumentShare from '#models/collaboration/document_share'
+import Team from '#models/team/team'
+import { collaborationEnabled } from '#services/billing/plan_entitlements'
 
 export default class ValidateLink {
   async handle(ctx: HttpContext) {
@@ -20,6 +22,11 @@ export default class ValidateLink {
 
     if (link.isExpired) {
       return response.gone({ message: 'This share link has expired' })
+    }
+
+    const linkTeam = await Team.find(link.teamId)
+    if (!linkTeam || !collaborationEnabled(linkTeam)) {
+      return response.gone({ message: "Ce lien n'est plus actif" })
     }
 
     if (link.visibility === 'team' && user.currentTeamId !== link.teamId) {
