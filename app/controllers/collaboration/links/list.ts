@@ -7,18 +7,18 @@ export default class List {
   async handle(ctx: HttpContext) {
     const { auth, request, response } = ctx
     const user = auth.user!
-    const teamId = user.currentTeamId
-
-    if (!teamId) {
-      return response.badRequest({ message: 'No team selected' })
-    }
 
     const documentType = request.param('documentType') as DocumentType
     const documentId = request.param('documentId') as string
 
     const accessService = new DocumentAccessService()
-    const document = await accessService.getDocument(documentType, documentId, teamId)
-    if (!document) {
+    const teamId = await accessService.getShareManagementTeamId(
+      documentType,
+      documentId,
+      user.id,
+      user.currentTeamId
+    )
+    if (!teamId) {
       return response.notFound({ message: 'Document not found' })
     }
 
@@ -37,6 +37,7 @@ export default class List {
         visibility: link.visibility,
         autoExpire: link.autoExpire,
         allowAnonymous: link.allowAnonymous,
+        allowResharing: link.allowResharing,
         isActive: link.isActive,
         expiresAt: link.expiresAt?.toISO() ?? null,
         createdAt: link.createdAt.toISO(),

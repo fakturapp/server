@@ -8,15 +8,20 @@ export default class Create {
   async handle(ctx: HttpContext) {
     const { auth, request, response } = ctx
     const user = auth.user!
-    const teamId = user.currentTeamId
-
-    if (!teamId) {
-      return response.badRequest({ message: 'No team selected' })
-    }
 
     const payload = await request.validateUsing(createShareLinkValidator)
 
     const accessService = new DocumentAccessService()
+    const teamId = await accessService.getShareManagementTeamId(
+      payload.documentType,
+      payload.documentId,
+      user.id,
+      user.currentTeamId
+    )
+    if (!teamId) {
+      return response.notFound({ message: 'Document not found' })
+    }
+
     const document = await accessService.getDocument(
       payload.documentType,
       payload.documentId,
@@ -37,6 +42,7 @@ export default class Create {
       visibility: payload.visibility || 'team',
       autoExpire: payload.autoExpire ?? false,
       allowAnonymous: payload.allowAnonymous ?? false,
+      allowResharing: payload.allowResharing ?? false,
       createdByUserId: user.id,
       isActive: true,
     })
@@ -50,6 +56,7 @@ export default class Create {
         visibility: link.visibility,
         autoExpire: link.autoExpire,
         allowAnonymous: link.allowAnonymous,
+        allowResharing: link.allowResharing,
         isActive: link.isActive,
         expiresAt: link.expiresAt?.toISO() ?? null,
         createdAt: link.createdAt.toISO(),

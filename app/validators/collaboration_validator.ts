@@ -15,7 +15,8 @@ export const createShareValidator = vine.compile(
 
 export const updateShareValidator = vine.compile(
   vine.object({
-    permission: vine.enum(SHARE_PERMISSIONS),
+    permission: vine.enum(SHARE_PERMISSIONS).optional(),
+    canShare: vine.boolean().optional(),
   })
 )
 
@@ -27,6 +28,7 @@ export const createShareLinkValidator = vine.compile(
     visibility: vine.enum(SHARE_VISIBILITIES).optional(),
     autoExpire: vine.boolean().optional(),
     allowAnonymous: vine.boolean().optional(),
+    allowResharing: vine.boolean().optional(),
   })
 )
 
@@ -36,5 +38,6 @@ export const updateShareLinkValidator = vine.compile(
     visibility: vine.enum(SHARE_VISIBILITIES).optional(),
     isActive: vine.boolean().optional(),
     allowAnonymous: vine.boolean().optional(),
+    allowResharing: vine.boolean().optional(),
   })
 )
