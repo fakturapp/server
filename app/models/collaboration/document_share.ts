@@ -38,6 +38,9 @@ export default class DocumentShare extends BaseModel {
   @column()
   declare status: ShareStatus
 
+  @column()
+  declare canShare: boolean
+
   @column.dateTime({ autoCreate: true })
   declare createdAt: DateTime
 

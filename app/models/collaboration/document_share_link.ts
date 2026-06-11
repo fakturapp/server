@@ -41,6 +41,9 @@ export default class DocumentShareLink extends BaseModel {
   @column()
   declare allowAnonymous: boolean
 
+  @column()
+  declare allowResharing: boolean
+
   @column.dateTime()
   declare expiresAt: DateTime | null
 
