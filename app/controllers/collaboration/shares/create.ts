@@ -11,15 +11,20 @@ export default class Create {
   async handle(ctx: HttpContext) {
     const { auth, request, response } = ctx
     const user = auth.user!
-    const teamId = user.currentTeamId
-
-    if (!teamId) {
-      return response.badRequest({ message: 'No team selected' })
-    }
 
     const payload = await request.validateUsing(createShareValidator)
 
     const accessService = new DocumentAccessService()
+    const teamId = await accessService.getShareManagementTeamId(
+      payload.documentType,
+      payload.documentId,
+      user.id,
+      user.currentTeamId
+    )
+    if (!teamId) {
+      return response.notFound({ message: 'Document not found' })
+    }
+
     const document = await accessService.getDocument(
       payload.documentType,
       payload.documentId,
@@ -71,6 +76,7 @@ export default class Create {
       sharedWithEmail: payload.email,
       permission: payload.permission,
       status,
+      canShare: false,
     })
 
     if (sharedWithUserId) {
@@ -97,6 +103,7 @@ export default class Create {
         id: share.id,
         permission: share.permission,
         status: share.status,
+        canShare: share.canShare,
         sharedWithEmail: share.sharedWithEmail,
         sharedWith: share.sharedWith
           ? {

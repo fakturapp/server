@@ -72,6 +72,7 @@ export default class ValidateLink {
         sharedWithEmail: user.email,
         permission: link.permission,
         status: 'active',
+        canShare: link.allowResharing,
       })
     }
 
@@ -83,6 +84,7 @@ export default class ValidateLink {
         permission: share.permission,
         isOwner: false,
         shareId: share.id,
+        canShare: share.canShare,
       },
     })
   }

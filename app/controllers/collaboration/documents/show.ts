@@ -99,7 +99,7 @@ export default class Show {
       return response.ok({
         documentType,
         document: await ctx.serialize.withoutWrapping(InvoiceTransformer.transform(invoice)),
-        shared: { permission: share.permission, isOwner: false },
+        shared: { permission: share.permission, isOwner: false, canShare: share.canShare },
       })
     }
 
@@ -119,7 +119,7 @@ export default class Show {
       return response.ok({
         documentType,
         document: await ctx.serialize.withoutWrapping(QuoteTransformer.transform(quote)),
-        shared: { permission: share.permission, isOwner: false },
+        shared: { permission: share.permission, isOwner: false, canShare: share.canShare },
       })
     }
 
@@ -138,7 +138,7 @@ export default class Show {
     return response.ok({
       documentType,
       document: await ctx.serialize.withoutWrapping(CreditNoteTransformer.transform(creditNote)),
-      shared: { permission: share.permission, isOwner: false },
+      shared: { permission: share.permission, isOwner: false, canShare: share.canShare },
     })
   }
 }
