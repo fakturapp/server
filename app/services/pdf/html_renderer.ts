@@ -146,7 +146,6 @@ function formatText(str: string | null | undefined): string {
       continue
     }
 
-    // List item
     if (line.startsWith('- ')) {
       if (!inList) {
         parts.push('<ul style="margin:0;padding-left:1.2em">')
@@ -156,7 +155,6 @@ function formatText(str: string | null | undefined): string {
       continue
     }
 
-    // Normal
     if (inList) {
       parts.push('</ul>')
       inList = false
@@ -171,14 +169,13 @@ function formatText(str: string | null | undefined): string {
 
 function formatIban(iban: string): string {
   const clean = iban.replace(/\s/g, '')
-  // Format in groups of 4
   return clean.match(/.{1,4}/g)?.join(' ') || clean
 }
 
 function fmtC(n: number, lang: string): string {
   const locale = lang === 'en' ? 'en-GB' : 'fr-FR'
   return (
-    n.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' \u20ac'
+    n.toLocaleString(locale, { minimumFractionDigits: 2, maximumFractionDigits: 2 }) + ' €'
   )
 }
 
@@ -198,12 +195,8 @@ function contrastText(hex: string): string {
   const r = Number.parseInt(hex.slice(1, 3), 16)
   const g = Number.parseInt(hex.slice(3, 5), 16)
   const b = Number.parseInt(hex.slice(5, 7), 16)
-  return (r * 299 + g * 587 + b * 114) / 1000 > 128 ? '#000' : '#fff'
+  return (r * 299 + g * 587 + b * 114) / 1000 > 128 ? '#000000' : '#ffffff'
 }
-
-/* ═══════════════════════════════════════════════════════════
-   i18n
-   ═══════════════════════════════════════════════════════════ */
 
 interface I18n {
   quote: string
@@ -314,7 +307,7 @@ function getI18n(lang: string): I18n {
     paymentMethods: 'Moyens de paiement acceptes',
     bankTransfer: 'Virement bancaire',
     cash: 'Especes',
-    vatNo: 'N\u00b0 TVA',
+    vatNo: 'N° TVA',
     company: 'Societe',
     vatBreakRate: 'Taux TVA',
     vatBreakBase: 'Base HT',
@@ -323,11 +316,11 @@ function getI18n(lang: string): I18n {
     conditionsAndNotes: 'Conditions et notes',
     freeField: 'Champ libre',
     unit: 'Unite',
-    quoteNumber: 'Devis n\u00b0',
+    quoteNumber: 'Devis n°',
     vatExemptNotSubject: 'TVA non applicable, article 293 B du CGI',
-    vatExemptFranceNoVat: 'Exon\u00e9ration de TVA, article 261 du CGI',
+    vatExemptFranceNoVat: 'Exonération de TVA, article 261 du CGI',
     vatExemptOutsideFrance:
-      'TVA non applicable \u2014 prestation de services r\u00e9alis\u00e9e hors de France, article 259-1 du CGI',
+      'TVA non applicable — prestation de services réalisée hors de France, article 259-1 du CGI',
     vatOnDebits: 'TVA acquittée d’après les débits',
   }
 }
@@ -359,10 +352,6 @@ function buildTvaBreakdown(lines: LineData[], billingType: string) {
   }))
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Main render
-   ═══════════════════════════════════════════════════════════ */
-
 export function renderQuoteHtml(
   quote: QuoteData,
   lines: LineData[],
@@ -386,7 +375,6 @@ export function renderQuoteHtml(
   }
   discountAmount = Math.round(discountAmount * 100) / 100
 
-  // Font: template-specific font takes priority, then user setting
   const fontName = T.font || settings.documentFont || 'Lexend'
   const fontImport = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700&display=swap`
 
@@ -409,7 +397,6 @@ export function renderQuoteHtml(
     print-color-adjust: exact;
   }
 
-  /* ── Page container ── */
   .page {
     width: 210mm;
     min-height: 297mm;
@@ -431,11 +418,10 @@ export function renderQuoteHtml(
       : ''
   }
 
-  /* ── Lateral sidebar ── */
   ${
     T.layout === 'lateral'
       ? `
-  .sidebar { width: 22%; background: ${ac}; padding: 28px 16px; color: #fff; }
+  .sidebar { width: 22%; background: ${ac}; padding: 28px 16px; color: ${contrastText(ac)}; }
   .sidebar h3 { font-size: 9px; text-transform: uppercase; letter-spacing: 1px; opacity: 0.7; margin-bottom: 6px; }
   .sidebar p { font-size: 10px; margin-bottom: 3px; line-height: 1.4; }
   .sidebar .section { margin-bottom: 20px; }
@@ -444,7 +430,6 @@ export function renderQuoteHtml(
       : ''
   }
 
-  /* ── Header ── */
   .header { display: flex; justify-content: space-between; align-items: flex-start; margin-bottom: 20px; }
   .logo img { max-height: 80px; max-width: 160px; object-fit: contain; }
   .logo-placeholder {
@@ -453,20 +438,17 @@ export function renderQuoteHtml(
   }
   .logo-placeholder span { font-size: 10px; font-weight: 500; color: ${ac}; }
 
-  /* Standard header (non-banner, non-classique) */
   .doc-badge {
     display: inline-block; padding: 10px 20px; margin-bottom: 8px;
     background: ${ac}12; border: 1px solid ${ac}33; border-radius: ${T.borderRadius};
   }
   .doc-badge-title { font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: ${ac}; }
 
-  /* Classique header */
   .classique-title { font-size: 14px; font-weight: 600; color: ${T.text}; margin-bottom: 4px; }
   .classique-number { font-size: 12px; color: ${T.text}; line-height: 1.8; }
 
   .doc-number { font-size: 12px; color: ${T.text}; line-height: 1.8; }
 
-  /* Banner header */
   .banner {
     padding: 16px 24px; border-radius: ${T.borderRadius}; margin: -8px -16px 24px -16px;
     background: ${ac}; display: flex; align-items: center; justify-content: space-between;
@@ -476,7 +458,6 @@ export function renderQuoteHtml(
   .banner .logo img { max-height: 64px; }
   .banner-company { font-size: 18px; font-weight: 700; color: ${contrastText(ac)}; }
 
-  /* ── Subject ── */
   ${
     isClassique
       ? `
@@ -491,7 +472,6 @@ export function renderQuoteHtml(
   `
   }
 
-  /* ── Date bar ── */
   ${
     isClassique
       ? `
@@ -516,14 +496,15 @@ export function renderQuoteHtml(
   `
   }
 
-  /* ── Client block ── */
   .client-block { display: flex; justify-content: flex-end; margin-bottom: 20px; }
-  .client-card { width: 50%; }
+  .client-card {
+    width: 50%; padding: 10px 12px; border-radius: ${T.borderRadius};
+    background: ${T.clientBlockBg}; border: 1px solid ${T.clientBlockBorder};
+  }
   .client-name { font-size: 13px; font-weight: 600; color: ${T.text}; margin-bottom: 4px; }
   .client-line { font-size: 12px; color: ${T.textMuted}; line-height: 1.5; }
   .client-info { font-size: 10px; color: ${T.textMuted}; margin-top: 2px; }
 
-  /* ── Addresses (lateral) ── */
   .addresses { display: flex; gap: 24px; margin-bottom: 20px; }
   .address-block { flex: 1; }
   .address-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1.5px; color: ${ac}; margin-bottom: 6px; }
@@ -531,7 +512,6 @@ export function renderQuoteHtml(
   .address-name { font-size: 12px; font-weight: 700; color: ${T.text}; margin-bottom: 4px; }
   .address-line { font-size: 10px; color: ${T.textMuted}; line-height: 1.5; }
 
-  /* ── Lines table ── */
   .lines-table { width: 100%; border-collapse: collapse; margin-bottom: 12px; }
   .lines-table thead th {
     padding: 8px 12px; font-size: 10px; font-weight: 600; text-transform: uppercase;
@@ -556,7 +536,6 @@ export function renderQuoteHtml(
     border-bottom: 2px solid ${ac}15; padding: 6px 12px;
   }
 
-  /* ── Totals ── */
   .totals-wrap { display: flex; justify-content: flex-end; margin-bottom: 20px; }
 
   ${
@@ -600,38 +579,31 @@ export function renderQuoteHtml(
   `
   }
 
-  /* ── TVA breakdown ── */
   .tva-table { margin-bottom: 16px; width: auto; border-collapse: collapse; }
   .tva-table th { font-size: 8px; padding: 5px 8px; background: ${ac}08; color: ${ac}; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; }
   .tva-table td { font-size: 9.5px; padding: 5px 8px; border-bottom: 1px solid ${T.borderLight}; }
   .tva-table td.right { text-align: right; }
 
-  /* ── VAT exempt ── */
   .vat-exempt { font-size: 10px; font-style: italic; color: ${T.textMuted}; margin-bottom: 12px; }
 
-  /* ── Notes ── */
   .notes-section { padding-top: 12px; border-top: 1px solid ${T.borderLight}; margin-bottom: 12px; }
   .section-label { font-size: 9px; font-weight: 700; text-transform: uppercase; letter-spacing: 1px; color: ${T.textMuted}; margin-bottom: 4px; }
   .notes-text { font-size: 11px; color: ${T.textMuted}; line-height: 1.6; white-space: pre-wrap; }
 
-  /* ── Acceptance conditions ── */
   .conditions-section { margin-bottom: 10px; }
   .conditions-text { font-size: 11px; color: ${T.textMuted}; line-height: 1.6; white-space: pre-wrap; }
 
-  /* ── Free field ── */
   .free-field-section { margin-bottom: 10px; }
   .free-field-text { font-size: 11px; color: ${T.textMuted}; white-space: pre-wrap; }
 
-  /* ── Signature ── */
   .signature-row { display: flex; gap: 20px; margin-bottom: 12px; }
   .signature-box { flex: 1; }
   .signature-area { height: 56px; border: 2px dashed ${T.signatureBorder}; border-radius: ${T.borderRadius}; }
 
-  /* ── Payment methods ── */
   .payment-section { margin-bottom: 12px; }
   .payment-badges { display: flex; gap: 6px; flex-wrap: wrap; }
   .payment-badge {
-    font-size: 9px; padding: 3px 8px; border-radius: 6px;
+    font-size: 10px; font-weight: 600; padding: 4px 10px; border-radius: 6px;
     background: ${T.paymentBadgeBg}; border: 1px solid ${T.paymentBadgeBorder};
     color: ${T.paymentBadgeText};
   }
@@ -639,7 +611,6 @@ export function renderQuoteHtml(
   .bank-item { font-size: 9px; color: ${T.textFooter}; }
   .bank-item strong { color: ${T.textMuted}; }
 
-  /* ── Footer ── */
   ${
     isClassique
       ? `
@@ -658,7 +629,6 @@ export function renderQuoteHtml(
   `
   }
 
-  /* ── Grow top, pin bottom ── */
   .top-section { flex: 1; }
   .bottom-section { margin-top: auto; }
 </style>
@@ -702,10 +672,6 @@ ${
 </html>`
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Standard + Banner layout
-   ═══════════════════════════════════════════════════════════ */
-
 function renderStandardPage(
   quote: QuoteData,
   lines: LineData[],
@@ -723,7 +689,6 @@ function renderStandardPage(
 ): string {
   let html = '<div class="top-section">'
 
-  // Banner header
   if (T.layout === 'banner') {
     html += `<div class="banner">
       <div class="logo">
@@ -740,10 +705,8 @@ function renderStandardPage(
     </div>`
   }
 
-  // Standard/Classique header
   if (T.layout !== 'banner') {
     html += '<div class="header">'
-    // Left: logo + company
     html += '<div style="max-width:55%">'
     if (quote.logoUrl) {
       html += `<div class="logo"><img src="${esc(quote.logoUrl)}" alt="Logo" style="border-radius:${quote.logoBorderRadius || 0}px" /></div>`
@@ -765,7 +728,6 @@ function renderStandardPage(
     }
     html += '</div>'
 
-    // Right: title + quote number
     html += '<div style="text-align:right">'
     if (isClassique) {
       html += `<div class="classique-title">${esc(docTitle)}</div>`
@@ -778,7 +740,6 @@ function renderStandardPage(
     html += '</div>'
   }
 
-  // Company info below banner
   if (T.layout === 'banner' && company) {
     html +=
       '<div style="display:flex;justify-content:space-between;align-items:flex-start;margin-bottom:20px">'
@@ -799,7 +760,6 @@ function renderStandardPage(
     html += '</div></div>'
   }
 
-  // Subject
   if (quote.subject) {
     if (isClassique) {
       html += `<div class="subject-block"><div class="subject-text">${esc(quote.subject)}</div></div>`
@@ -808,24 +768,18 @@ function renderStandardPage(
     }
   }
 
-  // Client block (right-aligned, like frontend)
   html += renderClientBlock(client, quote, T, lang, i)
 
-  // Dates
   html += renderDateBar(quote, docTitle, T, ac, lang, i, isClassique)
 
-  // Lines table
   html += renderTable(lines, quote, T, ac, lang, i)
 
-  html += '</div>' // end top-section
+  html += '</div>'
 
-  // Bottom section
   html += '<div class="bottom-section">'
 
-  // Totals
   html += renderTotals(quote, tva, discountAmount, lang, i, isClassique)
 
-  // VAT exempt
   const vatText = getVatExemptText(quote.vatExemptReason, i)
   if (vatText) {
     html += `<div class="vat-exempt">${vatText}</div>`
@@ -834,22 +788,18 @@ function renderStandardPage(
     html += `<div class="vat-exempt">${i.vatOnDebits}</div>`
   }
 
-  // Notes
   if (quote.notes) {
     html += `<div class="notes-section"><div class="section-label">${i.conditionsAndNotes}</div><div class="notes-text">${formatText(quote.notes)}</div></div>`
   }
 
-  // Acceptance conditions
   if (quote.acceptanceConditions) {
     html += `<div class="conditions-section"><div class="section-label">${i.acceptanceConditions}</div><div class="conditions-text">${formatText(quote.acceptanceConditions)}</div></div>`
   }
 
-  // Free field
   if (quote.freeField) {
     html += `<div class="free-field-section"><div class="section-label">${i.freeField}</div><div class="free-field-text">${formatText(quote.freeField)}</div></div>`
   }
 
-  // Signature
   if (quote.signatureField) {
     html += `<div class="signature-row">
       <div class="signature-box"><div class="section-label">${i.signatureIssuer}</div><div class="signature-area"></div></div>
@@ -857,20 +807,14 @@ function renderStandardPage(
     </div>`
   }
 
-  // Payment methods
   html += renderPaymentMethods(company, settings, T, lang, i)
 
-  // Footer
   html += renderLegalFooter(company, quote, settings, T, lang, i, isClassique)
 
-  html += '</div>' // end bottom-section
+  html += '</div>'
 
   return html
 }
-
-/* ═══════════════════════════════════════════════════════════
-   Client block
-   ═══════════════════════════════════════════════════════════ */
 
 function renderClientBlock(
   client: ClientData | null,
@@ -906,10 +850,6 @@ function renderClientBlock(
   return html
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Date bar
-   ═══════════════════════════════════════════════════════════ */
-
 function renderDateBar(
   quote: QuoteData,
   docTitle: string,
@@ -938,10 +878,6 @@ function renderDateBar(
   html += '</div>'
   return html
 }
-
-/* ═══════════════════════════════════════════════════════════
-   Lines table
-   ═══════════════════════════════════════════════════════════ */
 
 function renderTable(
   lines: LineData[],
@@ -989,10 +925,6 @@ function renderTable(
 
   return `<table class="lines-table"><thead><tr>${headerCols}</tr></thead><tbody>${rows}</tbody></table>`
 }
-
-/* ═══════════════════════════════════════════════════════════
-   Totals
-   ═══════════════════════════════════════════════════════════ */
 
 function renderTotals(
   quote: QuoteData,
@@ -1045,10 +977,6 @@ function renderTotals(
   return html
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Payment methods
-   ═══════════════════════════════════════════════════════════ */
-
 function renderPaymentMethods(
   company: CompanyData | null,
   settings: SettingsData,
@@ -1056,7 +984,6 @@ function renderPaymentMethods(
   lang: string,
   i: I18n
 ): string {
-  // Payment methods are only shown on invoices, not on quotes
   if (settings.documentType === 'quote') return ''
   if (!settings.paymentMethods || settings.paymentMethods.length === 0) return ''
 
@@ -1069,9 +996,8 @@ function renderPaymentMethods(
   else methodLabel = lang === 'en' ? 'Other' : 'Autre'
 
   let html = `<div class="payment-section"><div class="section-label">${lang === 'en' ? 'Payment method' : 'Moyen de paiement'}</div>`
-  html += `<div style="font-size:11px;line-height:1.7;color:${_T.text}"><div style="font-weight:600">${methodLabel}</div>`
+  html += `<div style="font-size:11px;line-height:1.7;color:${_T.text}"><div class="payment-badges"><span class="payment-badge">${methodLabel}</span></div>`
 
-  // Bank details
   if (method === 'bank_transfer' && company && (company.iban || company.bic || company.bankName)) {
     html += '<div style="margin-top:4px">'
     if (company.bankName)
@@ -1085,10 +1011,6 @@ function renderPaymentMethods(
   return html
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Legal footer
-   ═══════════════════════════════════════════════════════════ */
-
 function renderLegalFooter(
   company: CompanyData | null,
   quote: QuoteData,
@@ -1100,14 +1022,12 @@ function renderLegalFooter(
 ): string {
   const footerMode = settings.footerMode === 'custom' ? 'custom' : 'company_info'
 
-  // Custom footer text
   if (footerMode === 'custom') {
     const text = quote.footerText || ''
     if (!text) return ''
     return `<div class="legal-footer"><div class="legal-footer-text">${formatText(text)}</div></div>`
   }
 
-  // Company info
   if (!company) return ''
 
   let text = esc(company.tradeName || company.legalName)
@@ -1126,10 +1046,6 @@ function renderLegalFooter(
   return `<div class="legal-footer"><div class="legal-footer-text">${text}</div></div>`
 }
 
-/* ═══════════════════════════════════════════════════════════
-   Lateral layout
-   ═══════════════════════════════════════════════════════════ */
-
 function renderLateral(
   quote: QuoteData,
   lines: LineData[],
@@ -1144,7 +1060,6 @@ function renderLateral(
   lang: string,
   i: I18n
 ): string {
-  // Sidebar with company info
   let sidebar = '<div class="sidebar">'
   if (quote.logoUrl) {
     sidebar += `<div class="section"><img src="${esc(quote.logoUrl)}" alt="Logo" style="max-width:120px;max-height:60px;border-radius:${quote.logoBorderRadius || 0}px" /></div>`
@@ -1159,7 +1074,7 @@ function renderLateral(
       sidebar += `<p>${esc(company.postalCode || '')} ${esc(company.city || '')}</p>`
     sidebar += '</div>'
     if (company.siren || company.vatNumber) {
-      sidebar += '<div class="section"><h3>Informations</h3>'
+      sidebar += `<div class="section"><h3>${lang === 'en' ? 'Details' : 'Informations'}</h3>`
       if (company.siren) sidebar += `<p>SIREN: ${esc(company.siren)}</p>`
       if (company.vatNumber) sidebar += `<p>${i.vatNo}: ${esc(company.vatNumber)}</p>`
       sidebar += '</div>'
@@ -1173,7 +1088,6 @@ function renderLateral(
   }
   sidebar += '</div>'
 
-  // Main content area
   let main = '<div class="main-content"><div class="top-section">'
   main += `<div class="header"><div></div><div style="text-align:right">`
   main += `<div class="doc-badge"><div class="doc-badge-title">${esc(docTitle)}</div></div>`
@@ -1181,7 +1095,6 @@ function renderLateral(
   main += `<div style="font-size:11px;color:${T.textMuted}">${i.date} : ${fmtD(quote.issueDate, lang)}</div>`
   main += '</div></div>'
 
-  // Client only
   if (client) {
     main += `<div style="margin-bottom:20px"><div class="address-label">${i.recipient}</div><div class="address-content">`
     main += `<div class="address-name">${esc(clientDisplayName(client))}</div>`
@@ -1199,7 +1112,6 @@ function renderLateral(
   if (quote.subject)
     main += `<div class="subject-block"><span class="subject-label">${i.subject} : </span>${esc(quote.subject)}</div>`
 
-  // Dates
   main += `<div class="date-bar">`
   main += `<div class="date-item"><strong>${i.date} :</strong> ${fmtD(quote.issueDate, lang)}</div>`
   if (quote.validityDate)
@@ -1207,7 +1119,7 @@ function renderLateral(
   main += '</div>'
 
   main += renderTable(lines, quote, T, ac, lang, i)
-  main += '</div>' // end top-section
+  main += '</div>'
 
   main += '<div class="bottom-section">'
   main += renderTotals(quote, tva, discountAmount, lang, i, false)
@@ -1229,7 +1141,7 @@ function renderLateral(
   }
   main += renderPaymentMethods(company, settings, T, lang, i)
   main += renderLegalFooter(company, quote, settings, T, lang, i, false)
-  main += '</div>' // end bottom-section
+  main += '</div>'
   main += '</div>'
 
   return sidebar + main
