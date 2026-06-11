@@ -1,6 +1,9 @@
 import type { HttpContext } from '@adonisjs/core/http'
-
-const MODES = ['light', 'dark', 'system']
+import {
+  normalizeUiTheme,
+  parseStoredUiTheme,
+  serializeUiTheme,
+} from '#services/account/ui_theme'
 
 export default class UpdateUiTheme {
   async handle({ auth, request, response }: HttpContext) {
@@ -13,28 +16,28 @@ export default class UpdateUiTheme {
       return response.ok({ message: 'Thème réinitialisé', uiTheme: null })
     }
 
-    if (typeof raw !== 'string' || raw.length > 600) {
+    if (typeof raw !== 'string' || raw.length > 1200) {
       return response.unprocessableEntity({ message: 'Thème invalide' })
     }
 
-    let parsed: any
+    let parsed: unknown
     try {
       parsed = JSON.parse(raw)
     } catch {
       return response.unprocessableEntity({ message: 'Thème invalide' })
     }
 
-    const mode = MODES.includes(parsed?.mode) ? parsed.mode : 'system'
-    const accent =
-      typeof parsed?.accent === 'string' && /^#[0-9a-fA-F]{6}$/.test(parsed.accent)
-        ? parsed.accent
-        : null
-    const background =
-      typeof parsed?.background === 'string' && parsed.background.length <= 40
-        ? parsed.background
-        : null
+    const next = normalizeUiTheme(parsed)
+    const current = parseStoredUiTheme(user.uiTheme)
 
-    const theme = JSON.stringify({ mode, accent, background })
+    if (next.customBackgroundUrl !== current.customBackgroundUrl) {
+      next.customBackgroundUrl = current.customBackgroundUrl
+    }
+    if (next.background === 'custom' && !next.customBackgroundUrl) {
+      next.background = null
+    }
+
+    const theme = serializeUiTheme(next)
     user.uiTheme = theme
     await user.save()
 
