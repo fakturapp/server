@@ -42,6 +42,28 @@ export default class DocumentAccessService {
     return { permission: 'editor', isOwner: true }
   }
 
+  async getShareManagementTeamId(
+    documentType: DocumentType,
+    documentId: string,
+    userId: string,
+    currentTeamId: string | null
+  ): Promise<string | null> {
+    if (currentTeamId) {
+      const document = await this.getDocument(documentType, documentId, currentTeamId)
+      if (document) return currentTeamId
+    }
+
+    const share = await DocumentShare.query()
+      .where('document_type', documentType)
+      .where('document_id', documentId)
+      .where('shared_with_user_id', userId)
+      .where('status', 'active')
+      .where('can_share', true)
+      .first()
+
+    return share?.teamId ?? null
+  }
+
   async getSharePermission(
     documentType: DocumentType,
     documentId: string,
