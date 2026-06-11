@@ -1,11 +1,13 @@
 import { randomUUID } from 'node:crypto'
 import db from '@adonisjs/lucid/services/db'
 import StorageFile, { type StorageCategory } from '#models/storage/storage_file'
+import User from '#models/account/user'
 import Company from '#models/team/company'
 import InvoiceSetting from '#models/team/invoice_setting'
 import Team from '#models/team/team'
 import PaymentLink from '#models/invoice/payment_link'
 import r2StorageService from '#services/storage/r2_storage_service'
+import { parseStoredUiTheme, serializeUiTheme } from '#services/account/ui_theme'
 
 export type PlanId = 'free' | 'pro' | 'team'
 
@@ -238,7 +240,10 @@ class StorageService {
       sizeBytes: Number(f.sizeBytes),
       contentType: f.contentType,
       originalName: f.originalName,
-      isActive: f.category === 'payment_link_pdf' ? !f.isOrphaned : activeUrls.has(f.publicUrl),
+      isActive:
+        f.category === 'payment_link_pdf' || f.category === 'ui_background'
+          ? !f.isOrphaned
+          : activeUrls.has(f.publicUrl),
       createdAt: f.createdAt?.toISO() ?? null,
     }))
   }
@@ -274,6 +279,17 @@ class StorageService {
       if (link) {
         link.pdfStorageKey = null
         await link.save()
+      }
+    } else if (file.category === 'ui_background' && file.referenceId) {
+      const owner = await User.find(file.referenceId)
+      if (owner) {
+        const theme = parseStoredUiTheme(owner.uiTheme)
+        if (theme.customBackgroundUrl === file.publicUrl) {
+          theme.customBackgroundUrl = null
+          if (theme.background === 'custom') theme.background = null
+          owner.uiTheme = serializeUiTheme(theme)
+          await owner.save()
+        }
       }
     }
 
