@@ -6,9 +6,13 @@ export interface UiThemePayload {
   customBackgroundUrl: string | null
   customBlur: number
   customDim: number
+  surface: 'standard' | 'glass' | 'liquid' | 'opaque'
+  surfaceOpacity: number
+  surfaceBlur: number
 }
 
 const MODES = ['light', 'dark', 'system']
+const SURFACES = ['standard', 'glass', 'liquid', 'opaque']
 
 function clampInt(value: unknown, min: number, max: number, fallback: number): number {
   const num = typeof value === 'number' ? value : typeof value === 'string' ? Number(value) : NaN
@@ -37,6 +41,11 @@ export function normalizeUiTheme(parsed: unknown): UiThemePayload {
         : null,
     customBlur: clampInt(input.customBlur, 0, 40, 0),
     customDim: clampInt(input.customDim, 0, 80, 30),
+    surface: SURFACES.includes(input.surface as string)
+      ? (input.surface as UiThemePayload['surface'])
+      : 'standard',
+    surfaceOpacity: clampInt(input.surfaceOpacity, 10, 60, 30),
+    surfaceBlur: clampInt(input.surfaceBlur, 4, 32, 16),
   }
 }
 
