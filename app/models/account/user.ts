@@ -47,6 +47,12 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column()
   declare twoFactorEnabled: boolean
 
+  @column()
+  declare appLoginEnabled: boolean
+
+  @column()
+  declare appLoginRequireMatch: boolean
+
   @column({ serializeAs: null })
   declare twoFactorSecretEncrypted: string | null
 

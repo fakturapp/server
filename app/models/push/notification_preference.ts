@@ -24,6 +24,7 @@ export default class NotificationPreference extends BaseModel {
 }
 
 export const NOTIFICATION_EVENT_TYPES = [
+  'login.request',
   'payment.received',
   'payment.to_confirm',
   'payment.confirmed',

@@ -27,6 +27,9 @@ export default class PushDevice extends BaseModel {
   @column()
   declare locale: string | null
 
+  @column()
+  declare appLoginEnabled: boolean
+
   @column.dateTime()
   declare lastSeenAt: DateTime | null
 
