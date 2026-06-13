@@ -2,6 +2,8 @@ import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import { API_PREFIX } from '#start/routes/_prefix'
 
+const CreateWebLoginToken = () => import('#controllers/account/web_login/create')
+const RedeemWebLoginToken = () => import('#controllers/account/web_login/redeem')
 const ProfileShow = () => import('#controllers/account/profile/show')
 const ProfileUpdate = () => import('#controllers/account/profile/update')
 const UiThemeUpdate = () => import('#controllers/account/profile/update_ui_theme')
@@ -94,6 +96,12 @@ router
     router.post('/oauth-apps/sessions/:tokenId/revoke', [RevokeUserOauthSession, 'handle'])
 
     router.get('/api-usage', [ApiUsageShow, 'handle'])
+
+    // URL de connexion web à usage unique (« Gérer mon compte » mobile).
+    router.post('/web-login-token', [CreateWebLoginToken, 'handle'])
   })
   .prefix(API_PREFIX + '/account')
   .use(middleware.auth())
+
+// Échange du code à usage unique — non authentifié (consommé par /auto-login).
+router.post(API_PREFIX + '/account/web-login-token/redeem', [RedeemWebLoginToken, 'handle'])
