@@ -20,6 +20,8 @@ export default class RegisterDevice {
     const user = auth.user!
     const payload = await request.validateUsing(registerValidator)
 
+    const isSynthetic = payload.token.startsWith('faktur-synthetic-')
+
     const existing = await PushDevice.findBy('token', payload.token)
     if (existing) {
       existing.userId = user.id
@@ -27,6 +29,7 @@ export default class RegisterDevice {
       existing.environment = payload.environment ?? existing.environment
       existing.appVersion = payload.appVersion ?? existing.appVersion
       existing.locale = payload.locale ?? existing.locale
+      existing.isSynthetic = isSynthetic
       existing.lastSeenAt = DateTime.now()
       await existing.save()
       return response.ok({ message: 'Device updated' })
@@ -39,6 +42,7 @@ export default class RegisterDevice {
       environment: payload.environment ?? 'production',
       appVersion: payload.appVersion ?? null,
       locale: payload.locale ?? null,
+      isSynthetic,
       lastSeenAt: DateTime.now(),
     })
 

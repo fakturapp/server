@@ -30,6 +30,9 @@ export default class PushDevice extends BaseModel {
   @column()
   declare appLoginEnabled: boolean
 
+  @column()
+  declare isSynthetic: boolean
+
   @column.dateTime()
   declare lastSeenAt: DateTime | null
 

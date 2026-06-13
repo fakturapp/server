@@ -37,7 +37,9 @@ class PushService {
       const enabled = await this.isEnabled(userId, eventType)
       if (!enabled) return
 
-      const devices = await PushDevice.query().where('user_id', userId)
+      const devices = await PushDevice.query()
+        .where('user_id', userId)
+        .where('is_synthetic', false)
       if (devices.length === 0) return
 
       const payload = this.buildPayload(input)
