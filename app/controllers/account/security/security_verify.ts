@@ -47,6 +47,8 @@ export default class SecurityVerify {
         return response.unauthorized({ message: 'Invalid TOTP code' })
       }
 
+      user.securityVerifiedAt = DateTime.now()
+      await user.save()
       return response.ok({ verified: true })
     }
 
@@ -62,6 +64,7 @@ export default class SecurityVerify {
       }
 
       user.recoveryCodesEncrypted = TwoFactorService.encryptRecoveryCodes(result.remainingCodes)
+      user.securityVerifiedAt = DateTime.now()
       await user.save()
 
       return response.ok({ verified: true })
@@ -84,6 +87,7 @@ export default class SecurityVerify {
 
     user.securityCode = null
     user.securityCodeExpiresAt = null
+    user.securityVerifiedAt = DateTime.now()
     await user.save()
 
     return response.ok({ verified: true })

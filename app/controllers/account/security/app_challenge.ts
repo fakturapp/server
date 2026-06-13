@@ -78,6 +78,9 @@ export default class AccountSecurityAppChallenge {
     challenge.verifiedAt = DateTime.now()
     await challenge.save()
 
+    user.securityVerifiedAt = DateTime.now()
+    await user.save()
+
     return response.ok({ status: 'approved', verified: true })
   }
 }

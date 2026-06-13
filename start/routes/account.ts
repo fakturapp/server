@@ -56,7 +56,7 @@ router
     router.put('/ui-theme', [UiThemeUpdate, 'handle'])
     router.post('/ui-background', [UiBackgroundUpload, 'handle'])
     router.delete('/ui-background', [UiBackgroundDelete, 'handle'])
-    router.put('/password', [PasswordChange, 'handle'])
+    router.put('/password', [PasswordChange, 'handle']).use(middleware.securityVerified())
     router.post('/avatar', [UploadAvatar, 'handle'])
     router.get('/sessions', [SessionsList, 'handle'])
     router.delete('/sessions/:id', [SessionRevoke, 'handle'])
@@ -71,26 +71,26 @@ router
     router.post('/delete/verify-password', [DeletionVerifyPassword, 'handle'])
     router.delete('/delete/confirm', [DeletionConfirm, 'handle'])
 
-    router.post('/2fa/setup', [TwoFactorSetup, 'handle'])
+    router.post('/2fa/setup', [TwoFactorSetup, 'handle']).use(middleware.securityVerified())
     router.post('/2fa/enable', [TwoFactorEnable, 'handle'])
-    router.post('/2fa/disable', [TwoFactorDisable, 'handle'])
+    router.post('/2fa/disable', [TwoFactorDisable, 'handle']).use(middleware.securityVerified())
 
     router.post('/security/send-code', [SecurityVerify, 'sendCode'])
     router.post('/security/verify', [SecurityVerify, 'verify'])
     router.post('/security/app-challenge', [SecurityAppChallenge, 'create'])
     router.get('/security/app-challenge/:challengeId', [SecurityAppChallenge, 'poll'])
 
-    router.post('/email/request-change', [EmailRequestChange, 'handle'])
+    router.post('/email/request-change', [EmailRequestChange, 'handle']).use(middleware.securityVerified())
     router.post('/email/confirm-change', [EmailConfirmChange, 'handle'])
 
     router.get('/providers', [ListProviders, 'handle'])
-    router.post('/providers/link', [LinkProvider, 'handle'])
-    router.post('/providers/unlink', [UnlinkProvider, 'handle'])
+    router.post('/providers/link', [LinkProvider, 'handle']).use(middleware.securityVerified())
+    router.post('/providers/unlink', [UnlinkProvider, 'handle']).use(middleware.securityVerified())
 
     router.post('/passkeys/register-options', [PasskeyRegisterOptions, 'handle'])
-    router.post('/passkeys/register-verify', [PasskeyRegisterVerify, 'handle'])
+    router.post('/passkeys/register-verify', [PasskeyRegisterVerify, 'handle']).use(middleware.securityVerified())
     router.get('/passkeys', [PasskeyList, 'handle'])
-    router.delete('/passkeys/:id', [PasskeyDelete, 'handle'])
+    router.delete('/passkeys/:id', [PasskeyDelete, 'handle']).use(middleware.securityVerified())
 
     router.get('/oauth-apps', [ListUserOauthApps, 'handle'])
     router.post('/oauth-apps/:authorizationId/revoke', [RevokeUserOauthApp, 'handle'])

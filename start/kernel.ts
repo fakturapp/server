@@ -24,6 +24,7 @@ export const middleware = router.named({
   authOrApiKey: () => import('#middleware/auth/auth_or_api_key_middleware'),
   emailVerified: () => import('#middleware/auth/email_verified_middleware'),
   twoFactorVerified: () => import('#middleware/auth/two_factor_verified_middleware'),
+  securityVerified: () => import('#middleware/auth/security_verified_middleware'),
   onboardingCompleted: () => import('#middleware/auth/onboarding_completed_middleware'),
   vault: () => import('#middleware/crypto/vault_middleware'),
   storageQuota: () => import('#middleware/storage_quota_middleware'),

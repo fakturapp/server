@@ -60,6 +60,7 @@ export default class ExchangeSession {
     await oauthTokenService.touch(oauthToken, reqCtx.ip, reqCtx.userAgent)
 
     const token = await User.accessTokens.create(user, ['*'], {
+      name: 'mobile',
       expiresIn: '1 day',
     })
 

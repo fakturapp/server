@@ -86,6 +86,9 @@ export default class User extends compose(BaseModel, AuthFinder) {
   @column.dateTime()
   declare securityCodeExpiresAt: DateTime | null
 
+  @column.dateTime({ serializeAs: null })
+  declare securityVerifiedAt: DateTime | null
+
   @column({ serializeAs: null })
   declare saltKdf: string | null
 
