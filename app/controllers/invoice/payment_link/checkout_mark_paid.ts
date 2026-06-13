@@ -4,7 +4,7 @@ import PaymentLink from '#models/invoice/payment_link'
 import Invoice from '#models/invoice/invoice'
 import User from '#models/account/user'
 import encryptionService from '#services/encryption/encryption_service'
-import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
+import { broadcastDocumentSaved, notifyUser } from '#services/collaboration/websocket_service'
 import { PaymentMarkedToCreator } from '#mails/payment_marked_to_creator'
 import { PaymentMarkedToClient } from '#mails/payment_marked_to_client'
 import pushService from '#services/push/push_service'
@@ -56,6 +56,13 @@ export default class CheckoutMarkPaid {
         invoiceId: paymentLink.invoiceId,
         deepLink: `faktur://invoice/${paymentLink.invoiceId}`,
       },
+    })
+
+    notifyUser(paymentLink.createdByUserId, 'payment.to_confirm', {
+      invoiceId: paymentLink.invoiceId,
+      invoiceNumber: paymentLink.invoiceNumber,
+      amount: Number(paymentLink.amount) || 0,
+      currency: paymentLink.currency,
     })
 
     try {

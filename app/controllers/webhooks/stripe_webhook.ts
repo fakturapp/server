@@ -7,7 +7,7 @@ import User from '#models/account/user'
 import encryptionService from '#services/encryption/encryption_service'
 import stripeService from '#services/stripe/stripe_service'
 import r2StorageService from '#services/storage/r2_storage_service'
-import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
+import { broadcastDocumentSaved, notifyUser } from '#services/collaboration/websocket_service'
 import { StripePaymentToCreator } from '#mails/stripe_payment_to_creator'
 import { StripePaymentToClient } from '#mails/stripe_payment_to_client'
 import pushService from '#services/push/push_service'
@@ -138,6 +138,13 @@ export default class StripeWebhook {
         invoiceId: paymentLink.invoiceId,
         deepLink: `faktur://invoice/${paymentLink.invoiceId}`,
       },
+    })
+
+    notifyUser(paymentLink.createdByUserId, 'payment.received', {
+      invoiceId: paymentLink.invoiceId,
+      invoiceNumber: paymentLink.invoiceNumber,
+      amount: Number(paymentLink.amount) || 0,
+      currency: paymentLink.currency,
     })
 
     let receiptUrl: string | null = null

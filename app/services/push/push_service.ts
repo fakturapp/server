@@ -36,7 +36,13 @@ class PushService {
     input: PushNotificationInput
   ): Promise<void> {
     try {
-      if (!apnsClient.isConfigured) return
+      if (!apnsClient.isConfigured) {
+        logger.error(
+          { userId, eventType },
+          'APNs non configuré (APNS_KEY/APNS_KEY_ID/APNS_TEAM_ID/APNS_BUNDLE_ID) — notification ignorée'
+        )
+        return
+      }
 
       const enabled = await this.isEnabled(userId, eventType)
       if (!enabled) return

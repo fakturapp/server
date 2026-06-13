@@ -6,7 +6,7 @@ import { confirmPaymentValidator } from '#validators/payment_link_validator'
 import { encryptModelFields } from '#services/crypto/field_encryption_helper'
 import encryptionService from '#services/encryption/encryption_service'
 import r2StorageService from '#services/storage/r2_storage_service'
-import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
+import { broadcastDocumentSaved, notifyUser } from '#services/collaboration/websocket_service'
 import { PaymentConfirmedNotification } from '#mails/payment_confirmed_notification'
 import pushService from '#services/push/push_service'
 import mail from '@adonisjs/mail/services/main'
@@ -103,6 +103,11 @@ export default class ConfirmPayment {
     }
 
     broadcastDocumentSaved('invoice', invoice.id, user.id)
+
+    notifyUser(paymentLink.createdByUserId, 'payment.confirmed', {
+      invoiceId: invoice.id,
+      invoiceNumber: paymentLink.invoiceNumber,
+    })
 
     // Si un coéquipier confirme à la place du créateur, on le prévient
     // (sa facture est désormais payée).
