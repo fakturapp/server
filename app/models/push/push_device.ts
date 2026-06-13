@@ -28,6 +28,9 @@ export default class PushDevice extends BaseModel {
   declare locale: string | null
 
   @column()
+  declare lastIp: string | null
+
+  @column()
   declare appLoginEnabled: boolean
 
   @column()

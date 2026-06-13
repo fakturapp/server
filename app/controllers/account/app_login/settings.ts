@@ -17,7 +17,7 @@ export default class AppLoginSettings {
       devices: devices.map((device) => ({
         id: device.id,
         platform: device.platform,
-        appVersion: device.appVersion,
+        ip: device.lastIp,
         lastSeenAt: device.lastSeenAt?.toISO() ?? null,
       })),
     })
