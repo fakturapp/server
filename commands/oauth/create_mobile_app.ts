@@ -1,13 +1,6 @@
 import { BaseCommand, flags } from '@adonisjs/core/ace'
 import { CommandOptions } from '@adonisjs/core/types/ace'
 
-/**
- * Registers (idempotently) the first-party OAuth client used by the
- * official Faktur iOS app. Public client (kind=mobile, PKCE enforced,
- * no client secret needed) with a custom-scheme redirect.
- *
- *   node ace oauth:create-mobile-app [--owner you@example.com]
- */
 export default class OauthCreateMobileApp extends BaseCommand {
   static commandName = 'oauth:create-mobile-app'
   static description = 'Create or update the first-party OAuth client for the Faktur iOS app.'

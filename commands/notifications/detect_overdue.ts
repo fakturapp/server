@@ -1,13 +1,6 @@
 import { BaseCommand } from '@adonisjs/core/ace'
 import { CommandOptions } from '@adonisjs/core/types/ace'
 
-/**
- * Détecte les factures arrivées à échéance (statut 'sent', dueDate < today),
- * les passe en 'overdue' et envoie une notification push au propriétaire
- * de l'équipe. À planifier quotidiennement (cron, ex. 9h).
- *
- *   node ace notifications:detect-overdue
- */
 export default class DetectOverdue extends BaseCommand {
   static commandName = 'notifications:detect-overdue'
   static description = 'Mark due invoices as overdue and push a notification to team owners.'
@@ -24,7 +17,6 @@ export default class DetectOverdue extends BaseCommand {
 
     const today = DateTime.now().toSQLDate()!
 
-    // Factures qui basculent en retard aujourd'hui.
     const newlyOverdue = await Invoice.query()
       .where('status', 'sent')
       .whereNotNull('dueDate')
@@ -41,7 +33,6 @@ export default class DetectOverdue extends BaseCommand {
       .where('dueDate', '<', today)
       .update({ status: 'overdue' })
 
-    // Regroupe par équipe pour une notification par propriétaire.
     const byTeam = new Map<string, typeof newlyOverdue>()
     for (const invoice of newlyOverdue) {
       const list = byTeam.get(invoice.teamId) ?? []

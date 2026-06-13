@@ -6,13 +6,6 @@ import oauthCrypto from '#services/oauth/oauth_crypto_service'
 
 const TTL_SECONDS = 45
 
-/**
- * POST /v1/account/web-login-token
- *
- * Génère un code à usage unique (TTL 45 s) et renvoie l'URL d'auto-login
- * du site `account`. Seul le hash du code est stocké ; le code clair ne
- * vit que dans l'URL remise à l'app, jamais en base ni en logs.
- */
 export default class CreateWebLoginToken {
   async handle({ auth, request, response }: HttpContext) {
     const user = auth.user!

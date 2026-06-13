@@ -2,18 +2,6 @@ import http2 from 'node:http2'
 import crypto from 'node:crypto'
 import env from '#start/env'
 
-/**
- * Client APNs token-based (clé .p8, JWT ES256) construit sur le module
- * http2 natif de Node — aucune dépendance externe.
- *
- * Configuration (env) :
- *   APNS_KEY        contenu PEM de la clé .p8 (avec \n) OU base64 de ce PEM
- *   APNS_KEY_ID     identifiant de la clé (10 caractères)
- *   APNS_TEAM_ID    identifiant d'équipe Apple (10 caractères)
- *   APNS_BUNDLE_ID  dev.danbenba.faktur
- *   APNS_ENV        'production' | 'sandbox' (défaut : sandbox)
- */
-
 export interface ApnsPayload {
   aps: {
     alert?: { title?: string; subtitle?: string; body?: string }
@@ -57,20 +45,15 @@ class ApnsClient {
     return env.get('APNS_ENV') === 'production' ? HOSTS.production : HOSTS.sandbox
   }
 
-  /** Clé privée PEM : accepte le PEM brut (avec \n littéraux) ou en base64. */
   private get privateKeyPem(): string {
     const raw = String(env.get('APNS_KEY') ?? '')
     if (raw.includes('BEGIN PRIVATE KEY')) {
       return raw.replace(/\\n/g, '\n')
     }
-    // Supposé base64 d'un PEM.
+
     return Buffer.from(raw, 'base64').toString('utf8')
   }
 
-  /**
-   * JWT ES256 signé, mis en cache et régénéré toutes les ~50 min
-   * (Apple exige une validité de 20 à 60 min).
-   */
   private buildJwt(): string {
     const nowSeconds = Math.floor(Date.now() / 1000)
     if (this.cachedJwt && nowSeconds - this.cachedJwt.iat < 3000) {
@@ -93,10 +76,6 @@ class ApnsClient {
     return token
   }
 
-  /**
-   * Envoie une notification à un token. Push type 'alert' par défaut.
-   * Renvoie le statut et le motif Apple (pour purge des tokens morts).
-   */
   async send(token: string, payload: ApnsPayload, options?: { pushType?: string; priority?: number }): Promise<ApnsResult> {
     if (!this.isConfigured) {
       return { token, ok: false, status: 0, reason: 'APNsNotConfigured' }

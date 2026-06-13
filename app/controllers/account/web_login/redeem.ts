@@ -12,13 +12,6 @@ const redeemValidator = vine.compile(
   })
 )
 
-/**
- * POST /v1/account/web-login-token/redeem  (non authentifié)
- *
- * Consommé par la page web `/auto-login`. Échange le code à usage unique
- * contre un token de session web. Consommation ATOMIQUE (UPDATE … WHERE
- * used_at IS NULL) pour éviter les rejeux/races.
- */
 export default class RedeemWebLoginToken {
   async handle(ctx: HttpContext) {
     const { request, response } = ctx
@@ -29,7 +22,6 @@ export default class RedeemWebLoginToken {
     const codeHash = oauthCrypto.hash(code)
     const now = DateTime.now()
 
-    // Consommation atomique : ne réussit que si le code est non utilisé et non expiré.
     const updated = await db
       .from('web_login_tokens')
       .where('code_hash', codeHash)

@@ -15,11 +15,6 @@ const updateValidator = vine.compile(
   })
 )
 
-/**
- * GET  /v1/notification-preferences — état par type d'événement
- *      (activé par défaut quand aucune ligne n'existe).
- * PUT  /v1/notification-preferences — upsert des préférences.
- */
 export default class NotificationPreferences {
   async index({ auth, response }: HttpContext) {
     const user = auth.user!

@@ -126,8 +126,6 @@ export default class StripeWebhook {
       broadcastDocumentSaved('invoice', invoice.id, 'system')
     }
 
-    // Push « paiement reçu » au créateur (Stripe confirme directement,
-    // pas d'étape de confirmation manuelle nécessaire).
     await pushService.notifyUser(paymentLink.createdByUserId, 'payment.received', {
       title: 'Paiement reçu 🎉',
       body: `${paymentLink.invoiceNumber} · ${formatPushAmount(paymentLink.amount, paymentLink.currency)}`,

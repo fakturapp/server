@@ -97,11 +97,9 @@ router
 
     router.get('/api-usage', [ApiUsageShow, 'handle'])
 
-    // URL de connexion web à usage unique (« Gérer mon compte » mobile).
     router.post('/web-login-token', [CreateWebLoginToken, 'handle'])
   })
   .prefix(API_PREFIX + '/account')
   .use(middleware.auth())
 
-// Échange du code à usage unique — non authentifié (consommé par /auto-login).
 router.post(API_PREFIX + '/account/web-login-token/redeem', [RedeemWebLoginToken, 'handle'])

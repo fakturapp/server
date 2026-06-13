@@ -8,28 +8,18 @@ export interface PushNotificationInput {
   title: string
   body: string
   subtitle?: string
-  /** Catégorie iOS (boutons d'action). Ex. 'PAYMENT_TO_CONFIRM'. */
+
   category?: string
-  /** Regroupe les notifications liées (ex. id de facture). */
+
   threadId?: string
   interruptionLevel?: 'passive' | 'active' | 'time-sensitive'
   relevanceScore?: number
-  /** Données hors `aps` (deep link, ids) — primitives JSON uniquement. */
+
   data?: Record<string, string | number | boolean>
 }
 
-/**
- * Envoi des notifications push aux appareils d'un utilisateur, après
- * vérification des préférences. Purge les tokens morts (410 / BadDeviceToken).
- *
- * Tous les appels sont best-effort : un échec de push ne doit jamais
- * bloquer le flux métier appelant (paiement, etc.).
- */
 class PushService {
-  /**
-   * Notifie un utilisateur pour un type d'événement donné.
-   * Vérifie l'opt-out puis envoie à tous ses appareils enregistrés.
-   */
+
   async notifyUser(
     userId: string,
     eventType: NotificationEventType,
@@ -65,7 +55,6 @@ class PushService {
     }
   }
 
-  /** Préférence : activé sauf opt-out explicite (pas de ligne = activé). */
   private async isEnabled(userId: string, eventType: NotificationEventType): Promise<boolean> {
     const pref = await NotificationPreference.query()
       .where('user_id', userId)

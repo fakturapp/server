@@ -42,8 +42,6 @@ export default class CheckoutMarkPaid {
       broadcastDocumentSaved('invoice', invoice.id, 'system')
     }
 
-    // Push « paiement à confirmer » au créateur de la facture (action phare
-    // de l'app mobile : il pourra confirmer directement depuis la notification).
     const amountLabel = formatPushAmount(paymentLink.amount, paymentLink.currency)
     await pushService.notifyUser(paymentLink.createdByUserId, 'payment.to_confirm', {
       title: 'Paiement à confirmer',

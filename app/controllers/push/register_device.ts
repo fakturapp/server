@@ -15,10 +15,6 @@ const registerValidator = vine.compile(
   })
 )
 
-/**
- * PUT /v1/devices — enregistrement idempotent du token APNs.
- * Upsert par token ; réassigne user_id (un appareil peut changer de compte).
- */
 export default class RegisterDevice {
   async handle({ auth, request, response }: HttpContext) {
     const user = auth.user!

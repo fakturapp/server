@@ -3,11 +3,6 @@ import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import User from '#models/account/user'
 
-/**
- * Code à usage unique pour ouvrir le site web déjà authentifié
- * (« Gérer mon compte » depuis l'app mobile). Pattern Stripe Express /
- * Shopify Multipass : TTL court, single-use, lié à l'utilisateur.
- */
 export default class WebLoginToken extends BaseModel {
   public static table = 'web_login_tokens'
 

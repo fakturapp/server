@@ -109,8 +109,6 @@ export default class ConfirmPayment {
       invoiceNumber: paymentLink.invoiceNumber,
     })
 
-    // Si un coéquipier confirme à la place du créateur, on le prévient
-    // (sa facture est désormais payée).
     if (paymentLink.createdByUserId && paymentLink.createdByUserId !== user.id) {
       await pushService.notifyUser(paymentLink.createdByUserId, 'payment.confirmed', {
         title: 'Paiement confirmé',

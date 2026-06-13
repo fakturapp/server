@@ -3,11 +3,6 @@ import { BaseModel, column, belongsTo } from '@adonisjs/lucid/orm'
 import type { BelongsTo } from '@adonisjs/lucid/types/relations'
 import User from '#models/account/user'
 
-/**
- * Jeton d'appareil APNs. Une ligne par token ; le token est unique et
- * sert de clé d'upsert. Réassigné à l'utilisateur courant au login,
- * supprimé sur retour APNs 410 (Unregistered) ou 400 (BadDeviceToken).
- */
 export default class PushDevice extends BaseModel {
   public static table = 'push_devices'
 
