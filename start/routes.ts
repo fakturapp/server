@@ -31,6 +31,7 @@ import '#start/routes/billing'
 import '#start/routes/storage'
 import '#start/routes/oauth'
 import '#start/routes/push'
+import '#start/routes/app_login'
 import '#start/routes/api_keys'
 import '#start/routes/api_platform/index'
 

@@ -93,7 +93,7 @@ export default class Login {
       })
     }
 
-    if (user.twoFactorEnabled) {
+    if (user.twoFactorEnabled || user.appLoginEnabled) {
       if (!code) {
         const trustedDeviceToken = request.cookie(TRUSTED_DEVICE_COOKIE_NAME)
         const trustedDevice = trustedDeviceToken
@@ -101,10 +101,13 @@ export default class Login {
           : false
 
         if (!trustedDevice) {
+          const availableMethods: string[] = []
+          if (user.appLoginEnabled) availableMethods.push('app')
+          if (user.twoFactorEnabled) availableMethods.push('totp', 'email', 'recovery')
           return response.ok({
             requiresTwoFactor: true,
             userId: user.id,
-            availableMethods: ['totp', 'email', 'recovery'],
+            availableMethods,
             email: maskLoginEmail(user.email),
             message: 'Two-factor authentication required',
           })
