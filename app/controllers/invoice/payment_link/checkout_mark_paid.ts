@@ -7,6 +7,8 @@ import encryptionService from '#services/encryption/encryption_service'
 import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
 import { PaymentMarkedToCreator } from '#mails/payment_marked_to_creator'
 import { PaymentMarkedToClient } from '#mails/payment_marked_to_client'
+import pushService from '#services/push/push_service'
+import { formatPushAmount } from '#services/push/push_formatters'
 import mail from '@adonisjs/mail/services/main'
 
 export default class CheckoutMarkPaid {
@@ -39,6 +41,22 @@ export default class CheckoutMarkPaid {
 
       broadcastDocumentSaved('invoice', invoice.id, 'system')
     }
+
+    // Push « paiement à confirmer » au créateur de la facture (action phare
+    // de l'app mobile : il pourra confirmer directement depuis la notification).
+    const amountLabel = formatPushAmount(paymentLink.amount, paymentLink.currency)
+    await pushService.notifyUser(paymentLink.createdByUserId, 'payment.to_confirm', {
+      title: 'Paiement à confirmer',
+      body: `${paymentLink.invoiceNumber} · ${amountLabel} — votre client a signalé un paiement`,
+      category: 'PAYMENT_TO_CONFIRM',
+      threadId: paymentLink.invoiceId,
+      interruptionLevel: 'time-sensitive',
+      relevanceScore: 1,
+      data: {
+        invoiceId: paymentLink.invoiceId,
+        deepLink: `faktur://invoice/${paymentLink.invoiceId}`,
+      },
+    })
 
     try {
       const creator = await User.find(paymentLink.createdByUserId)

@@ -8,6 +8,7 @@ import encryptionService from '#services/encryption/encryption_service'
 import r2StorageService from '#services/storage/r2_storage_service'
 import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
 import { PaymentConfirmedNotification } from '#mails/payment_confirmed_notification'
+import pushService from '#services/push/push_service'
 import mail from '@adonisjs/mail/services/main'
 
 export default class ConfirmPayment {
@@ -102,6 +103,22 @@ export default class ConfirmPayment {
     }
 
     broadcastDocumentSaved('invoice', invoice.id, user.id)
+
+    // Si un coéquipier confirme à la place du créateur, on le prévient
+    // (sa facture est désormais payée).
+    if (paymentLink.createdByUserId && paymentLink.createdByUserId !== user.id) {
+      await pushService.notifyUser(paymentLink.createdByUserId, 'payment.confirmed', {
+        title: 'Paiement confirmé',
+        body: `${paymentLink.invoiceNumber} a été marquée comme payée`,
+        threadId: invoice.id,
+        interruptionLevel: 'active',
+        relevanceScore: 0.7,
+        data: {
+          invoiceId: invoice.id,
+          deepLink: `faktur://invoice/${invoice.id}`,
+        },
+      })
+    }
 
     return response.ok({
       message: 'Payment confirmed',

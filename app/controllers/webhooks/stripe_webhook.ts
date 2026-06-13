@@ -10,6 +10,8 @@ import r2StorageService from '#services/storage/r2_storage_service'
 import { broadcastDocumentSaved } from '#services/collaboration/websocket_service'
 import { StripePaymentToCreator } from '#mails/stripe_payment_to_creator'
 import { StripePaymentToClient } from '#mails/stripe_payment_to_client'
+import pushService from '#services/push/push_service'
+import { formatPushAmount } from '#services/push/push_formatters'
 import mail from '@adonisjs/mail/services/main'
 
 export default class StripeWebhook {
@@ -123,6 +125,20 @@ export default class StripeWebhook {
       await invoice.save()
       broadcastDocumentSaved('invoice', invoice.id, 'system')
     }
+
+    // Push « paiement reçu » au créateur (Stripe confirme directement,
+    // pas d'étape de confirmation manuelle nécessaire).
+    await pushService.notifyUser(paymentLink.createdByUserId, 'payment.received', {
+      title: 'Paiement reçu 🎉',
+      body: `${paymentLink.invoiceNumber} · ${formatPushAmount(paymentLink.amount, paymentLink.currency)}`,
+      threadId: paymentLink.invoiceId,
+      interruptionLevel: 'active',
+      relevanceScore: 0.9,
+      data: {
+        invoiceId: paymentLink.invoiceId,
+        deepLink: `faktur://invoice/${paymentLink.invoiceId}`,
+      },
+    })
 
     let receiptUrl: string | null = null
     try {
