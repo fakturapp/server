@@ -41,10 +41,16 @@ export default class AppLoginDevice {
         .orderBy('last_seen_at', 'desc')
         .first()
     }
-    if (device) {
-      device.appLoginEnabled = true
-      await device.save()
+
+    if (!device) {
+      return response.badRequest({
+        message: 'Aucun appareil à enrôler. Enregistrez cet appareil avant d’activer la connexion par application.',
+        hasDevice: false,
+      })
     }
+
+    device.appLoginEnabled = true
+    await device.save()
 
     user.appLoginEnabled = true
     if (typeof payload.requireMatch === 'boolean') {
@@ -55,7 +61,7 @@ export default class AppLoginDevice {
     return response.ok({
       enabled: true,
       requireMatch: user.appLoginRequireMatch,
-      hasDevice: device !== null,
+      hasDevice: true,
     })
   }
 
