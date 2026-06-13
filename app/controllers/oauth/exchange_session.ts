@@ -102,6 +102,8 @@ export default class ExchangeSession {
         encryptionMode: m.team.encryptionMode as 'private' | 'standard',
         locked: m.team.encryptionMode === 'private' && vaultKey === null,
         role: m.role,
+        plan: m.team.plan,
+        isCurrent: m.team.id === user.currentTeamId,
       }))
 
     let currentTeamEncryptionMode: 'private' | 'standard' | null = null
