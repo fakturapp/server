@@ -18,6 +18,7 @@ import UserTransformer from '#transformers/user_transformer'
 import { realClientIp } from '#services/http/real_client_ip'
 import { setAuthTokenCookie, TRUSTED_DEVICE_COOKIE_NAME } from '#services/auth/auth_cookie'
 import TrustedDeviceService from '#services/auth/trusted_device_service'
+import appLoginService from '#services/auth/app_login_service'
 
 function maskLoginEmail(email: string): string {
   const [local, domain] = email.split('@')
@@ -93,7 +94,10 @@ export default class Login {
       })
     }
 
-    if (user.twoFactorEnabled || user.appLoginEnabled) {
+    const appLoginAvailable =
+      user.appLoginEnabled && (await appLoginService.hasEnrolledDevice(user.id))
+
+    if (user.twoFactorEnabled || appLoginAvailable) {
       if (!code) {
         const trustedDeviceToken = request.cookie(TRUSTED_DEVICE_COOKIE_NAME)
         const trustedDevice = trustedDeviceToken
@@ -102,7 +106,7 @@ export default class Login {
 
         if (!trustedDevice) {
           const availableMethods: string[] = []
-          if (user.appLoginEnabled) availableMethods.push('app')
+          if (appLoginAvailable) availableMethods.push('app')
           if (user.twoFactorEnabled) availableMethods.push('totp', 'email', 'recovery')
           return response.ok({
             requiresTwoFactor: true,
