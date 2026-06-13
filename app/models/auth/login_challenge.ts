@@ -15,6 +15,12 @@ export default class LoginChallenge extends BaseModel {
   @column()
   declare status: 'pending' | 'approved' | 'denied' | 'expired'
 
+  @column()
+  declare purpose: 'login' | 'account_verify'
+
+  @column.dateTime()
+  declare verifiedAt: DateTime | null
+
   @column({ serializeAs: null })
   declare matchCode: string
 

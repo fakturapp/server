@@ -21,6 +21,7 @@ const ServeAvatar = () => import('#controllers/account/profile/serve_avatar')
 
 const PasswordChange = () => import('#controllers/account/security/password')
 const SecurityVerify = () => import('#controllers/account/security/security_verify')
+const SecurityAppChallenge = () => import('#controllers/account/security/app_challenge')
 const SessionRevoke = () => import('#controllers/account/security/revoke_session')
 const SessionsList = () => import('#controllers/account/security/sessions')
 
@@ -76,6 +77,8 @@ router
 
     router.post('/security/send-code', [SecurityVerify, 'sendCode'])
     router.post('/security/verify', [SecurityVerify, 'verify'])
+    router.post('/security/app-challenge', [SecurityAppChallenge, 'create'])
+    router.get('/security/app-challenge/:challengeId', [SecurityAppChallenge, 'poll'])
 
     router.post('/email/request-change', [EmailRequestChange, 'handle'])
     router.post('/email/confirm-change', [EmailConfirmChange, 'handle'])

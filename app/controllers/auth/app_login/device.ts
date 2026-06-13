@@ -80,6 +80,7 @@ export default class AppLoginDevice {
     return response.ok({
       challenges: challenges.map((challenge) => ({
         id: challenge.id,
+        purpose: challenge.purpose,
         ipAddress: challenge.ipAddress,
         userAgent: challenge.userAgent,
         location: challenge.location,
@@ -96,6 +97,9 @@ export default class AppLoginDevice {
   /**
    * POST /v1/auth/app-login/:id/respond  (app authentifiée)
    * Approuve ou refuse une demande (avec number-matching si renforcé).
+   * Gère les deux usages (purpose 'login' et 'account_verify') : seule la
+   * propriété du challenge (user_id) est vérifiée. Le polling web distinct
+   * (login vs account-verify) filtre ensuite par purpose.
    */
   async respond({ auth, params, request, response }: HttpContext) {
     const user = auth.user!

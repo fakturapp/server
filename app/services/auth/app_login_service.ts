@@ -28,11 +28,14 @@ class AppLoginService {
 
   async createChallenge(
     user: User,
-    context: { ip: string | null; userAgent: string | null; location: string | null }
+    context: { ip: string | null; userAgent: string | null; location: string | null },
+    purpose: 'login' | 'account_verify' = 'login'
   ): Promise<LoginChallenge> {
     return LoginChallenge.create({
       userId: user.id,
       status: 'pending',
+      purpose,
+      verifiedAt: null,
       matchCode: this.generateMatchCode(),
       requireMatch: user.appLoginRequireMatch === true,
       ipAddress: context.ip,
