@@ -34,6 +34,13 @@ export default await Env.create(new URL('../', import.meta.url), {
   FRONTEND_URL: Env.schema.string.optional(),
   ACCOUNT_URL: Env.schema.string.optional(),
 
+  // Notifications push iOS (APNs token-based, clé .p8)
+  APNS_KEY: Env.schema.string.optional(),
+  APNS_KEY_ID: Env.schema.string.optional(),
+  APNS_TEAM_ID: Env.schema.string.optional(),
+  APNS_BUNDLE_ID: Env.schema.string.optional(),
+  APNS_ENV: Env.schema.enum.optional(['production', 'sandbox'] as const),
+
   API_PREFIX: Env.schema.string.optional(),
   API_PLATFORM_PREFIX: Env.schema.string.optional(),
 
