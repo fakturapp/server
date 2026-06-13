@@ -2,6 +2,7 @@ import type RecurringInvoice from '#models/recurring_invoice/recurring_invoice'
 import { BaseTransformer } from '@adonisjs/core/transformers'
 import ClientTransformer from '#transformers/client_transformer'
 import RecurringInvoiceLineTransformer from '#transformers/recurring_invoice_line_transformer'
+import { num } from '#transformers/helpers/decimal'
 
 export default class RecurringInvoiceTransformer extends BaseTransformer<RecurringInvoice> {
   toObject() {
@@ -29,7 +30,6 @@ export default class RecurringInvoiceTransformer extends BaseTransformer<Recurri
         'documentTitle',
         'freeField',
         'globalDiscountType',
-        'globalDiscountValue',
         'deliveryAddress',
         'clientSiren',
         'clientVatNumber',
@@ -41,6 +41,10 @@ export default class RecurringInvoiceTransformer extends BaseTransformer<Recurri
         'clientId',
         'createdAt',
       ]),
+      globalDiscountValue: num(this.resource.globalDiscountValue),
+      total: Array.isArray(this.resource.lines)
+        ? this.resource.lines.reduce((sum, line) => sum + (num(line.total) ?? 0), 0)
+        : null,
       clientName: this.resource.client?.displayName || null,
       client: ClientTransformer.transform(this.whenLoaded(this.resource.client)),
       lines: RecurringInvoiceLineTransformer.transform(this.whenLoaded(this.resource.lines)),

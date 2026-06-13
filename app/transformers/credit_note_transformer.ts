@@ -2,6 +2,7 @@ import type CreditNote from '#models/credit_note/credit_note'
 import { BaseTransformer } from '@adonisjs/core/transformers'
 import ClientTransformer from '#transformers/client_transformer'
 import CreditNoteLineTransformer from '#transformers/credit_note_line_transformer'
+import { num } from '#transformers/helpers/decimal'
 
 export default class CreditNoteTransformer extends BaseTransformer<CreditNote> {
   toObject() {
@@ -23,13 +24,9 @@ export default class CreditNoteTransformer extends BaseTransformer<CreditNote> {
         'documentTitle',
         'freeField',
         'globalDiscountType',
-        'globalDiscountValue',
         'deliveryAddress',
         'clientSiren',
         'clientVatNumber',
-        'subtotal',
-        'taxAmount',
-        'total',
         'sourceInvoiceId',
         'comment',
         'vatExemptReason',
@@ -37,6 +34,10 @@ export default class CreditNoteTransformer extends BaseTransformer<CreditNote> {
         'clientId',
         'createdAt',
       ]),
+      globalDiscountValue: num(this.resource.globalDiscountValue),
+      subtotal: num(this.resource.subtotal),
+      taxAmount: num(this.resource.taxAmount),
+      total: num(this.resource.total),
       clientName: this.resource.client?.displayName || null,
       client: ClientTransformer.transform(this.whenLoaded(this.resource.client)),
       lines: CreditNoteLineTransformer.transform(this.whenLoaded(this.resource.lines)),

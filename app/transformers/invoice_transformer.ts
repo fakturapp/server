@@ -2,6 +2,7 @@ import type Invoice from '#models/invoice/invoice'
 import { BaseTransformer } from '@adonisjs/core/transformers'
 import ClientTransformer from '#transformers/client_transformer'
 import InvoiceLineTransformer from '#transformers/invoice_line_transformer'
+import { num } from '#transformers/helpers/decimal'
 
 export default class InvoiceTransformer extends BaseTransformer<Invoice> {
   toObject() {
@@ -24,7 +25,6 @@ export default class InvoiceTransformer extends BaseTransformer<Invoice> {
         'documentTitle',
         'freeField',
         'globalDiscountType',
-        'globalDiscountValue',
         'paymentTerms',
         'comment',
         'deliveryAddress',
@@ -34,9 +34,6 @@ export default class InvoiceTransformer extends BaseTransformer<Invoice> {
         'showUnitColumn',
         'showUnitPriceColumn',
         'showVatColumn',
-        'subtotal',
-        'taxAmount',
-        'total',
         'vatExemptReason',
         'vatOnDebits',
         'sourceQuoteId',
@@ -48,6 +45,10 @@ export default class InvoiceTransformer extends BaseTransformer<Invoice> {
         'companySnapshot',
         'createdAt',
       ]),
+      globalDiscountValue: num(this.resource.globalDiscountValue),
+      subtotal: num(this.resource.subtotal),
+      taxAmount: num(this.resource.taxAmount),
+      total: num(this.resource.total),
       clientName: this.resource.client?.displayName || null,
       client: ClientTransformer.transform(this.whenLoaded(this.resource.client)),
       lines: InvoiceLineTransformer.transform(this.whenLoaded(this.resource.lines)),

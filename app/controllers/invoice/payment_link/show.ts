@@ -35,7 +35,7 @@ export default class Show {
         expiresAt: paymentLink.expiresAt?.toISO() || null,
         paidAt: paymentLink.paidAt?.toISO() || null,
         confirmedAt: paymentLink.confirmedAt?.toISO() || null,
-        amount: paymentLink.amount,
+        amount: Number(paymentLink.amount) || 0,
         currency: paymentLink.currency,
         invoiceNumber: paymentLink.invoiceNumber,
         url: paymentLink.isActive ? buildCheckoutUrl(paymentLink.tokenHash) : null,

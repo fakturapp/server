@@ -4,6 +4,7 @@ import Invoice from '#models/invoice/invoice'
 import PaymentLink from '#models/invoice/payment_link'
 import Quote from '#models/quote/quote'
 import InvoiceTransformer from '#transformers/invoice_transformer'
+import { buildCheckoutUrl } from '#services/checkout/checkout_url_builder'
 import {
   decryptModelFields,
   decryptModelFieldsArray,
@@ -66,15 +67,22 @@ export default class Show {
       invoice: {
         ...(await ctx.serialize.withoutWrapping(InvoiceTransformer.transform(invoice))),
         sourceQuote,
+        needsAction: invoice.status === 'paid_unconfirmed' || invoice.status === 'overdue',
         paymentLink: paymentLink
           ? {
               id: paymentLink.id,
               isActive: paymentLink.isActive,
               isExpired: paymentLink.isExpired,
               isPasswordProtected: !!paymentLink.passwordHash,
+              paymentMethod: paymentLink.paymentMethod,
+              paymentType: paymentLink.paymentType,
+              showIban: paymentLink.showIban,
               paidAt: paymentLink.paidAt?.toISO() || null,
               confirmedAt: paymentLink.confirmedAt?.toISO() || null,
               expiresAt: paymentLink.expiresAt?.toISO() || null,
+              amount: Number(paymentLink.amount) || 0,
+              currency: paymentLink.currency,
+              url: paymentLink.isActive ? buildCheckoutUrl(paymentLink.tokenHash) : null,
             }
           : null,
       },

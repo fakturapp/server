@@ -2,6 +2,7 @@ import type Quote from '#models/quote/quote'
 import { BaseTransformer } from '@adonisjs/core/transformers'
 import ClientTransformer from '#transformers/client_transformer'
 import QuoteLineTransformer from '#transformers/quote_line_transformer'
+import { num } from '#transformers/helpers/decimal'
 
 export default class QuoteTransformer extends BaseTransformer<Quote> {
   toObject() {
@@ -23,7 +24,6 @@ export default class QuoteTransformer extends BaseTransformer<Quote> {
         'documentTitle',
         'freeField',
         'globalDiscountType',
-        'globalDiscountValue',
         'deliveryAddress',
         'clientSiren',
         'clientVatNumber',
@@ -31,9 +31,6 @@ export default class QuoteTransformer extends BaseTransformer<Quote> {
         'showUnitColumn',
         'showUnitPriceColumn',
         'showVatColumn',
-        'subtotal',
-        'taxAmount',
-        'total',
         'comment',
         'vatExemptReason',
         'clientId',
@@ -41,6 +38,10 @@ export default class QuoteTransformer extends BaseTransformer<Quote> {
         'companySnapshot',
         'createdAt',
       ]),
+      globalDiscountValue: num(this.resource.globalDiscountValue),
+      subtotal: num(this.resource.subtotal),
+      taxAmount: num(this.resource.taxAmount),
+      total: num(this.resource.total),
       clientName: this.resource.client?.displayName || null,
       client: ClientTransformer.transform(this.whenLoaded(this.resource.client)),
       lines: QuoteLineTransformer.transform(this.whenLoaded(this.resource.lines)),
