@@ -9,6 +9,7 @@ export interface UiThemePayload {
   surface: 'standard' | 'glass' | 'liquid' | 'opaque'
   surfaceOpacity: number
   surfaceBlur: number
+  surfaceTint: number
 }
 
 const MODES = ['light', 'dark', 'system']
@@ -46,6 +47,7 @@ export function normalizeUiTheme(parsed: unknown): UiThemePayload {
       : 'standard',
     surfaceOpacity: clampInt(input.surfaceOpacity, 10, 60, 30),
     surfaceBlur: clampInt(input.surfaceBlur, 4, 32, 16),
+    surfaceTint: clampInt(input.surfaceTint, 0, 80, 0),
   }
 }
 
