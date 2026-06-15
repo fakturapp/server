@@ -49,14 +49,6 @@ export default class UploadUiBackground {
       return response.internalServerError({ message: "Lecture du fichier impossible, réessayez." })
     }
 
-    const usage = await storageService.usage(team.id, team.plan)
-    if (usage.totalBytes + buffer.length > usage.quotaBytes) {
-      return response.unprocessableEntity({
-        message:
-          "Espace de stockage insuffisant : libérez de l'espace ou choisissez une image plus légère.",
-      })
-    }
-
     const theme = parseStoredUiTheme(user.uiTheme)
     const previousUrl = theme.customBackgroundUrl
 

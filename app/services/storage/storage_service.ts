@@ -22,6 +22,8 @@ export const DOC_PER_LINE_BYTES = 2 * 1024
 
 const SINGLETON_CATEGORIES: StorageCategory[] = ['company_logo', 'invoice_logo', 'team_icon']
 
+const UNQUOTED_CATEGORIES: StorageCategory[] = ['ui_background']
+
 const DOCUMENT_DEFS = [
   {
     type: 'invoice',
@@ -166,6 +168,7 @@ class StorageService {
     const row = await db
       .from('storage_files')
       .where('team_id', teamId)
+      .whereNotIn('category', UNQUOTED_CATEGORIES)
       .sum('size_bytes as total')
       .first()
     return Number(row?.total ?? 0)
