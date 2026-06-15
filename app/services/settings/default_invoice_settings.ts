@@ -36,6 +36,7 @@ export function buildDefaultInvoiceSettings(teamId: string) {
     invoiceNumberPattern: 'FAC-{numero}',
     footerMode: 'company_info' as const,
     logoBorderRadius: 0,
+    customBackgroundUrl: null,
     nextInvoiceNumber: null,
     nextQuoteNumber: null,
     stripePublishableKey: null,

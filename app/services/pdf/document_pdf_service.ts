@@ -55,7 +55,7 @@ async function resolveLogoToBase64(logoUrl: string | null): Promise<string | nul
     }
   }
 
-  const match = logoUrl.match(/^\/(invoice-logos|company-logos)\/(.+)$/)
+  const match = logoUrl.match(/^\/(invoice-logos|company-logos|invoice-backgrounds)\/(.+)$/)
   if (!match) return null
   const filePath = join(app.tmpPath(), 'uploads', match[1], match[2])
   if (!existsSync(filePath)) return null
@@ -165,6 +165,7 @@ export async function generateInvoicePdf(
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'invoice' as const,
     footerMode: (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
+    customBackgroundUrl: await resolveLogoToBase64(invoiceSettings?.customBackgroundUrl || null),
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'
@@ -302,6 +303,7 @@ export async function generateQuotePdf(
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'quote' as const,
     footerMode: (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
+    customBackgroundUrl: await resolveLogoToBase64(invoiceSettings?.customBackgroundUrl || null),
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'
@@ -414,6 +416,7 @@ export async function generateCreditNotePdf(
     documentFont: invoiceSettings?.documentFont || 'Lexend',
     documentType: 'credit_note' as const,
     footerMode: (invoiceSettings?.footerMode as 'company_info' | 'custom') || 'company_info',
+    customBackgroundUrl: await resolveLogoToBase64(invoiceSettings?.customBackgroundUrl || null),
   }
 
   const logoSource = invoiceSettings?.logoSource || 'custom'

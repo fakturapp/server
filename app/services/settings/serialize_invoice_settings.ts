@@ -36,6 +36,7 @@ type InvoiceSettingsSource = {
   nextInvoiceNumber?: string | null
   footerMode?: string | null
   logoBorderRadius?: number | null
+  customBackgroundUrl?: string | null
   collaborationEnabled?: boolean | null
   aiEnabled?: boolean | null
   aiModel?: string | null
@@ -84,6 +85,7 @@ export function serializeInvoiceSettings(settings: InvoiceSettingsSource) {
       ? settings.footerMode
       : 'company_info',
     logoBorderRadius: settings.logoBorderRadius ?? 0,
+    customBackgroundUrl: settings.customBackgroundUrl || null,
     collaborationEnabled: settings.collaborationEnabled ?? false,
     aiEnabled: settings.aiEnabled ?? false,
     aiProvider: 'gemini' as const,

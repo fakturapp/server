@@ -5,6 +5,10 @@ import { API_PREFIX } from '#start/routes/_prefix'
 const InvoiceSettingsShow = () => import('#controllers/settings/invoice/invoice_settings_show')
 const InvoiceSettingsUpdate = () => import('#controllers/settings/invoice/invoice_settings_update')
 const InvoiceLogoUpload = () => import('#controllers/settings/invoice/invoice_logo_upload')
+const InvoiceBackgroundUpload = () =>
+  import('#controllers/settings/invoice/invoice_background_upload')
+const InvoiceBackgroundDelete = () =>
+  import('#controllers/settings/invoice/invoice_background_delete')
 const ServeInvoiceLogo = () => import('#controllers/settings/invoice/serve_invoice_logo')
 const StripeSettingsShow = () => import('#controllers/settings/stripe/stripe_settings_show')
 const StripeSettingsSave = () => import('#controllers/settings/stripe/stripe_settings_save')
@@ -17,6 +21,13 @@ router
     router.get('/invoices', [InvoiceSettingsShow, 'handle'])
     router.put('/invoices', [InvoiceSettingsUpdate, 'handle'])
     router.post('/invoices/logo', [InvoiceLogoUpload, 'handle']).use(middleware.storageQuota())
+    router
+      .post('/invoices/background', [InvoiceBackgroundUpload, 'handle'])
+      .use(middleware.requirePro())
+      .use(middleware.storageQuota())
+    router
+      .delete('/invoices/background', [InvoiceBackgroundDelete, 'handle'])
+      .use(middleware.requirePro())
 
     router.get('/stripe', [StripeSettingsShow, 'handle'])
     router.put('/stripe', [StripeSettingsSave, 'handle']).use(middleware.requirePro())

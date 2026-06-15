@@ -10,6 +10,7 @@ export type StorageCategory =
   | 'payment_link_pdf'
   | 'invoice_attachment'
   | 'ui_background'
+  | 'invoice_background'
 
 export default class StorageFile extends BaseModel {
   static table = 'storage_files'

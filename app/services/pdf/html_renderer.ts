@@ -96,6 +96,7 @@ interface SettingsData {
   documentFont: string
   documentType?: 'quote' | 'invoice' | 'credit_note'
   footerMode?: 'company_info' | 'custom'
+  customBackgroundUrl?: string | null
 }
 
 function esc(str: string | null | undefined): string {
@@ -377,6 +378,8 @@ export function renderQuoteHtml(
 
   const fontName = T.font || settings.documentFont || 'Lexend'
   const fontImport = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700&display=swap`
+  const customBackgroundUrl = settings.customBackgroundUrl || null
+  const hasCustomBackground = !!customBackgroundUrl
 
   return `<!DOCTYPE html>
 <html>
@@ -407,8 +410,15 @@ export function renderQuoteHtml(
         ? `background: linear-gradient(270deg, ${T.docBg}, ${settings.darkMode ? '#161618' : '#fff'} 23.44%, ${settings.darkMode ? '#161618' : '#fff'} 77.6%, ${T.docBg});`
         : ''
     }
+    ${
+      customBackgroundUrl
+        ? `background-image: url('${esc(customBackgroundUrl)}'); background-size: cover; background-position: center; background-repeat: no-repeat;`
+        : ''
+    }
     ${T.layout === 'lateral' ? 'display: flex;' : 'padding: 32px 40px 28px 40px; display: flex; flex-direction: column;'}
   }
+  .page > * { position: relative; z-index: 1; }
+  .doc-badge-title, .banner-title, .classique-title { position: relative; z-index: 2; }
 
   ${
     isClassique
@@ -440,11 +450,14 @@ export function renderQuoteHtml(
 
   .doc-badge {
     display: inline-block; padding: 10px 20px; margin-bottom: 8px;
-    background: ${ac}12; border: 1px solid ${ac}33; border-radius: ${T.borderRadius};
+    background: ${hasCustomBackground ? T.docBg : `${ac}12`}; border: 1px solid ${ac}33; border-radius: ${T.borderRadius};
   }
   .doc-badge-title { font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: ${ac}; }
 
-  .classique-title { font-size: 14px; font-weight: 600; color: ${T.text}; margin-bottom: 4px; }
+  .classique-title {
+    font-size: 14px; font-weight: 600; color: ${T.text}; margin-bottom: 4px;
+    ${hasCustomBackground ? `display: inline-block; background: ${T.docBg}; padding: 2px 8px; border-radius: ${T.borderRadius};` : ''}
+  }
   .classique-number { font-size: 12px; color: ${T.text}; line-height: 1.8; }
 
   .doc-number { font-size: 12px; color: ${T.text}; line-height: 1.8; }
