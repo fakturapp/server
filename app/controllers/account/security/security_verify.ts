@@ -3,6 +3,7 @@ import { DateTime } from 'luxon'
 import crypto from 'node:crypto'
 import SecurityCodeRequested from '#events/security_code_requested'
 import TwoFactorService from '#services/auth/two_factor_service'
+import encryptionService from '#services/encryption/encryption_service'
 import { securityVerifyValidator } from '#validators/account_validator'
 
 export default class SecurityVerify {
@@ -81,7 +82,7 @@ export default class SecurityVerify {
       return response.unauthorized({ message: 'Security code expired' })
     }
 
-    if (user.securityCode !== payload.code) {
+    if (!encryptionService.timingSafeEqual(user.securityCode, payload.code)) {
       return response.unauthorized({ message: 'Invalid security code' })
     }
 

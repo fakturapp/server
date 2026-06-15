@@ -1,6 +1,7 @@
 import router from '@adonisjs/core/services/router'
 import { middleware } from '#start/kernel'
 import { API_PREFIX } from '#start/routes/_prefix'
+import { twoFactorLimiter } from '#start/limiter'
 
 const ProfileShow = () => import('#controllers/account/profile/show')
 const ProfileUpdate = () => import('#controllers/account/profile/update')
@@ -75,13 +76,13 @@ router
     router.post('/2fa/enable', [TwoFactorEnable, 'handle'])
     router.post('/2fa/disable', [TwoFactorDisable, 'handle']).use(middleware.securityVerified())
 
-    router.post('/security/send-code', [SecurityVerify, 'sendCode'])
-    router.post('/security/verify', [SecurityVerify, 'verify'])
+    router.post('/security/send-code', [SecurityVerify, 'sendCode']).use(twoFactorLimiter)
+    router.post('/security/verify', [SecurityVerify, 'verify']).use(twoFactorLimiter)
     router.post('/security/app-challenge', [SecurityAppChallenge, 'create'])
     router.get('/security/app-challenge/:challengeId', [SecurityAppChallenge, 'poll'])
 
     router.post('/email/request-change', [EmailRequestChange, 'handle']).use(middleware.securityVerified())
-    router.post('/email/confirm-change', [EmailConfirmChange, 'handle'])
+    router.post('/email/confirm-change', [EmailConfirmChange, 'handle']).use(twoFactorLimiter)
 
     router.get('/providers', [ListProviders, 'handle'])
     router.post('/providers/link', [LinkProvider, 'handle']).use(middleware.securityVerified())
