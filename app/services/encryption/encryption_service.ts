@@ -78,6 +78,10 @@ class EncryptionService {
     return crypto.createHash('sha256').update(value).digest('hex')
   }
 
+  hmac(value: string): string {
+    return crypto.createHmac('sha256', this.getKey()).update(value).digest('base64url')
+  }
+
   generateSecureToken(length: number = 32): string {
     return crypto.randomBytes(length).toString('hex')
   }
