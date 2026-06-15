@@ -6,6 +6,7 @@ import oauthCrypto from '#services/oauth/oauth_crypto_service'
 import oauthAppService from '#services/oauth/oauth_app_service'
 import encryptionService from '#services/encryption/encryption_service'
 import type { OauthWebhookEvent } from '#services/oauth/oauth_constants'
+import { isPublicHttpUrl } from '#services/security/url_guard'
 import logger from '@adonisjs/core/services/logger'
 
 class OauthWebhookService {
@@ -84,6 +85,17 @@ class OauthWebhookService {
     const timestamp = Math.floor(Date.now() / 1000).toString()
 
     delivery.attemptCount += 1
+
+    if (!isPublicHttpUrl(delivery.url)) {
+      logger.warn(
+        { eventId: delivery.eventId, url: delivery.url },
+        'webhook: delivery blocked, non-public url'
+      )
+      delivery.lastError = 'blocked_non_public_url'
+      this.scheduleRetry(delivery)
+      await delivery.save()
+      return
+    }
 
     try {
       const response = await fetch(delivery.url, {

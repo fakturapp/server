@@ -3,6 +3,7 @@ import ApiKeyWebhook from '#models/api/api_key_webhook'
 import ApiWebhookDelivery from '#models/api/api_webhook_delivery'
 import encryptionService from '#services/encryption/encryption_service'
 import webhookSigner from '#services/api/webhook_signer'
+import { isPublicHttpUrl } from '#services/security/url_guard'
 import logger from '@adonisjs/core/services/logger'
 
 export const RETRY_DELAYS_SECONDS = [0, 30, 120, 600, 3600, 21600, 86400] as const
@@ -61,26 +62,34 @@ class WebhookDispatcher {
     let statusCode: number | null = null
     let errorMessage: string | null = null
 
-    try {
-      const controller = new AbortController()
-      const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
-      const response = await fetch(delivery.url, {
-        method: 'POST',
-        headers: {
-          'Content-Type': 'application/json',
-          'User-Agent': 'Faktur-Webhooks/2.0',
-          'X-Faktur-Signature': signed.signature,
-          'X-Faktur-Event-Id': delivery.eventId,
-          'X-Faktur-Event-Type': delivery.eventType,
-          'X-Faktur-Delivery': String(delivery.attemptCount),
-        },
-        body: rawBody,
-        signal: controller.signal,
-      })
-      clearTimeout(timer)
-      statusCode = response.status
-    } catch (err) {
-      errorMessage = (err as Error).message || 'network_error'
+    if (!isPublicHttpUrl(delivery.url)) {
+      logger.warn(
+        { delivery_id: delivery.id, url: delivery.url },
+        'api-v2 webhook delivery blocked: non-public url'
+      )
+      errorMessage = 'blocked_non_public_url'
+    } else {
+      try {
+        const controller = new AbortController()
+        const timer = setTimeout(() => controller.abort(), REQUEST_TIMEOUT_MS)
+        const response = await fetch(delivery.url, {
+          method: 'POST',
+          headers: {
+            'Content-Type': 'application/json',
+            'User-Agent': 'Faktur-Webhooks/2.0',
+            'X-Faktur-Signature': signed.signature,
+            'X-Faktur-Event-Id': delivery.eventId,
+            'X-Faktur-Event-Type': delivery.eventType,
+            'X-Faktur-Delivery': String(delivery.attemptCount),
+          },
+          body: rawBody,
+          signal: controller.signal,
+        })
+        clearTimeout(timer)
+        statusCode = response.status
+      } catch (err) {
+        errorMessage = (err as Error).message || 'network_error'
+      }
     }
 
     const latencyMs = Date.now() - start
