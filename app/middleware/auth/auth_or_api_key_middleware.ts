@@ -51,7 +51,6 @@ export default class AuthOrApiKeyMiddleware {
       }
 
       user.currentTeamId = apiKey.teamId
-      await user.save()
 
       const guard = ctx.auth.use('api') as unknown as Record<string, unknown>
       Object.defineProperty(guard, 'user', {

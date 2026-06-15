@@ -25,7 +25,7 @@ export default class TeamWriteMiddleware {
       .where('status', 'active')
       .first()
 
-    if (member && member.role === 'viewer') {
+    if (!member || member.role === 'viewer') {
       return ctx.response.forbidden({
         message:
           "Votre rôle est en lecture seule. Contactez un administrateur de l'équipe pour effectuer cette action.",
