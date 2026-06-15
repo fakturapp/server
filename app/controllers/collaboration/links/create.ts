@@ -31,6 +31,19 @@ export default class Create {
       return response.notFound({ message: 'Document not found' })
     }
 
+    const isTeamMember = user.currentTeamId === teamId
+
+    const visibility = payload.visibility || 'team'
+    const allowAnonymous = payload.allowAnonymous ?? false
+
+    if (!isTeamMember && (allowAnonymous || visibility === 'anyone')) {
+      return response.forbidden({
+        message:
+          "Seul un membre de l'équipe propriétaire peut créer un lien public anonyme. Vous pouvez créer un lien restreint à l'équipe.",
+        code: 'permission_anonymous_link_team_member_only',
+      })
+    }
+
     const token = randomBytes(32).toString('hex')
 
     const link = await DocumentShareLink.create({
@@ -39,9 +52,9 @@ export default class Create {
       documentId: payload.documentId,
       token,
       permission: payload.permission,
-      visibility: payload.visibility || 'team',
+      visibility,
       autoExpire: payload.autoExpire ?? false,
-      allowAnonymous: payload.allowAnonymous ?? false,
+      allowAnonymous,
       allowResharing: payload.allowResharing ?? false,
       createdByUserId: user.id,
       isActive: true,
