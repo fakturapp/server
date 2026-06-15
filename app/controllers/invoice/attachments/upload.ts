@@ -38,12 +38,17 @@ export default class UploadAttachment {
       })
     }
 
-    const file = request.file('file', { size: '10mb' })
+    const file = request.file('file', {
+      size: '10mb',
+      extnames: ['pdf', 'png', 'jpg', 'jpeg', 'webp', 'gif', 'doc', 'docx', 'xls', 'xlsx', 'csv', 'txt'],
+    })
     if (!file) {
       return response.badRequest({ message: 'Aucun fichier fourni' })
     }
     if (!file.isValid) {
-      return response.badRequest({ message: file.errors[0]?.message || 'Fichier invalide' })
+      return response.unprocessableEntity({
+        message: file.errors[0]?.message || 'Fichier invalide',
+      })
     }
     if (!file.tmpPath) {
       return response.badRequest({ message: 'Fichier temporaire introuvable' })
