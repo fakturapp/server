@@ -1,4 +1,5 @@
 import app from '@adonisjs/core/services/app'
+import env from '#start/env'
 import { existsSync, readFileSync } from 'node:fs'
 import { join, extname } from 'node:path'
 import Invoice from '#models/invoice/invoice'
@@ -42,6 +43,23 @@ async function resolveLogoToBase64(logoUrl: string | null): Promise<string | nul
   if (logoUrl.startsWith('data:')) return logoUrl
 
   if (logoUrl.startsWith('http://') || logoUrl.startsWith('https://')) {
+    const publicUrl = env.get('R2_PUBLIC_URL')
+    if (!publicUrl) return null
+
+    let allowedHost: string
+    let requestedHost: string
+    let requestedProtocol: string
+    try {
+      allowedHost = new URL(publicUrl).host
+      const parsed = new URL(logoUrl)
+      requestedHost = parsed.host
+      requestedProtocol = parsed.protocol
+    } catch {
+      return null
+    }
+
+    if ((requestedProtocol !== 'https:' && requestedProtocol !== 'http:') || requestedHost !== allowedHost) return null
+
     try {
       const res = await fetch(logoUrl)
       if (!res.ok) return null
