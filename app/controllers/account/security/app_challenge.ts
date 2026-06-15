@@ -25,7 +25,8 @@ export default class AccountSecurityAppChallenge {
         userAgent: request.header('user-agent') ?? null,
         location: null,
       },
-      'account_verify'
+      'account_verify',
+      true
     )
 
     await pushService.notifyUser(user.id, 'login.request', {

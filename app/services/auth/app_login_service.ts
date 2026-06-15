@@ -29,7 +29,8 @@ class AppLoginService {
   async createChallenge(
     user: User,
     context: { ip: string | null; userAgent: string | null; location: string | null },
-    purpose: 'login' | 'account_verify' = 'login'
+    purpose: 'login' | 'account_verify' = 'login',
+    forceRequireMatch: boolean = false
   ): Promise<LoginChallenge> {
     return LoginChallenge.create({
       userId: user.id,
@@ -37,7 +38,7 @@ class AppLoginService {
       purpose,
       verifiedAt: null,
       matchCode: this.generateMatchCode(),
-      requireMatch: user.appLoginRequireMatch === true,
+      requireMatch: forceRequireMatch || user.appLoginRequireMatch === true,
       ipAddress: context.ip,
       userAgent: context.userAgent ? context.userAgent.slice(0, 512) : null,
       location: context.location,
