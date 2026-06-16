@@ -2,6 +2,8 @@ import PushDevice from '#models/push/push_device'
 import NotificationPreference from '#models/push/notification_preference'
 import type { NotificationEventType } from '#models/push/notification_preference'
 import apnsClient, { type ApnsPayload } from '#services/push/apns_client'
+import appLoginService from '#services/auth/app_login_service'
+import User from '#models/account/user'
 import logger from '@adonisjs/core/services/logger'
 
 export interface PushNotificationInput {
@@ -48,7 +50,12 @@ class PushService {
         devices.map(async (device) => {
           const result = await apnsClient.send(device.token, payload)
           if (!result.ok && this.isDeadToken(result.reason, result.status)) {
+            const deviceUserId = device.userId
+            const wasAppLoginEnabled = device.appLoginEnabled
             await device.delete().catch(() => {})
+            if (wasAppLoginEnabled) {
+              await this.disableAppLoginIfNoDevice(deviceUserId).catch(() => {})
+            }
           }
         })
       )
@@ -92,6 +99,16 @@ class PushService {
 
   private isDeadToken(reason: string | undefined, status: number): boolean {
     return status === 410 || reason === 'Unregistered' || reason === 'BadDeviceToken'
+  }
+
+  private async disableAppLoginIfNoDevice(userId: string): Promise<void> {
+    if (await appLoginService.hasEnrolledDevice(userId)) return
+    const user = await User.find(userId)
+    if (!user) return
+    if (!user.appLoginEnabled && !user.appLoginRequireMatch) return
+    user.appLoginEnabled = false
+    user.appLoginRequireMatch = false
+    await user.save()
   }
 }
 
