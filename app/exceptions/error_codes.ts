@@ -86,6 +86,12 @@ export const ERROR_CODES = {
     visibility: 'user_facing',
     defaultMessage: "You don't have permission to perform this action",
   },
+  security_verification_required: {
+    type: 'permission_error',
+    status: 403,
+    visibility: 'user_facing',
+    defaultMessage: 'Vérification de sécurité requise pour cette action.',
+  },
   permission_team_role_required: {
     type: 'permission_error',
     status: 403,

@@ -41,7 +41,7 @@ export default class SecurityVerifiedMiddleware {
     if (!consumed || consumed.length === 0) {
       return response.forbidden({
         message: 'Vérification de sécurité requise pour cette action.',
-        code: 'SECURITY_VERIFICATION_REQUIRED',
+        code: 'security_verification_required',
       })
     }
 
