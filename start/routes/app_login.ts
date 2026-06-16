@@ -20,8 +20,10 @@ router
 
     router.get('/account/app-login', [Settings, 'show'])
     router.put('/account/app-login/require-match', [Settings, 'updateRequireMatch'])
-    router.delete('/account/app-login/devices/:id', [Settings, 'removeDevice'])
-    router.delete('/account/app-login', [Settings, 'disable'])
+    router
+      .delete('/account/app-login/devices/:id', [Settings, 'removeDevice'])
+      .use(middleware.securityVerified())
+    router.delete('/account/app-login', [Settings, 'disable']).use(middleware.securityVerified())
   })
   .prefix(API_PREFIX)
   .use(middleware.auth())

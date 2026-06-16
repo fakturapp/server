@@ -45,9 +45,13 @@ export default class AppLoginSettings {
     }
     if (!(await appLoginService.hasEnrolledDevice(user.id))) {
       user.appLoginEnabled = false
+      user.appLoginRequireMatch = false
       await user.save()
     }
-    return response.ok({ enabled: user.appLoginEnabled })
+    return response.ok({
+      enabled: user.appLoginEnabled,
+      requireMatch: user.appLoginRequireMatch,
+    })
   }
 
   /** DELETE /v1/account/app-login — désactive complètement. */
