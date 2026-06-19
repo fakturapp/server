@@ -4,7 +4,6 @@ import { randomUUID } from 'node:crypto'
 import { readFile } from 'node:fs/promises'
 import Team from '#models/team/team'
 import r2StorageService from '#services/storage/r2_storage_service'
-import storageService from '#services/storage/storage_service'
 import uiBackgroundService from '#services/storage/ui_background_service'
 import { parseStoredUiTheme, serializeUiTheme } from '#services/account/ui_theme'
 
@@ -22,7 +21,7 @@ export default class UploadUiBackground {
     }
 
     const file = request.file('background', {
-      size: '8mb',
+      size: '2mb',
       extnames: ['jpg', 'jpeg', 'png', 'webp'],
     })
 
@@ -68,35 +67,6 @@ export default class UploadUiBackground {
       )
       return response.internalServerError({
         message: "L'envoi de l'image a échoué, réessayez dans un instant.",
-      })
-    }
-
-    try {
-      await storageService.recordUpload(
-        team.id,
-        'ui_background',
-        objectKey,
-        backgroundUrl,
-        buffer.length,
-        contentType,
-        file.clientName ?? null,
-        user.id
-      )
-    } catch (error) {
-      logger.error(
-        { err: error, userId: user.id, teamId: team.id, objectKey },
-        'ui background storage record failed'
-      )
-      try {
-        await r2StorageService.delete(backgroundUrl)
-      } catch (cleanupError) {
-        logger.error(
-          { err: cleanupError, userId: user.id, objectKey },
-          'ui background r2 cleanup failed'
-        )
-      }
-      return response.internalServerError({
-        message: "L'enregistrement de l'image a échoué, réessayez dans un instant.",
       })
     }
 
