@@ -96,7 +96,8 @@ interface SettingsData {
   documentFont: string
   documentType?: 'quote' | 'invoice' | 'credit_note'
   footerMode?: 'company_info' | 'custom'
-  customBackgroundUrl?: string | null
+  customFontUrl?: string | null
+  customFontName?: string | null
 }
 
 function esc(str: string | null | undefined): string {
@@ -376,18 +377,20 @@ export function renderQuoteHtml(
   }
   discountAmount = Math.round(discountAmount * 100) / 100
 
-  const fontName = T.font || settings.documentFont || 'Lexend'
-  const fontImport = `https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700&display=swap`
-  const customBackgroundUrl = settings.customBackgroundUrl || null
-  const hasCustomBackground = !!customBackgroundUrl
+  const baseFont = T.font || settings.documentFont || 'Lexend'
+  const customFontUrl = settings.customFontUrl || null
+  const customFontName = settings.customFontName || null
+  const useCustomFont = !T.font && !!customFontUrl && settings.documentFont === customFontName
+  const fontName = useCustomFont ? customFontName! : baseFont
+  const fontHead = useCustomFont
+    ? `<style>@font-face{font-family:'${esc(fontName)}';src:url('${esc(customFontUrl!)}');font-display:swap;}</style>`
+    : `<link rel="preconnect" href="https://fonts.googleapis.com"><link rel="preconnect" href="https://fonts.gstatic.com" crossorigin><link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=${encodeURIComponent(fontName)}:wght@400;500;600;700&display=swap">`
 
   return `<!DOCTYPE html>
 <html>
 <head>
 <meta charset="utf-8">
-<link rel="preconnect" href="https://fonts.googleapis.com">
-<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link rel="stylesheet" href="${fontImport}">
+${fontHead}
 <style>
   @page { size: A4; margin: 0; }
   * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -408,11 +411,6 @@ export function renderQuoteHtml(
     ${
       isClassique
         ? `background: linear-gradient(270deg, ${T.docBg}, ${settings.darkMode ? '#161618' : '#fff'} 23.44%, ${settings.darkMode ? '#161618' : '#fff'} 77.6%, ${T.docBg});`
-        : ''
-    }
-    ${
-      customBackgroundUrl
-        ? `background-image: url('${esc(customBackgroundUrl)}'); background-size: cover; background-position: center; background-repeat: no-repeat;`
         : ''
     }
     ${T.layout === 'lateral' ? 'display: flex;' : 'padding: 32px 40px 28px 40px; display: flex; flex-direction: column;'}
@@ -450,13 +448,12 @@ export function renderQuoteHtml(
 
   .doc-badge {
     display: inline-block; padding: 10px 20px; margin-bottom: 8px;
-    background: ${hasCustomBackground ? T.docBg : `${ac}12`}; border: 1px solid ${ac}33; border-radius: ${T.borderRadius};
+    background: ${ac}12; border: 1px solid ${ac}33; border-radius: ${T.borderRadius};
   }
   .doc-badge-title { font-size: 20px; font-weight: 700; text-transform: uppercase; letter-spacing: 2px; color: ${ac}; }
 
   .classique-title {
     font-size: 14px; font-weight: 600; color: ${T.text}; margin-bottom: 4px;
-    ${hasCustomBackground ? `display: inline-block; background: ${T.docBg}; padding: 2px 8px; border-radius: ${T.borderRadius};` : ''}
   }
   .classique-number { font-size: 12px; color: ${T.text}; line-height: 1.8; }
 

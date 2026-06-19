@@ -11,6 +11,7 @@ export type StorageCategory =
   | 'invoice_attachment'
   | 'ui_background'
   | 'invoice_background'
+  | 'invoice_font'
 
 export default class StorageFile extends BaseModel {
   static table = 'storage_files'

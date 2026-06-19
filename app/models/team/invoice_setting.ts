@@ -121,7 +121,10 @@ export default class InvoiceSetting extends BaseModel {
   declare logoBorderRadius: number
 
   @column()
-  declare customBackgroundUrl: string | null
+  declare customFontUrl: string | null
+
+  @column()
+  declare customFontName: string | null
 
   @column()
   declare nextInvoiceNumber: string | null
